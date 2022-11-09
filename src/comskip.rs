@@ -22865,12 +22865,12 @@ pub unsafe extern "C" fn AddCC(mut i: libc::c_int) {
             }
         }
     }
-    if isalpha(
-        (*cc_text.offset(cc_text_count as isize)).text
-            [((*cc_text.offset(cc_text_count as isize)).text_len - 1) as usize]
-            as libc::c_int,
-    ) == 0
-        && (*cc_text.offset(cc_text_count as isize)).text_len > 200 as libc::c_int as libc::c_long
+    if (*cc_text.offset(cc_text_count as isize)).text_len > 200 as libc::c_int as libc::c_long
+        && isalpha(
+            (*cc_text.offset(cc_text_count as isize)).text
+                [((*cc_text.offset(cc_text_count as isize)).text_len - 1) as usize]
+                as libc::c_int,
+        ) == 0
         || (*cc_text.offset(cc_text_count as isize)).text_len > 245 as libc::c_int as libc::c_long
     {
         (*cc_text.offset(cc_text_count as isize)).end_frame =
