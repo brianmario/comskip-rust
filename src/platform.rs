@@ -1,6 +1,12 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
-#![register_tool(c2rust)]
-#![feature(extern_types, linkage, register_tool)]
+#![allow(
+    dead_code,
+    mutable_transmutes,
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    unused_assignments,
+    unused_mut
+)]
 extern "C" {
     pub type __sFILEX;
     fn unlink(_: *const libc::c_char) -> libc::c_int;
@@ -52,23 +58,13 @@ pub struct __sFILE {
     pub _bf: __sbuf,
     pub _lbfsize: libc::c_int,
     pub _cookie: *mut libc::c_void,
-    pub _close: Option::<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option::<
-        unsafe extern "C" fn(
-            *mut libc::c_void,
-            *mut libc::c_char,
-            libc::c_int,
-        ) -> libc::c_int,
+    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
+    pub _read: Option<
+        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
     >,
-    pub _seek: Option::<
-        unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t,
-    >,
-    pub _write: Option::<
-        unsafe extern "C" fn(
-            *mut libc::c_void,
-            *const libc::c_char,
-            libc::c_int,
-        ) -> libc::c_int,
+    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
+    pub _write: Option<
+        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
     >,
     pub _ub: __sbuf,
     pub _extra: *mut __sFILEX,
@@ -118,10 +114,7 @@ pub unsafe extern "C" fn mystat(mut f: *mut libc::c_char, mut s: stath) -> libc:
     return stat(f, s);
 }
 #[no_mangle]
-pub unsafe extern "C" fn myfopen(
-    mut f: *const libc::c_char,
-    mut m: *mut libc::c_char,
-) -> fileh {
+pub unsafe extern "C" fn myfopen(mut f: *const libc::c_char, mut m: *mut libc::c_char) -> fileh {
     return fopen(f, m);
 }
 #[no_mangle]

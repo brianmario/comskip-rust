@@ -1,28 +1,15 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
-#![register_tool(c2rust)]
-#![feature(linkage, register_tool)]
-extern "C" {
-    fn __toupper(_: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
-    fn __tolower(_: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
-}
+#![allow(
+    dead_code,
+    mutable_transmutes,
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    unused_assignments,
+    unused_mut
+)]
 pub type __darwin_ct_rune_t = libc::c_int;
 #[no_mangle]
-#[inline]
-#[linkage = "external"]
-pub unsafe extern "C" fn tolower(mut _c: libc::c_int) -> libc::c_int {
-    return __tolower(_c);
-}
-#[no_mangle]
-#[inline]
-#[linkage = "external"]
-pub unsafe extern "C" fn toupper(mut _c: libc::c_int) -> libc::c_int {
-    return __toupper(_c);
-}
-#[no_mangle]
-pub unsafe extern "C" fn get_char_in_latin_1(
-    mut buffer: *mut libc::c_uchar,
-    mut c: libc::c_uchar,
-) {
+pub unsafe extern "C" fn get_char_in_latin_1(mut buffer: *mut libc::c_uchar, mut c: libc::c_uchar) {
     let mut c1: libc::c_uchar = '?' as i32 as libc::c_uchar;
     if (c as libc::c_int) < 0x80 as libc::c_int {
         match c as libc::c_int {
@@ -398,10 +385,7 @@ pub unsafe extern "C" fn get_char_in_latin_1(
     *buffer = c1;
 }
 #[no_mangle]
-pub unsafe extern "C" fn get_char_in_unicode(
-    mut buffer: *mut libc::c_uchar,
-    mut c: libc::c_uchar,
-) {
+pub unsafe extern "C" fn get_char_in_unicode(mut buffer: *mut libc::c_uchar, mut c: libc::c_uchar) {
     let mut c1: libc::c_uchar = 0;
     let mut c2: libc::c_uchar = 0;
     match c as libc::c_int {
@@ -450,74 +434,47 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         match c as libc::c_int {
             42 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xa1 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xa1 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             92 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xa9 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xa9 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             94 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xad as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xad as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             95 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xb3 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xb3 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             96 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xba as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xba as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             123 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xa7 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xa7 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             124 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xb7 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xb7 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             125 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0x91 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0x91 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             126 => {
                 *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-                *buffer
-                    .offset(
-                        1 as libc::c_int as isize,
-                    ) = 0xb1 as libc::c_int as libc::c_uchar;
+                *buffer.offset(1 as libc::c_int as isize) = 0xb1 as libc::c_int as libc::c_uchar;
                 return 2 as libc::c_int;
             }
             _ => {
@@ -529,82 +486,49 @@ pub unsafe extern "C" fn get_char_in_utf_8(
     match c as libc::c_int {
         128 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xae as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xae as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         129 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb0 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb0 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         130 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xbd as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xbd as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         131 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xbf as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xbf as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         132 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x84 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0xa2 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x84 as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0xa2 as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         133 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa2 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa2 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         134 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa3 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa3 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         135 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x99 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0xaa as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x99 as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0xaa as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         136 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa0 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa0 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         137 => {
@@ -613,98 +537,62 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         138 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa8 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa8 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         139 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa2 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa2 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         140 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xaa as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xaa as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         141 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xae as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xae as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         142 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb4 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb4 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         143 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xbb as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xbb as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         144 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x81 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x81 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         145 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x89 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x89 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         146 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x93 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x93 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         147 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x9a as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x9a as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         148 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x9c as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x9c as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         149 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xbc as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xbc as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         150 => {
@@ -713,10 +601,7 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         151 => {
             *buffer = 0xc1 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa1 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa1 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         152 => {
@@ -733,22 +618,13 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         155 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa9 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa9 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         156 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x84 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0xa0 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x84 as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0xa0 as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         157 => {
@@ -765,202 +641,127 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         160 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x80 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x80 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         161 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x82 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x82 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         162 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x87 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x87 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         163 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x88 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x88 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         164 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8a as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8a as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         165 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8b as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8b as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         166 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xab as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xab as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         167 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8e as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8e as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         168 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8f as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8f as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         169 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xaf as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xaf as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         170 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x94 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x94 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         171 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x99 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x99 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         172 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb9 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb9 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         173 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x9b as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x9b as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         174 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xab as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xab as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         175 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xbb as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xbb as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         176 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x83 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x83 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         177 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa3 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa3 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         178 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8d as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8d as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         179 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8c as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8c as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         180 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xac as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xac as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         181 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x92 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x92 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         182 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb2 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb2 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         183 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x95 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x95 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         184 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb5 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb5 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         185 => {
@@ -985,10 +786,7 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         190 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa6 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa6 as libc::c_int as libc::c_uchar;
             return 1 as libc::c_int;
         }
         191 => {
@@ -997,58 +795,37 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         192 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x84 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x84 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         193 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa4 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa4 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         194 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x96 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x96 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         195 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb6 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb6 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         196 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x9f as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x9f as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         197 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa5 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa5 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         198 => {
             *buffer = 0xc2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa4 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa4 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         199 => {
@@ -1057,82 +834,46 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
         200 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x85 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x85 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         201 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xa5 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xa5 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         202 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x98 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x98 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         203 => {
             *buffer = 0xc3 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0xb8 as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0xb8 as libc::c_int as libc::c_uchar;
             return 2 as libc::c_int;
         }
         204 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8c as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0x9c as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8c as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0x9c as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         205 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8c as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0x9d as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8c as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0x9d as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         206 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8c as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0x9e as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8c as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0x9e as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         207 => {
             *buffer = 0xe2 as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    1 as libc::c_int as isize,
-                ) = 0x8c as libc::c_int as libc::c_uchar;
-            *buffer
-                .offset(
-                    2 as libc::c_int as isize,
-                ) = 0x9f as libc::c_int as libc::c_uchar;
+            *buffer.offset(1 as libc::c_int as isize) = 0x8c as libc::c_int as libc::c_uchar;
+            *buffer.offset(2 as libc::c_int as isize) = 0x9f as libc::c_int as libc::c_uchar;
             return 3 as libc::c_int;
         }
         _ => {
@@ -1141,10 +882,11 @@ pub unsafe extern "C" fn get_char_in_utf_8(
         }
     };
 }
+use crate::ccextratorwin::ccextractor;
 #[no_mangle]
 pub unsafe extern "C" fn cctolower(mut c: libc::c_uchar) -> libc::c_uchar {
     if c as libc::c_int >= 'A' as i32 && c as libc::c_int <= 'Z' as i32 {
-        return tolower(c as libc::c_int) as libc::c_uchar;
+        return ccextractor::tolower(c as libc::c_int) as libc::c_uchar;
     }
     match c as libc::c_int {
         125 => return 0x7e as libc::c_int as libc::c_uchar,
@@ -1177,10 +919,11 @@ pub unsafe extern "C" fn cctolower(mut c: libc::c_uchar) -> libc::c_uchar {
     }
     return c;
 }
+use crate::platform;
 #[no_mangle]
 pub unsafe extern "C" fn cctoupper(mut c: libc::c_uchar) -> libc::c_uchar {
     if c as libc::c_int >= 'a' as i32 && c as libc::c_int <= 'z' as i32 {
-        return toupper(c as libc::c_int) as libc::c_uchar;
+        return platform::toupper(c as libc::c_int) as libc::c_uchar;
     }
     match c as libc::c_int {
         126 => return 0x7d as libc::c_int as libc::c_uchar,

@@ -1,6 +1,12 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
-#![register_tool(c2rust)]
-#![feature(extern_types, register_tool)]
+#![allow(
+    dead_code,
+    mutable_transmutes,
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    unused_assignments,
+    unused_mut
+)]
 extern "C" {
     pub type __sFILEX;
     fn fwrite(
@@ -10,21 +16,10 @@ extern "C" {
         _: *mut FILE,
     ) -> libc::c_ulong;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn memcpy(
-        _: *mut libc::c_void,
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-    ) -> *mut libc::c_void;
-    fn memmove(
-        _: *mut libc::c_void,
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-    ) -> *mut libc::c_void;
-    fn memset(
-        _: *mut libc::c_void,
-        _: libc::c_int,
-        _: libc::c_ulong,
-    ) -> *mut libc::c_void;
+    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
+    fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
+        -> *mut libc::c_void;
+    fn memset(_: *mut libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
     fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn exit(_: libc::c_int) -> !;
@@ -108,23 +103,13 @@ pub struct __sFILE {
     pub _bf: __sbuf,
     pub _lbfsize: libc::c_int,
     pub _cookie: *mut libc::c_void,
-    pub _close: Option::<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option::<
-        unsafe extern "C" fn(
-            *mut libc::c_void,
-            *mut libc::c_char,
-            libc::c_int,
-        ) -> libc::c_int,
+    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
+    pub _read: Option<
+        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
     >,
-    pub _seek: Option::<
-        unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t,
-    >,
-    pub _write: Option::<
-        unsafe extern "C" fn(
-            *mut libc::c_void,
-            *const libc::c_char,
-            libc::c_int,
-        ) -> libc::c_int,
+    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
+    pub _write: Option<
+        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
     >,
     pub _ub: __sbuf,
     pub _extra: *mut __sFILEX,
@@ -188,34 +173,30 @@ pub static mut next_ts_header_read: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub static mut end_of_file: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
-pub static mut current_picture_coding_type: libc::c_int = RESET_OR_UNKNOWN
-    as libc::c_int;
+pub static mut current_picture_coding_type: libc::c_int = RESET_OR_UNKNOWN as libc::c_int;
 #[no_mangle]
 pub static mut last_picture_coding_type: libc::c_int = RESET_OR_UNKNOWN as libc::c_int;
 #[no_mangle]
-pub static mut twoback_picture_coding_type: libc::c_int = RESET_OR_UNKNOWN
-    as libc::c_int;
+pub static mut twoback_picture_coding_type: libc::c_int = RESET_OR_UNKNOWN as libc::c_int;
 #[no_mangle]
 pub static mut p_caption_size: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub static mut p_caption_capacity: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
-pub static mut p_caption: *mut libc::c_uchar = 0 as *const libc::c_uchar
-    as *mut libc::c_uchar;
+pub static mut p_caption: *mut libc::c_uchar = 0 as *const libc::c_uchar as *mut libc::c_uchar;
 #[no_mangle]
 pub static mut non_compliant_DVD: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub unsafe extern "C" fn calculate_ccblock_gop_time(mut g: *mut gop_time_code) {
     let mut seconds: libc::c_int = (*g).time_code_hours * 3600 as libc::c_int
-        + (*g).time_code_minutes * 60 as libc::c_int + (*g).time_code_seconds;
-    (*g)
-        .ccblocks = ((seconds as libc::c_double * 29.97f64) as libc::c_int
-        + (*g).time_code_pictures) as LONG;
+        + (*g).time_code_minutes * 60 as libc::c_int
+        + (*g).time_code_seconds;
+    (*g).ccblocks =
+        ((seconds as libc::c_double * 29.97f64) as libc::c_int + (*g).time_code_pictures) as LONG;
     if gop_rollover != 0 {
         let ref mut fresh0 = (*g).ccblocks;
-        *fresh0
-            += (86400 as libc::c_int as libc::c_double * 29.97f64) as libc::c_int
-                as libc::c_long;
+        *fresh0 +=
+            (86400 as libc::c_int as libc::c_double * 29.97f64) as libc::c_int as libc::c_long;
     }
 }
 #[no_mangle]
@@ -303,8 +284,7 @@ pub unsafe extern "C" fn update_clock() {
     }
 }
 #[no_mangle]
-pub static mut filebuffer: *mut libc::c_uchar = 0 as *const libc::c_uchar
-    as *mut libc::c_uchar;
+pub static mut filebuffer: *mut libc::c_uchar = 0 as *const libc::c_uchar as *mut libc::c_uchar;
 #[no_mangle]
 pub static mut filebuffer_start: LONG = 0;
 #[no_mangle]
@@ -340,11 +320,11 @@ pub unsafe extern "C" fn do_padding(mut mis1: libc::c_int, mut mis2: libc::c_int
 #[no_mangle]
 pub unsafe extern "C" fn gop_padding() {
     if first_gop_time.inited != 0 {
-        let mut mis1: libc::c_int = (gop_time.ccblocks
-            + frames_since_last_gop as libc::c_long - first_gop_time.ccblocks
+        let mut mis1: libc::c_int = (gop_time.ccblocks + frames_since_last_gop as libc::c_long
+            - first_gop_time.ccblocks
             - c1count as libc::c_long) as libc::c_int;
-        let mut mis2: libc::c_int = (gop_time.ccblocks
-            + frames_since_last_gop as libc::c_long - first_gop_time.ccblocks
+        let mut mis2: libc::c_int = (gop_time.ccblocks + frames_since_last_gop as libc::c_long
+            - first_gop_time.ccblocks
             - c2count as libc::c_long) as libc::c_int;
         do_padding(mis1, mis2);
     }
@@ -353,10 +333,8 @@ pub unsafe extern "C" fn gop_padding() {
 pub unsafe extern "C" fn pts_padding() {
     let mut exp: libc::c_int = ((current_pts - min_pts) as libc::c_double * 29.97f64
         / 90000 as libc::c_int as libc::c_double) as libc::c_int;
-    let mut mis1: libc::c_int = (exp as libc::c_uint).wrapping_sub(c1count)
-        as libc::c_int;
-    let mut mis2: libc::c_int = (exp as libc::c_uint).wrapping_sub(c2count)
-        as libc::c_int;
+    let mut mis1: libc::c_int = (exp as libc::c_uint).wrapping_sub(c1count) as libc::c_int;
+    let mut mis2: libc::c_int = (exp as libc::c_uint).wrapping_sub(c2count) as libc::c_int;
     do_padding(mis1, mis2);
 }
 #[no_mangle]
@@ -366,8 +344,7 @@ pub unsafe extern "C" fn init_file_buffer() -> libc::c_int {
     bytesinbuffer = 0 as libc::c_int;
     if filebuffer.is_null() {
         filebuffer = malloc(
-            (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int)
-                as libc::c_ulong,
+            (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int) as libc::c_ulong,
         ) as *mut libc::c_uchar;
     }
     if filebuffer.is_null() {
@@ -384,8 +361,8 @@ pub unsafe extern "C" fn buffered_seek(mut offset: libc::c_int) {
             filebuffer_pos = 0 as libc::c_int;
             if startbytes_pos <= 0 as libc::c_int as libc::c_uint {
                 printf(
-                    b"PANIC: Attempt to seek before buffer start, this is a bug!\0"
-                        as *const u8 as *const libc::c_char,
+                    b"PANIC: Attempt to seek before buffer start, this is a bug!\0" as *const u8
+                        as *const libc::c_char,
                 );
                 exit(-(4 as libc::c_int));
             }
@@ -429,18 +406,17 @@ pub unsafe extern "C" fn buffered_read_opt(
                 };
                 memmove(
                     filebuffer as *mut libc::c_void,
-                    filebuffer
-                        .offset(
-                            (1024 as libc::c_int * 1024 as libc::c_int
-                                * 16 as libc::c_int - keep) as isize,
-                        ) as *const libc::c_void,
+                    filebuffer.offset(
+                        (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int - keep)
+                            as isize,
+                    ) as *const libc::c_void,
                     keep as libc::c_ulong,
                 );
                 i = read(
                     in_0,
                     filebuffer.offset(keep as isize) as *mut libc::c_void,
-                    (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int
-                        - keep) as size_t,
+                    (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int - keep)
+                        as size_t,
                 ) as libc::c_int;
                 if i == 0 as libc::c_int {
                     eof = 1 as libc::c_int;
@@ -471,8 +447,8 @@ pub unsafe extern "C" fn buffered_read_opt(
         if !fbuffer.is_null() {
             return copied + read(in_0, fbuffer as *mut libc::c_void, bytes as size_t);
         }
-        return (copied as libc::c_longlong
-            + lseek(in_0, bytes as off_t, 1 as libc::c_int)) as LONG;
+        return (copied as libc::c_longlong + lseek(in_0, bytes as off_t, 1 as libc::c_int))
+            as LONG;
     };
 }
 #[no_mangle]
@@ -493,8 +469,8 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
     full_pes = 0 as libc::c_int;
     let mut current_block_143: u64;
     loop {
-        if (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
-            as libc::c_long - inbuf < 184 as libc::c_int as libc::c_long
+        if (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_long - inbuf
+            < 184 as libc::c_int as libc::c_long
         {
             enough = 1 as libc::c_int;
         } else {
@@ -504,25 +480,20 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
             } else {
                 if 4 as libc::c_int <= bytesinbuffer - filebuffer_pos {
                     if !tsheader.as_mut_ptr().is_null() {
-                        tsheader[0 as libc::c_int
-                            as usize] = *filebuffer.offset(filebuffer_pos as isize);
-                        tsheader[1 as libc::c_int
-                            as usize] = *filebuffer
-                            .offset((filebuffer_pos + 1 as libc::c_int) as isize);
-                        tsheader[2 as libc::c_int
-                            as usize] = *filebuffer
-                            .offset((filebuffer_pos + 2 as libc::c_int) as isize);
-                        tsheader[3 as libc::c_int
-                            as usize] = *filebuffer
-                            .offset((filebuffer_pos + 3 as libc::c_int) as isize);
+                        tsheader[0 as libc::c_int as usize] =
+                            *filebuffer.offset(filebuffer_pos as isize);
+                        tsheader[1 as libc::c_int as usize] =
+                            *filebuffer.offset((filebuffer_pos + 1 as libc::c_int) as isize);
+                        tsheader[2 as libc::c_int as usize] =
+                            *filebuffer.offset((filebuffer_pos + 2 as libc::c_int) as isize);
+                        tsheader[3 as libc::c_int as usize] =
+                            *filebuffer.offset((filebuffer_pos + 3 as libc::c_int) as isize);
                         filebuffer_pos += 4 as libc::c_int;
                         result = 4 as libc::c_int as LONG;
                     }
                 } else {
-                    result = buffered_read_opt(
-                        tsheader.as_mut_ptr(),
-                        4 as libc::c_int as libc::c_uint,
-                    );
+                    result =
+                        buffered_read_opt(tsheader.as_mut_ptr(), 4 as libc::c_int as libc::c_uint);
                 }
                 if result != 4 as libc::c_int as libc::c_long {
                     end_of_file = 1 as libc::c_int;
@@ -532,23 +503,21 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                     ts_headers_total += 1;
                 }
             }
-            if tsheader[0 as libc::c_int as usize] as libc::c_int != 0x47 as libc::c_int
-            {
+            if tsheader[0 as libc::c_int as usize] as libc::c_int != 0x47 as libc::c_int {
                 printf(
                     b"\nProblem: No TS header mark. Received bytes:\n\0" as *const u8
                         as *const libc::c_char,
                 );
                 dump(tsheader.as_mut_ptr(), 4 as libc::c_int);
-                printf(
-                    b"Trying to continue anyway.\n\0" as *const u8 as *const libc::c_char,
-                );
+                printf(b"Trying to continue anyway.\n\0" as *const u8 as *const libc::c_char);
             }
-            error = ((tsheader[1 as libc::c_int as usize] as libc::c_int
-                & 0x80 as libc::c_int) >> 7 as libc::c_int) as libc::c_uint;
+            error = ((tsheader[1 as libc::c_int as usize] as libc::c_int & 0x80 as libc::c_int)
+                >> 7 as libc::c_int) as libc::c_uint;
             payload_start = ((tsheader[1 as libc::c_int as usize] as libc::c_int
-                & 0x40 as libc::c_int) >> 6 as libc::c_int) as libc::c_uint;
-            pid = ((tsheader[1 as libc::c_int as usize] as libc::c_int
-                & 0x1f as libc::c_int) << 8 as libc::c_int
+                & 0x40 as libc::c_int)
+                >> 6 as libc::c_int) as libc::c_uint;
+            pid = ((tsheader[1 as libc::c_int as usize] as libc::c_int & 0x1f as libc::c_int)
+                << 8 as libc::c_int
                 | tsheader[2 as libc::c_int as usize] as libc::c_int)
                 & 0x1fff as libc::c_int;
             if pid < 0x10 as libc::c_int || pid >= 0x1fff as libc::c_int {
@@ -562,18 +531,16 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                     );
                 }
             } else {
-                adapt = ((tsheader[3 as libc::c_int as usize] as libc::c_int
-                    & 0x30 as libc::c_int) >> 4 as libc::c_int) as libc::c_uint;
+                adapt = ((tsheader[3 as libc::c_int as usize] as libc::c_int & 0x30 as libc::c_int)
+                    >> 4 as libc::c_int) as libc::c_uint;
                 if error != 0 {
                     printf(
-                        b"Warning: Defective TS packet: %u\n\0" as *const u8
-                            as *const libc::c_char,
+                        b"Warning: Defective TS packet: %u\n\0" as *const u8 as *const libc::c_char,
                         error,
                     );
                     dump_tspacket = 1 as libc::c_int;
                 }
-                ts_adaptation = (adapt & 2 as libc::c_int as libc::c_uint)
-                    as libc::c_int;
+                ts_adaptation = (adapt & 2 as libc::c_int as libc::c_uint) as libc::c_int;
                 payload_length = 184 as libc::c_int as libc::c_uint;
                 if payload_start != 0 {
                     paystart += 1;
@@ -606,8 +573,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                             payload_length = payload_length
                                 .wrapping_sub(adlength as libc::c_uint)
                                 .wrapping_sub(1 as libc::c_int as libc::c_uint);
-                            if adlength as libc::c_int <= bytesinbuffer - filebuffer_pos
-                            {
+                            if adlength as libc::c_int <= bytesinbuffer - filebuffer_pos {
                                 filebuffer_pos += adlength as libc::c_int;
                                 result = adlength as LONG;
                             } else {
@@ -631,24 +597,20 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                             filebuffer_pos += 6 as libc::c_int;
                             result = 6 as libc::c_int as LONG;
                         } else {
-                            result = buffered_read_opt(
-                                pesheaderbuf,
-                                6 as libc::c_int as libc::c_uint,
-                            );
+                            result =
+                                buffered_read_opt(pesheaderbuf, 6 as libc::c_int as libc::c_uint);
                         }
                         past = past + result;
-                        payload_length = payload_length
-                            .wrapping_sub(6 as libc::c_int as libc::c_uint);
+                        payload_length =
+                            payload_length.wrapping_sub(6 as libc::c_int as libc::c_uint);
                         if *pesheaderbuf.offset(0 as libc::c_int as isize) as libc::c_int
                             != 0 as libc::c_int
-                            || *pesheaderbuf.offset(1 as libc::c_int as isize)
-                                as libc::c_int != 0 as libc::c_int
-                            || *pesheaderbuf.offset(2 as libc::c_int as isize)
-                                as libc::c_int != 0x1 as libc::c_int
+                            || *pesheaderbuf.offset(1 as libc::c_int as isize) as libc::c_int
+                                != 0 as libc::c_int
+                            || *pesheaderbuf.offset(2 as libc::c_int as isize) as libc::c_int
+                                != 0x1 as libc::c_int
                         {
-                            if payload_length as libc::c_int
-                                <= bytesinbuffer - filebuffer_pos
-                            {
+                            if payload_length as libc::c_int <= bytesinbuffer - filebuffer_pos {
                                 filebuffer_pos += payload_length as libc::c_int;
                                 result = payload_length as libc::c_int as LONG;
                             } else {
@@ -660,8 +622,8 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                             current_block_143 = 5720623009719927633;
                         } else {
                             got_pes_header = 1 as libc::c_int;
-                            stream_id = *pesheaderbuf.offset(3 as libc::c_int as isize)
-                                as libc::c_uint;
+                            stream_id =
+                                *pesheaderbuf.offset(3 as libc::c_int as isize) as libc::c_uint;
                             if stream_id != 0xbe as libc::c_int as libc::c_uint
                                 && stream_id != 0xbf as libc::c_int as libc::c_uint
                             {
@@ -669,8 +631,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                 let mut pes_header_length: libc::c_uint = 0;
                                 let mut need_to_skip: libc::c_int = 0;
                                 if 3 as libc::c_int <= bytesinbuffer - filebuffer_pos {
-                                    if !pesheaderbuf.offset(6 as libc::c_int as isize).is_null()
-                                    {
+                                    if !pesheaderbuf.offset(6 as libc::c_int as isize).is_null() {
                                         memcpy(
                                             pesheaderbuf.offset(6 as libc::c_int as isize)
                                                 as *mut libc::c_void,
@@ -688,13 +649,15 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                     );
                                 }
                                 past = past + result;
-                                payload_length = payload_length
-                                    .wrapping_sub(3 as libc::c_int as libc::c_uint);
-                                PTS_present = ((*pesheaderbuf
-                                    .offset(7 as libc::c_int as isize) as libc::c_int
-                                    & 0x80 as libc::c_int) >> 7 as libc::c_int) as libc::c_uint;
-                                pes_header_length = *pesheaderbuf
-                                    .offset(8 as libc::c_int as isize) as libc::c_uint;
+                                payload_length =
+                                    payload_length.wrapping_sub(3 as libc::c_int as libc::c_uint);
+                                PTS_present = ((*pesheaderbuf.offset(7 as libc::c_int as isize)
+                                    as libc::c_int
+                                    & 0x80 as libc::c_int)
+                                    >> 7 as libc::c_int)
+                                    as libc::c_uint;
+                                pes_header_length =
+                                    *pesheaderbuf.offset(8 as libc::c_int as isize) as libc::c_uint;
                                 need_to_skip = pes_header_length as libc::c_int;
                                 if PTS_present != 0 {
                                     let mut pts_raw: [libc::c_uchar; 5] = [0; 5];
@@ -720,29 +683,40 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                         .wrapping_sub(5 as libc::c_int as libc::c_uint);
                                     need_to_skip = need_to_skip - 5 as libc::c_int;
                                     if pts_raw[0 as libc::c_int as usize] as libc::c_int
-                                        & 1 as libc::c_int != 0
+                                        & 1 as libc::c_int
+                                        != 0
                                         && pts_raw[2 as libc::c_int as usize] as libc::c_int
-                                            & 1 as libc::c_int != 0
+                                            & 1 as libc::c_int
+                                            != 0
                                         && pts_raw[4 as libc::c_int as usize] as libc::c_int
-                                            & 1 as libc::c_int != 0
+                                            & 1 as libc::c_int
+                                            != 0
                                     {
-                                        let mut bits_9: libc::c_uint = ((pts_raw[0 as libc::c_int
-                                            as usize] as libc::c_int & 0xe as libc::c_int)
-                                            << 28 as libc::c_int) as libc::c_uint;
-                                        let mut bits_10: libc::c_uint = ((pts_raw[1 as libc::c_int
-                                            as usize] as libc::c_int) << 22 as libc::c_int)
-                                            as libc::c_uint;
-                                        let mut bits_11: libc::c_uint = ((pts_raw[2 as libc::c_int
-                                            as usize] as libc::c_int & 0xfe as libc::c_int)
-                                            << 14 as libc::c_int) as libc::c_uint;
-                                        let mut bits_12: libc::c_uint = ((pts_raw[3 as libc::c_int
-                                            as usize] as libc::c_int) << 7 as libc::c_int)
-                                            as libc::c_uint;
-                                        let mut bits_13: libc::c_uint = (pts_raw[4 as libc::c_int
-                                            as usize] as libc::c_int >> 1 as libc::c_int)
-                                            as libc::c_uint;
-                                        current_pts = (bits_9 | bits_10 | bits_11 | bits_12
-                                            | bits_13) as LONG;
+                                        let mut bits_9: libc::c_uint =
+                                            ((pts_raw[0 as libc::c_int as usize] as libc::c_int
+                                                & 0xe as libc::c_int)
+                                                << 28 as libc::c_int)
+                                                as libc::c_uint;
+                                        let mut bits_10: libc::c_uint =
+                                            ((pts_raw[1 as libc::c_int as usize] as libc::c_int)
+                                                << 22 as libc::c_int)
+                                                as libc::c_uint;
+                                        let mut bits_11: libc::c_uint =
+                                            ((pts_raw[2 as libc::c_int as usize] as libc::c_int
+                                                & 0xfe as libc::c_int)
+                                                << 14 as libc::c_int)
+                                                as libc::c_uint;
+                                        let mut bits_12: libc::c_uint =
+                                            ((pts_raw[3 as libc::c_int as usize] as libc::c_int)
+                                                << 7 as libc::c_int)
+                                                as libc::c_uint;
+                                        let mut bits_13: libc::c_uint =
+                                            (pts_raw[4 as libc::c_int as usize] as libc::c_int
+                                                >> 1 as libc::c_int)
+                                                as libc::c_uint;
+                                        current_pts =
+                                            (bits_9 | bits_10 | bits_11 | bits_12 | bits_13)
+                                                as LONG;
                                         if pts_set == 0 as libc::c_int {
                                             pts_set = 1 as libc::c_int;
                                         }
@@ -769,8 +743,8 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                     );
                                 }
                                 past = past + need_to_skip as libc::c_long;
-                                payload_length = payload_length
-                                    .wrapping_sub(need_to_skip as libc::c_uint);
+                                payload_length =
+                                    payload_length.wrapping_sub(need_to_skip as libc::c_uint);
                             }
                             current_block_143 = 7761909515536616543;
                         }
@@ -781,14 +755,16 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                 match current_block_143 {
                     5720623009719927633 => {}
                     _ => {
-                        want = (if (256 as libc::c_int * 1024 as libc::c_int
-                            + 120 as libc::c_int) as libc::c_long - inbuf
+                        want = (if (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
+                            as libc::c_long
+                            - inbuf
                             > payload_length as libc::c_long
                         {
                             payload_length as libc::c_long
                         } else {
-                            (256 as libc::c_int * 1024 as libc::c_int
-                                + 120 as libc::c_int) as libc::c_long - inbuf
+                            (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
+                                as libc::c_long
+                                - inbuf
                         }) as libc::c_int;
                         if want <= bytesinbuffer - filebuffer_pos {
                             if !fbuffer.offset(inbuf as isize).is_null() {
@@ -812,9 +788,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                         }
                         past = past + result;
                         if dump_tspacket != 0 {
-                            printf(
-                                b"Payload dump:\n\0" as *const u8 as *const libc::c_char,
-                            );
+                            printf(b"Payload dump:\n\0" as *const u8 as *const libc::c_char);
                             dump_tspacket = 0 as libc::c_int;
                             dump(fbuffer.offset(inbuf as isize), 184 as libc::c_int);
                         }
@@ -823,16 +797,15 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                 }
             }
         }
-        if !(result != 0 as libc::c_int as libc::c_long && enough == 0
-            && (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
-                as libc::c_long != inbuf)
+        if !(result != 0 as libc::c_int as libc::c_long
+            && enough == 0
+            && (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_long
+                != inbuf)
         {
             break;
         }
     }
-    if (pes_start_in_this_pass == 0 as libc::c_int || full_pes == 0 as libc::c_int)
-        && result != 0
-    {
+    if (pes_start_in_this_pass == 0 as libc::c_int || full_pes == 0 as libc::c_int) && result != 0 {
         printf(
             b"Warning: We don't have the complete PES in buffer.\n\0" as *const u8
                 as *const libc::c_char,
@@ -847,8 +820,9 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
 #[no_mangle]
 pub unsafe extern "C" fn general_getmoredata() -> LONG {
     loop {
-        let mut want: libc::c_int = ((256 as libc::c_int * 1024 as libc::c_int
-            + 120 as libc::c_int) as libc::c_long - inbuf) as libc::c_int;
+        let mut want: libc::c_int = ((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
+            as libc::c_long
+            - inbuf) as libc::c_int;
         if want <= bytesinbuffer - filebuffer_pos {
             if !fbuffer.offset(inbuf as isize).is_null() {
                 memcpy(
@@ -860,16 +834,13 @@ pub unsafe extern "C" fn general_getmoredata() -> LONG {
             filebuffer_pos += want;
             result = want as LONG;
         } else {
-            result = buffered_read_opt(
-                fbuffer.offset(inbuf as isize),
-                want as libc::c_uint,
-            );
+            result = buffered_read_opt(fbuffer.offset(inbuf as isize), want as libc::c_uint);
         }
         past = past + result;
         inbuf += result;
         if !(result != 0 as libc::c_int as libc::c_long
-            && (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
-                as libc::c_long != inbuf)
+            && (256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_long
+                != inbuf)
         {
             break;
         }
@@ -886,8 +857,8 @@ pub unsafe extern "C" fn raw_loop() {
         while i < inbuf {
             if !(c1count < 2 as libc::c_int as libc::c_uint
                 && *fbuffer.offset(i as isize) as libc::c_int == 0xff as libc::c_int
-                && *fbuffer.offset(i as isize).offset(1 as libc::c_int as isize)
-                    as libc::c_int == 0xff as libc::c_int)
+                && *fbuffer.offset(i as isize).offset(1 as libc::c_int as isize) as libc::c_int
+                    == 0xff as libc::c_int)
             {
                 printdata(
                     fbuffer.offset(i as isize),
@@ -902,13 +873,10 @@ pub unsafe extern "C" fn raw_loop() {
         if !(inbuf != 0) {
             break;
         }
-    };
+    }
 }
 #[no_mangle]
-pub unsafe extern "C" fn process_block(
-    mut data: *mut libc::c_uchar,
-    mut length: LONG,
-) -> LONG {
+pub unsafe extern "C" fn process_block(mut data: *mut libc::c_uchar, mut length: LONG) -> LONG {
     let mut limit: libc::c_int = 0;
     let mut printed: libc::c_int = 0;
     let mut j: libc::c_int = 0;
@@ -918,10 +886,8 @@ pub unsafe extern "C" fn process_block(
         return length;
     }
     while !(header.offset(4 as libc::c_int as isize) > endofbuffer) {
-        if *header.offset(0 as libc::c_int as isize) as libc::c_int
-            == 0x43 as libc::c_int
-            && *header.offset(1 as libc::c_int as isize) as libc::c_int
-                == 0x43 as libc::c_int
+        if *header.offset(0 as libc::c_int as isize) as libc::c_int == 0x43 as libc::c_int
+            && *header.offset(1 as libc::c_int as isize) as libc::c_int == 0x43 as libc::c_int
         {
             let mut pattern: libc::c_uchar = 0;
             let mut field1packet: libc::c_int = 0;
@@ -929,7 +895,8 @@ pub unsafe extern "C" fn process_block(
             let mut j_0: libc::c_int = 0;
             let mut capcount: libc::c_int = 0;
             if non_compliant_DVD != 0
-                && current_picture_coding_type == B_FRAME as libc::c_int && autopad != 0
+                && current_picture_coding_type == B_FRAME as libc::c_int
+                && autopad != 0
             {
                 gop_padding();
             }
@@ -942,7 +909,8 @@ pub unsafe extern "C" fn process_block(
                 field1packet = 1 as libc::c_int;
             }
             capcount = (*header.offset(0 as libc::c_int as isize) as libc::c_int
-                & 0x1e as libc::c_int) / 2 as libc::c_int;
+                & 0x1e as libc::c_int)
+                / 2 as libc::c_int;
             header = header.offset(1);
             i = 0 as libc::c_int;
             while i < capcount {
@@ -957,37 +925,27 @@ pub unsafe extern "C" fn process_block(
                 j_0 = 0 as libc::c_int;
                 while j_0 < 2 as libc::c_int {
                     let mut data_0: [libc::c_uchar; 3] = [0; 3];
-                    data_0[0 as libc::c_int
-                        as usize] = *header.offset(0 as libc::c_int as isize);
-                    data_0[1 as libc::c_int
-                        as usize] = *header.offset(1 as libc::c_int as isize);
-                    data_0[2 as libc::c_int
-                        as usize] = *header.offset(2 as libc::c_int as isize);
+                    data_0[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+                    data_0[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
+                    data_0[2 as libc::c_int as usize] = *header.offset(2 as libc::c_int as isize);
                     header = header.offset(3 as libc::c_int as isize);
-                    if data_0[0 as libc::c_int as usize] as libc::c_int
-                        == 0xff as libc::c_int && j_0 == field1packet
+                    if data_0[0 as libc::c_int as usize] as libc::c_int == 0xff as libc::c_int
+                        && j_0 == field1packet
                     {
-                        data1[0 as libc::c_int
-                            as usize] = data_0[1 as libc::c_int as usize];
-                        data1[1 as libc::c_int
-                            as usize] = data_0[2 as libc::c_int as usize];
+                        data1[0 as libc::c_int as usize] = data_0[1 as libc::c_int as usize];
+                        data1[1 as libc::c_int as usize] = data_0[2 as libc::c_int as usize];
                     } else {
-                        data2[0 as libc::c_int
-                            as usize] = data_0[1 as libc::c_int as usize];
-                        data2[1 as libc::c_int
-                            as usize] = data_0[2 as libc::c_int as usize];
+                        data2[0 as libc::c_int as usize] = data_0[1 as libc::c_int as usize];
+                        data2[1 as libc::c_int as usize] = data_0[2 as libc::c_int as usize];
                     }
                     j_0 += 1;
                 }
                 if non_compliant_DVD == 0 as libc::c_int
-                    || data1[0 as libc::c_int as usize] as libc::c_int
-                        != 0x80 as libc::c_int
-                        && data1[0 as libc::c_int as usize] as libc::c_int
-                            != 0 as libc::c_int
-                    || data1[1 as libc::c_int as usize] as libc::c_int
-                        != 0x80 as libc::c_int
-                        && data1[1 as libc::c_int as usize] as libc::c_int
-                            != 0 as libc::c_int || too_many_blocks() == 0
+                    || data1[0 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                        && data1[0 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                    || data1[1 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                        && data1[1 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                    || too_many_blocks() == 0
                 {
                     printdata(
                         data1.as_mut_ptr(),
@@ -1000,10 +958,8 @@ pub unsafe extern "C" fn process_block(
                 }
                 i += 1;
             }
-            while *header.offset(0 as libc::c_int as isize) as libc::c_int
-                == 0xfe as libc::c_int
-                || *header.offset(0 as libc::c_int as isize) as libc::c_int
-                    == 0xff as libc::c_int
+            while *header.offset(0 as libc::c_int as isize) as libc::c_int == 0xfe as libc::c_int
+                || *header.offset(0 as libc::c_int as isize) as libc::c_int == 0xff as libc::c_int
             {
                 let mut j_1: libc::c_int = 0;
                 let mut data1_0: [libc::c_uchar; 2] = [
@@ -1017,36 +973,26 @@ pub unsafe extern "C" fn process_block(
                 j_1 = 0 as libc::c_int;
                 while j_1 < 2 as libc::c_int {
                     let mut data_1: [libc::c_uchar; 3] = [0; 3];
-                    data_1[0 as libc::c_int
-                        as usize] = *header.offset(0 as libc::c_int as isize);
-                    data_1[1 as libc::c_int
-                        as usize] = *header.offset(1 as libc::c_int as isize);
-                    data_1[2 as libc::c_int
-                        as usize] = *header.offset(2 as libc::c_int as isize);
+                    data_1[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+                    data_1[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
+                    data_1[2 as libc::c_int as usize] = *header.offset(2 as libc::c_int as isize);
                     header = header.offset(3 as libc::c_int as isize);
-                    if data_1[0 as libc::c_int as usize] as libc::c_int
-                        == 0xff as libc::c_int && j_1 == field1packet
+                    if data_1[0 as libc::c_int as usize] as libc::c_int == 0xff as libc::c_int
+                        && j_1 == field1packet
                     {
-                        data1_0[0 as libc::c_int
-                            as usize] = data_1[1 as libc::c_int as usize];
-                        data1_0[1 as libc::c_int
-                            as usize] = data_1[2 as libc::c_int as usize];
+                        data1_0[0 as libc::c_int as usize] = data_1[1 as libc::c_int as usize];
+                        data1_0[1 as libc::c_int as usize] = data_1[2 as libc::c_int as usize];
                     } else {
-                        data2_0[0 as libc::c_int
-                            as usize] = data_1[1 as libc::c_int as usize];
-                        data2_0[1 as libc::c_int
-                            as usize] = data_1[2 as libc::c_int as usize];
+                        data2_0[0 as libc::c_int as usize] = data_1[1 as libc::c_int as usize];
+                        data2_0[1 as libc::c_int as usize] = data_1[2 as libc::c_int as usize];
                     }
                     j_1 += 1;
                 }
-                if data1_0[0 as libc::c_int as usize] as libc::c_int
-                    != 0x80 as libc::c_int
-                    && data1_0[0 as libc::c_int as usize] as libc::c_int
-                        != 0 as libc::c_int
-                    || data1_0[1 as libc::c_int as usize] as libc::c_int
-                        != 0x80 as libc::c_int
-                        && data1_0[1 as libc::c_int as usize] as libc::c_int
-                            != 0 as libc::c_int || too_many_blocks() == 0
+                if data1_0[0 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                    && data1_0[0 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                    || data1_0[1 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                        && data1_0[1 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                    || too_many_blocks() == 0
                 {
                     non_compliant_DVD = 1 as libc::c_int;
                     printdata(
@@ -1059,34 +1005,24 @@ pub unsafe extern "C" fn process_block(
                     c2count = c2count.wrapping_add(1);
                 }
             }
-        } else if *header.offset(0 as libc::c_int as isize) as libc::c_int
-                == 0xbb as libc::c_int
-                && *header.offset(1 as libc::c_int as isize) as libc::c_int
-                    == 0x2 as libc::c_int
-                || *header.offset(2 as libc::c_int as isize) as libc::c_int
-                    == 0x99 as libc::c_int
-                    && *header.offset(3 as libc::c_int as isize) as libc::c_int
-                        == 0x2 as libc::c_int
-            {
+        } else if *header.offset(0 as libc::c_int as isize) as libc::c_int == 0xbb as libc::c_int
+            && *header.offset(1 as libc::c_int as isize) as libc::c_int == 0x2 as libc::c_int
+            || *header.offset(2 as libc::c_int as isize) as libc::c_int == 0x99 as libc::c_int
+                && *header.offset(3 as libc::c_int as isize) as libc::c_int == 0x2 as libc::c_int
+        {
             let mut data1_1: [libc::c_uchar; 2] = [0; 2];
             let mut data2_1: [libc::c_uchar; 2] = [0; 2];
-            if *header.offset(0 as libc::c_int as isize) as libc::c_int
-                == 0xbb as libc::c_int
-            {
+            if *header.offset(0 as libc::c_int as isize) as libc::c_int == 0xbb as libc::c_int {
                 stat_replay4000headers += 1;
             } else {
                 stat_replay5000headers += 1;
             }
             header = header.offset(2 as libc::c_int as isize);
-            data2_1[0 as libc::c_int
-                as usize] = *header.offset(0 as libc::c_int as isize);
-            data2_1[1 as libc::c_int
-                as usize] = *header.offset(1 as libc::c_int as isize);
+            data2_1[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+            data2_1[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
             header = header.offset(4 as libc::c_int as isize);
-            data1_1[0 as libc::c_int
-                as usize] = *header.offset(0 as libc::c_int as isize);
-            data1_1[1 as libc::c_int
-                as usize] = *header.offset(1 as libc::c_int as isize);
+            data1_1[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+            data1_1[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
             printdata(
                 data1_1.as_mut_ptr(),
                 2 as libc::c_int,
@@ -1095,23 +1031,17 @@ pub unsafe extern "C" fn process_block(
             );
             c1count = c1count.wrapping_add(1);
             c2count = c2count.wrapping_add(1);
-        } else if *header.offset(0 as libc::c_int as isize) as libc::c_int
-                == 0x47 as libc::c_int
-                && *header.offset(1 as libc::c_int as isize) as libc::c_int
-                    == 0x41 as libc::c_int
-                && *header.offset(2 as libc::c_int as isize) as libc::c_int
-                    == 0x39 as libc::c_int
-                && *header.offset(3 as libc::c_int as isize) as libc::c_int
-                    == 0x34 as libc::c_int
-            {
+        } else if *header.offset(0 as libc::c_int as isize) as libc::c_int == 0x47 as libc::c_int
+            && *header.offset(1 as libc::c_int as isize) as libc::c_int == 0x41 as libc::c_int
+            && *header.offset(2 as libc::c_int as isize) as libc::c_int == 0x39 as libc::c_int
+            && *header.offset(3 as libc::c_int as isize) as libc::c_int == 0x34 as libc::c_int
+        {
             if header.offset(5 as libc::c_int as isize) > endofbuffer {
                 header = header.offset(-(4 as libc::c_int as isize));
                 break;
             } else {
                 stat_hdtv += 1;
-                if *header.offset(4 as libc::c_int as isize) as libc::c_int
-                    == 0x3 as libc::c_int
-                {
+                if *header.offset(4 as libc::c_int as isize) as libc::c_int == 0x3 as libc::c_int {
                     let mut cc_data: *mut libc::c_uchar = 0 as *mut libc::c_uchar;
                     let mut ud_header: libc::c_uchar = 0;
                     let mut cc_count: libc::c_uchar = 0;
@@ -1145,9 +1075,7 @@ pub unsafe extern "C" fn process_block(
                         }
                     }
                     current_picture_coding_type != B_FRAME as libc::c_int;
-                    if current_picture_coding_type == B_FRAME as libc::c_int
-                        && autopad != 0
-                    {
+                    if current_picture_coding_type == B_FRAME as libc::c_int && autopad != 0 {
                         if gop_pad != 0 {
                             gop_padding();
                         } else if pts_set == 2 as libc::c_int {
@@ -1155,27 +1083,25 @@ pub unsafe extern "C" fn process_block(
                         }
                     }
                     ud_header = *header.offset(5 as libc::c_int as isize);
-                    cc_count = (ud_header as libc::c_int & 0x1f as libc::c_int)
+                    cc_count = (ud_header as libc::c_int & 0x1f as libc::c_int) as libc::c_uchar;
+                    process_cc_data_flag = ((ud_header as libc::c_int & 0x40 as libc::c_int)
+                        >> 6 as libc::c_int)
                         as libc::c_uchar;
-                    process_cc_data_flag = ((ud_header as libc::c_int
-                        & 0x40 as libc::c_int) >> 6 as libc::c_int) as libc::c_uchar;
                     if process_cc_data_flag != 0 {
                         let mut j_2: libc::c_int = 0;
                         let mut bail: libc::c_int = 0;
                         let mut proceed: libc::c_int = 1 as libc::c_int;
                         cc_data = header.offset(7 as libc::c_int as isize);
-                        if cc_data
-                            .offset(
-                                (cc_count as libc::c_int * 3 as libc::c_int) as isize,
-                            ) > endofbuffer
+                        if cc_data.offset((cc_count as libc::c_int * 3 as libc::c_int) as isize)
+                            > endofbuffer
                         {
                             header = header.offset(-(4 as libc::c_int as isize));
                             break;
                         } else {
                             if *cc_data
-                                .offset(
-                                    (cc_count as libc::c_int * 3 as libc::c_int) as isize,
-                                ) as libc::c_int != 0xff as libc::c_int
+                                .offset((cc_count as libc::c_int * 3 as libc::c_int) as isize)
+                                as libc::c_int
+                                != 0xff as libc::c_int
                             {
                                 proceed = 0 as libc::c_int;
                             }
@@ -1203,10 +1129,11 @@ pub unsafe extern "C" fn process_block(
                                         as *const libc::c_char,
                                 );
                                 printf(
-                                    b"Data start at offset %d of a %d bytes block.\n\0"
-                                        as *const u8 as *const libc::c_char,
+                                    b"Data start at offset %d of a %d bytes block.\n\0" as *const u8
+                                        as *const libc::c_char,
                                     (header.offset_from(data) as libc::c_long
-                                        - 4 as libc::c_int as libc::c_long) as libc::c_int,
+                                        - 4 as libc::c_int as libc::c_long)
+                                        as libc::c_int,
                                     length as libc::c_int,
                                 );
                                 dump(data, 256 as libc::c_int);
@@ -1219,45 +1146,54 @@ pub unsafe extern "C" fn process_block(
                                     if *cc_data.offset(j_2 as isize) as libc::c_int
                                         == 0xfa as libc::c_int
                                         && *cc_data.offset((j_2 + 1 as libc::c_int) as isize)
-                                            as libc::c_int == 0 as libc::c_int
+                                            as libc::c_int
+                                            == 0 as libc::c_int
                                         && *cc_data.offset((j_2 + 2 as libc::c_int) as isize)
-                                            as libc::c_int == 0 as libc::c_int
+                                            as libc::c_int
+                                            == 0 as libc::c_int
                                     {
                                         break;
                                     }
                                     if cc608_parity_table[*cc_data
-                                        .offset((j_2 + 1 as libc::c_int) as isize) as usize] == 0
+                                        .offset((j_2 + 1 as libc::c_int) as isize)
+                                        as usize]
+                                        == 0
                                         || cc608_parity_table[*cc_data
-                                            .offset((j_2 + 2 as libc::c_int) as isize) as usize] == 0
+                                            .offset((j_2 + 2 as libc::c_int) as isize)
+                                            as usize]
+                                            == 0
                                     {
                                         break;
                                     }
                                 }
                                 cc_valid = ((*cc_data.offset(j_2 as isize) as libc::c_int
-                                    & 4 as libc::c_int) >> 2 as libc::c_int) as libc::c_uchar;
+                                    & 4 as libc::c_int)
+                                    >> 2 as libc::c_int)
+                                    as libc::c_uchar;
                                 cc_type = (*cc_data.offset(j_2 as isize) as libc::c_int
-                                    & 3 as libc::c_int) as libc::c_uchar;
+                                    & 3 as libc::c_int)
+                                    as libc::c_uchar;
                                 if cc_valid as libc::c_int == 0 as libc::c_int
                                     && *cc_data.offset((j_2 + 1 as libc::c_int) as isize)
-                                        as libc::c_int == 0 as libc::c_int
+                                        as libc::c_int
+                                        == 0 as libc::c_int
                                     && *cc_data.offset((j_2 + 2 as libc::c_int) as isize)
-                                        as libc::c_int == 0 as libc::c_int && fix_padding != 0
+                                        as libc::c_int
+                                        == 0 as libc::c_int
+                                    && fix_padding != 0
                                 {
                                     cc_valid = 1 as libc::c_int as libc::c_uchar;
-                                    *cc_data
-                                        .offset(
-                                            (j_2 + 1 as libc::c_int) as isize,
-                                        ) = 0x80 as libc::c_int as libc::c_uchar;
-                                    *cc_data
-                                        .offset(
-                                            (j_2 + 2 as libc::c_int) as isize,
-                                        ) = 0x80 as libc::c_int as libc::c_uchar;
+                                    *cc_data.offset((j_2 + 1 as libc::c_int) as isize) =
+                                        0x80 as libc::c_int as libc::c_uchar;
+                                    *cc_data.offset((j_2 + 2 as libc::c_int) as isize) =
+                                        0x80 as libc::c_int as libc::c_uchar;
                                 }
                                 if cc_valid != 0 {
                                     cc_stats[cc_type as usize] += 1;
                                     if bail != 0
                                         && (cc_type as libc::c_int == 0 as libc::c_int
-                                            || cc_type as libc::c_int == 1 as libc::c_int) && debug != 0
+                                            || cc_type as libc::c_int == 1 as libc::c_int)
+                                        && debug != 0
                                     {
                                         if printed == 0 {
                                             printf(
@@ -1319,11 +1255,9 @@ pub unsafe extern "C" fn process_block(
                 }
                 header = header.offset(1);
             }
-        } else if *header.offset(0 as libc::c_int as isize) as libc::c_int
-                == 0x5 as libc::c_int
-                && *header.offset(1 as libc::c_int as isize) as libc::c_int
-                    == 0x2 as libc::c_int
-            {
+        } else if *header.offset(0 as libc::c_int as isize) as libc::c_int == 0x5 as libc::c_int
+            && *header.offset(1 as libc::c_int as isize) as libc::c_int == 0x2 as libc::c_int
+        {
             let mut type_0: libc::c_uchar = 0;
             let mut hi: libc::c_uchar = 0;
             let mut data1_2: [libc::c_uchar; 2] = [0; 2];
@@ -1337,21 +1271,16 @@ pub unsafe extern "C" fn process_block(
             match type_0 as libc::c_int {
                 2 => {
                     header = header.offset(1);
-                    data1_2[0 as libc::c_int
-                        as usize] = *header.offset(0 as libc::c_int as isize);
-                    data1_2[1 as libc::c_int
-                        as usize] = *header.offset(1 as libc::c_int as isize);
+                    data1_2[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+                    data1_2[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
                     header = header.offset(2 as libc::c_int as isize);
                     type_0 = *header.offset(0 as libc::c_int as isize);
                     header = header.offset(1);
-                    if data1_2[0 as libc::c_int as usize] as libc::c_int
-                        != 0x80 as libc::c_int
-                        && data1_2[0 as libc::c_int as usize] as libc::c_int
-                            != 0 as libc::c_int
-                        || data1_2[1 as libc::c_int as usize] as libc::c_int
-                            != 0x80 as libc::c_int
-                            && data1_2[1 as libc::c_int as usize] as libc::c_int
-                                != 0 as libc::c_int || too_many_blocks() == 0
+                    if data1_2[0 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                        && data1_2[0 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                        || data1_2[1 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                            && data1_2[1 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                        || too_many_blocks() == 0
                     {
                         printdata(
                             data1_2.as_mut_ptr(),
@@ -1361,19 +1290,18 @@ pub unsafe extern "C" fn process_block(
                         );
                         c1count = c1count.wrapping_add(1);
                     }
-                    hi = (data1_2[0 as libc::c_int as usize] as libc::c_int
-                        & 0x7f as libc::c_int) as libc::c_uchar;
+                    hi = (data1_2[0 as libc::c_int as usize] as libc::c_int & 0x7f as libc::c_int)
+                        as libc::c_uchar;
                     if type_0 as libc::c_int == 0x4 as libc::c_int
                         && (hi as libc::c_int) < 32 as libc::c_int
                     {
-                        if data1_2[0 as libc::c_int as usize] as libc::c_int
-                            != 0x80 as libc::c_int
-                            && data1_2[0 as libc::c_int as usize] as libc::c_int
-                                != 0 as libc::c_int
+                        if data1_2[0 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                            && data1_2[0 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
                             || data1_2[1 as libc::c_int as usize] as libc::c_int
                                 != 0x80 as libc::c_int
                                 && data1_2[1 as libc::c_int as usize] as libc::c_int
-                                    != 0 as libc::c_int || too_many_blocks() == 0
+                                    != 0 as libc::c_int
+                            || too_many_blocks() == 0
                         {
                             printdata(
                                 data1_2.as_mut_ptr(),
@@ -1390,19 +1318,14 @@ pub unsafe extern "C" fn process_block(
                 }
                 4 => {
                     header = header.offset(1);
-                    data1_2[0 as libc::c_int
-                        as usize] = *header.offset(0 as libc::c_int as isize);
-                    data1_2[1 as libc::c_int
-                        as usize] = *header.offset(1 as libc::c_int as isize);
+                    data1_2[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+                    data1_2[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
                     header = header.offset(2 as libc::c_int as isize);
-                    if data1_2[0 as libc::c_int as usize] as libc::c_int
-                        != 0x80 as libc::c_int
-                        && data1_2[0 as libc::c_int as usize] as libc::c_int
-                            != 0 as libc::c_int
-                        || data1_2[1 as libc::c_int as usize] as libc::c_int
-                            != 0x80 as libc::c_int
-                            && data1_2[1 as libc::c_int as usize] as libc::c_int
-                                != 0 as libc::c_int || too_many_blocks() == 0
+                    if data1_2[0 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                        && data1_2[0 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                        || data1_2[1 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                            && data1_2[1 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                        || too_many_blocks() == 0
                     {
                         printdata(
                             data1_2.as_mut_ptr(),
@@ -1414,19 +1337,14 @@ pub unsafe extern "C" fn process_block(
                         c1count = c1count.wrapping_add(1);
                         c2count = c2count.wrapping_add(1);
                     }
-                    data1_2[0 as libc::c_int
-                        as usize] = *header.offset(0 as libc::c_int as isize);
-                    data1_2[1 as libc::c_int
-                        as usize] = *header.offset(1 as libc::c_int as isize);
+                    data1_2[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+                    data1_2[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
                     header = header.offset(2 as libc::c_int as isize);
-                    if data1_2[0 as libc::c_int as usize] as libc::c_int
-                        != 0x80 as libc::c_int
-                        && data1_2[0 as libc::c_int as usize] as libc::c_int
-                            != 0 as libc::c_int
-                        || data1_2[1 as libc::c_int as usize] as libc::c_int
-                            != 0x80 as libc::c_int
-                            && data1_2[1 as libc::c_int as usize] as libc::c_int
-                                != 0 as libc::c_int || too_many_blocks() == 0
+                    if data1_2[0 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                        && data1_2[0 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                        || data1_2[1 as libc::c_int as usize] as libc::c_int != 0x80 as libc::c_int
+                            && data1_2[1 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                        || too_many_blocks() == 0
                     {
                         printdata(
                             data1_2.as_mut_ptr(),
@@ -1456,10 +1374,8 @@ pub unsafe extern "C" fn process_block(
                     header = header.offset(6 as libc::c_int as isize);
                     type_0 = *header.offset(0 as libc::c_int as isize);
                     header = header.offset(2 as libc::c_int as isize);
-                    data1_2[0 as libc::c_int
-                        as usize] = *header.offset(0 as libc::c_int as isize);
-                    data1_2[1 as libc::c_int
-                        as usize] = *header.offset(1 as libc::c_int as isize);
+                    data1_2[0 as libc::c_int as usize] = *header.offset(0 as libc::c_int as isize);
+                    data1_2[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
                     header = header.offset(2 as libc::c_int as isize);
                     if p_caption_capacity < 2 as libc::c_int {
                         p_caption = realloc(
@@ -1468,14 +1384,10 @@ pub unsafe extern "C" fn process_block(
                         ) as *mut libc::c_uchar;
                         p_caption_capacity = 1024 as libc::c_int;
                     }
-                    *p_caption
-                        .offset(
-                            0 as libc::c_int as isize,
-                        ) = data1_2[0 as libc::c_int as usize];
-                    *p_caption
-                        .offset(
-                            1 as libc::c_int as isize,
-                        ) = data1_2[1 as libc::c_int as usize];
+                    *p_caption.offset(0 as libc::c_int as isize) =
+                        data1_2[0 as libc::c_int as usize];
+                    *p_caption.offset(1 as libc::c_int as isize) =
+                        data1_2[1 as libc::c_int as usize];
                     p_caption_size = 2 as libc::c_int;
                     if type_0 as libc::c_int == 0x2 as libc::c_int {
                         type_0 = *header.offset(0 as libc::c_int as isize);
@@ -1492,21 +1404,17 @@ pub unsafe extern "C" fn process_block(
                                 ) as *mut libc::c_uchar;
                                 p_caption_capacity += 1024 as libc::c_int;
                             }
-                            *p_caption
-                                .offset(
-                                    p_caption_size as isize,
-                                ) = data1_2[0 as libc::c_int as usize];
-                            *p_caption
-                                .offset(
-                                    (p_caption_size + 1 as libc::c_int) as isize,
-                                ) = data1_2[1 as libc::c_int as usize];
+                            *p_caption.offset(p_caption_size as isize) =
+                                data1_2[0 as libc::c_int as usize];
+                            *p_caption.offset((p_caption_size + 1 as libc::c_int) as isize) =
+                                data1_2[1 as libc::c_int as usize];
                             p_caption_size += 2 as libc::c_int;
                         }
                     } else {
-                        data1_2[0 as libc::c_int
-                            as usize] = *header.offset(0 as libc::c_int as isize);
-                        data1_2[1 as libc::c_int
-                            as usize] = *header.offset(1 as libc::c_int as isize);
+                        data1_2[0 as libc::c_int as usize] =
+                            *header.offset(0 as libc::c_int as isize);
+                        data1_2[1 as libc::c_int as usize] =
+                            *header.offset(1 as libc::c_int as isize);
                         header = header.offset(2 as libc::c_int as isize);
                         if p_caption_capacity < p_caption_size + 2 as libc::c_int {
                             p_caption = realloc(
@@ -1515,14 +1423,10 @@ pub unsafe extern "C" fn process_block(
                             ) as *mut libc::c_uchar;
                             p_caption_capacity += 1024 as libc::c_int;
                         }
-                        *p_caption
-                            .offset(
-                                p_caption_size as isize,
-                            ) = data1_2[0 as libc::c_int as usize];
-                        *p_caption
-                            .offset(
-                                (p_caption_size + 1 as libc::c_int) as isize,
-                            ) = data1_2[1 as libc::c_int as usize];
+                        *p_caption.offset(p_caption_size as isize) =
+                            data1_2[0 as libc::c_int as usize];
+                        *p_caption.offset((p_caption_size + 1 as libc::c_int) as isize) =
+                            data1_2[1 as libc::c_int as usize];
                         p_caption_size += 2 as libc::c_int;
                         header = header.offset(1);
                     }
@@ -1575,8 +1479,8 @@ pub unsafe extern "C" fn general_loop() {
             memset(
                 fbuffer.offset(inbuf as isize) as *mut libc::c_void,
                 0 as libc::c_int,
-                ((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
-                    as libc::c_long - inbuf) as size_t,
+                ((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_long
+                    - inbuf) as size_t,
             );
         }
         if inbuf == 0 as libc::c_int as libc::c_long {
@@ -1588,14 +1492,14 @@ pub unsafe extern "C" fn general_loop() {
         }
         pos += got;
         if inputsize > 0 as libc::c_int as libc::c_long {
-            let mut progress: libc::c_int = ((past >> 8 as libc::c_int)
-                * 100 as libc::c_int as libc::c_long / (inputsize >> 8 as libc::c_int))
-                as libc::c_int;
+            let mut progress: libc::c_int =
+                ((past >> 8 as libc::c_int) * 100 as libc::c_int as libc::c_long
+                    / (inputsize >> 8 as libc::c_int)) as libc::c_int;
             if last_reported_progress != progress {
                 let mut cur_sec: libc::c_int = 0;
                 printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
-                cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double
-                    / 29.97f64) as libc::c_int;
+                cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double / 29.97f64)
+                    as libc::c_int;
                 printf(
                     b"  |  %02d:%02d\0" as *const u8 as *const libc::c_char,
                     cur_sec / 60 as libc::c_int,

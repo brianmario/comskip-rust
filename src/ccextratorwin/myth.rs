@@ -1,23 +1,18 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
-#![register_tool(c2rust)]
-#![feature(register_tool)]
+#![allow(
+    dead_code,
+    mutable_transmutes,
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    unused_assignments,
+    unused_mut
+)]
 extern "C" {
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn memcmp(
-        _: *const libc::c_void,
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-    ) -> libc::c_int;
-    fn memcpy(
-        _: *mut libc::c_void,
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-    ) -> *mut libc::c_void;
-    fn memmove(
-        _: *mut libc::c_void,
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-    ) -> *mut libc::c_void;
+    fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
+    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
+    fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
+        -> *mut libc::c_void;
     fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     fn free(_: *mut libc::c_void);
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
@@ -64,7 +59,7 @@ pub struct AVPacket {
     pub stream_index: libc::c_int,
     pub flags: libc::c_int,
     pub duration: libc::c_int,
-    pub destruct: Option::<unsafe extern "C" fn(*mut AVPacket) -> ()>,
+    pub destruct: Option<unsafe extern "C" fn(*mut AVPacket) -> ()>,
     pub priv_0: *mut libc::c_void,
     pub pos: LONG,
     pub codec_id: libc::c_int,
@@ -304,9 +299,9 @@ pub unsafe extern "C" fn get_byte() -> libc::c_int {
         result = buffered_read_opt(&mut b, 1 as libc::c_int as libc::c_uint);
     }
     if result == 1 as libc::c_int as libc::c_long {
-        return b as libc::c_int
+        return b as libc::c_int;
     } else {
-        return 0 as libc::c_int
+        return 0 as libc::c_int;
     };
 }
 #[no_mangle]
@@ -362,14 +357,12 @@ unsafe extern "C" fn find_next_start_code(
         v = cx as libc::c_uint;
         n -= 1;
         if state == 0x1 as libc::c_int as libc::c_uint {
-            state = (state << 8 as libc::c_int | v)
-                & 0xffffff as libc::c_int as libc::c_uint;
+            state = (state << 8 as libc::c_int | v) & 0xffffff as libc::c_int as libc::c_uint;
             val = state as libc::c_int;
             current_block = 18295522109918506392;
             break;
         } else {
-            state = (state << 8 as libc::c_int | v)
-                & 0xffffff as libc::c_int as libc::c_uint;
+            state = (state << 8 as libc::c_int | v) & 0xffffff as libc::c_int as libc::c_uint;
         }
     }
     match current_block {
@@ -403,9 +396,8 @@ unsafe extern "C" fn mpegps_psm_parse() -> libc::c_long {
         psm_es_type[es_id as usize] = type_0;
         url_fskip(es_info_length as libc::c_int);
         es_map_length = (es_map_length as libc::c_uint)
-            .wrapping_sub(
-                (4 as libc::c_int as libc::c_uint).wrapping_add(es_info_length),
-            ) as libc::c_int as libc::c_int;
+            .wrapping_sub((4 as libc::c_int as libc::c_uint).wrapping_add(es_info_length))
+            as libc::c_int as libc::c_int;
     }
     get_be32();
     return (2 as libc::c_int + psm_length) as libc::c_long;
@@ -545,12 +537,10 @@ unsafe extern "C" fn cc608_good_parity(
     mut parity_table: *const libc::c_int,
     mut data: libc::c_uint,
 ) -> libc::c_int {
-    let mut ret: libc::c_int = (*parity_table
-        .offset((data & 0xff as libc::c_int as libc::c_uint) as isize) != 0
-        && *parity_table
-            .offset(
-                ((data & 0xff00 as libc::c_int as libc::c_uint) >> 8 as libc::c_int)
-                    as isize,
+    let mut ret: libc::c_int =
+        (*parity_table.offset((data & 0xff as libc::c_int as libc::c_uint) as isize) != 0
+            && *parity_table.offset(
+                ((data & 0xff00 as libc::c_int as libc::c_uint) >> 8 as libc::c_int) as isize,
             ) != 0) as libc::c_int;
     ret == 0;
     return ret;
@@ -563,8 +553,8 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
     let mut i: libc::c_uint = 0;
     if meat.is_null() {
         printf(
-            b"Warning: ProcessVBIDataPacket called with NULL data, ignoring.\n\0"
-                as *const u8 as *const libc::c_char,
+            b"Warning: ProcessVBIDataPacket called with NULL data, ignoring.\n\0" as *const u8
+                as *const libc::c_char,
         );
         return;
     }
@@ -579,9 +569,9 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
         );
         meat = meat.offset(11 as libc::c_int as isize);
     } else if *meat.offset(0 as libc::c_int as isize) as libc::c_int == 'T' as i32
-            && *meat.offset(1 as libc::c_int as isize) as libc::c_int == 'V' as i32
-            && *meat.offset(2 as libc::c_int as isize) as libc::c_int == '0' as i32
-        {
+        && *meat.offset(1 as libc::c_int as isize) as libc::c_int == 'V' as i32
+        && *meat.offset(2 as libc::c_int as isize) as libc::c_int == '0' as i32
+    {
         linemask = 0xffffffffffffffff as libc::c_ulong as LONG;
         meat = meat.offset(3 as libc::c_int as isize);
     } else {
@@ -599,7 +589,7 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
             } else {
                 i.wrapping_sub(18 as libc::c_int as libc::c_uint)
             })
-                .wrapping_add(min_blank);
+            .wrapping_add(min_blank);
             field = (if i < 18 as libc::c_int as libc::c_uint {
                 0 as libc::c_int
             } else {
@@ -609,14 +599,12 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
             match id2 {
                 4 => {
                     if 21 as libc::c_int as libc::c_uint == line {
-                        let mut data: libc::c_int = (*meat
-                            .offset(2 as libc::c_int as isize) as libc::c_int)
+                        let mut data: libc::c_int = (*meat.offset(2 as libc::c_int as isize)
+                            as libc::c_int)
                             << 8 as libc::c_int
                             | *meat.offset(1 as libc::c_int as isize) as libc::c_int;
-                        if cc608_good_parity(
-                            cc608_parity_table.as_mut_ptr(),
-                            data as libc::c_uint,
-                        ) != 0
+                        if cc608_good_parity(cc608_parity_table.as_mut_ptr(), data as libc::c_uint)
+                            != 0
                         {
                             if field == 0 as libc::c_int as libc::c_uint {
                                 printdata(
@@ -694,8 +682,7 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
             } else {
                 current_block = 16088375578540436547;
             }
-        } else if startcode >= 0x1e0 as libc::c_int && startcode <= 0x1ef as libc::c_int
-            {
+        } else if startcode >= 0x1e0 as libc::c_int && startcode <= 0x1ef as libc::c_int {
             static mut avs_seqh: [libc::c_uchar; 4] = [
                 0 as libc::c_int as libc::c_uchar,
                 0 as libc::c_int as libc::c_uchar,
@@ -707,18 +694,14 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
                 if !buf.as_mut_ptr().is_null() {
                     memcpy(
                         buf.as_mut_ptr() as *mut libc::c_void,
-                        filebuffer.offset(filebuffer_pos as isize)
-                            as *const libc::c_void,
+                        filebuffer.offset(filebuffer_pos as isize) as *const libc::c_void,
                         8 as libc::c_int as libc::c_ulong,
                     );
                 }
                 filebuffer_pos += 8 as libc::c_int;
                 result = 8 as libc::c_int as LONG;
             } else {
-                result = buffered_read_opt(
-                    buf.as_mut_ptr(),
-                    8 as libc::c_int as libc::c_uint,
-                );
+                result = buffered_read_opt(buf.as_mut_ptr(), 8 as libc::c_int as libc::c_uint);
             }
             buffered_seek(-(8 as libc::c_int));
             if memcmp(
@@ -735,8 +718,7 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
             }
             type_0 = CODEC_TYPE_VIDEO as libc::c_int;
             current_block = 5028470053297453708;
-        } else if startcode >= 0x1c0 as libc::c_int && startcode <= 0x1df as libc::c_int
-            {
+        } else if startcode >= 0x1c0 as libc::c_int && startcode <= 0x1df as libc::c_int {
             type_0 = CODEC_TYPE_AUDIO as libc::c_int;
             codec_id = CODEC_ID_MP2 as libc::c_int;
             current_block = 5028470053297453708;
@@ -765,9 +747,7 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
         }
         match current_block {
             5028470053297453708 => {
-                if !(startcode >= 0xa0 as libc::c_int
-                    && startcode <= 0xbf as libc::c_int)
-                {
+                if !(startcode >= 0xa0 as libc::c_int && startcode <= 0xbf as libc::c_int) {
                     break;
                 }
                 if !(len <= 3 as libc::c_int) {
@@ -783,9 +763,7 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
         url_fskip(len);
     }
     av.size = len;
-    av
-        .data = realloc(av.data as *mut libc::c_void, av.size as libc::c_ulong)
-        as *mut libc::c_uchar;
+    av.data = realloc(av.data as *mut libc::c_void, av.size as libc::c_ulong) as *mut libc::c_uchar;
     if (av.data).is_null() {
         printf(
             b"\rNot enough memory, realloc() failed. Giving up.\n\0" as *const u8
@@ -831,10 +809,8 @@ unsafe extern "C" fn cc608_build_parity_table(mut parity_table: *mut libc::c_int
     while byte <= 127 as libc::c_int as libc::c_uint {
         parity_v = cc608_parity(byte);
         *parity_table.offset(byte as isize) = parity_v;
-        *parity_table
-            .offset(
-                (byte | 0x80 as libc::c_int as libc::c_uint) as isize,
-            ) = (parity_v == 0) as libc::c_int;
+        *parity_table.offset((byte | 0x80 as libc::c_int as libc::c_uint) as isize) =
+            (parity_v == 0) as libc::c_int;
         byte = byte.wrapping_add(1);
     }
 }
@@ -856,12 +832,10 @@ pub unsafe extern "C" fn myth_loop() {
     }
     desp = malloc(65536 as libc::c_int as libc::c_ulong) as *mut libc::c_uchar;
     saved = 0 as libc::c_int as LONG;
-    while processed_enough == 0
-        && {
-            rc = mpegps_read_packet();
-            rc == 0 as libc::c_int
-        }
-    {
+    while processed_enough == 0 && {
+        rc = mpegps_read_packet();
+        rc == 0 as libc::c_int
+    } {
         if av.codec_id == CODEC_ID_MPEG2VBI as libc::c_int
             && av.type_0 == CODEC_TYPE_DATA as libc::c_int
         {
@@ -875,7 +849,8 @@ pub unsafe extern "C" fn myth_loop() {
             ProcessVBIDataPacket();
         }
         if av.codec_id == CODEC_ID_MPEG2VIDEO as libc::c_int
-            && av.type_0 == CODEC_TYPE_VIDEO as libc::c_int && has_vbi == 0
+            && av.type_0 == CODEC_TYPE_VIDEO as libc::c_int
+            && has_vbi == 0
         {
             let mut length: LONG = saved + av.size as libc::c_long;
             let mut used: LONG = 0;
@@ -886,9 +861,7 @@ pub unsafe extern "C" fn myth_loop() {
                 );
                 exit(-(500 as libc::c_int));
             }
-            if av.pts as libc::c_longlong
-                != 0x8000000000000000 as libc::c_ulong as int64_t
-            {
+            if av.pts as libc::c_longlong != 0x8000000000000000 as libc::c_ulong as int64_t {
                 current_pts = av.pts;
                 if pts_set == 0 as libc::c_int {
                     pts_set = 1 as libc::c_int;
@@ -909,15 +882,14 @@ pub unsafe extern "C" fn myth_loop() {
         }
         if inputsize > 0 as libc::c_int as libc::c_long {
             let mut cur_sec: libc::c_int = 0;
-            let mut at: LONG = lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int)
-                as LONG;
-            let mut progress: libc::c_int = ((at >> 8 as libc::c_int)
-                * 100 as libc::c_int as libc::c_long / (inputsize >> 8 as libc::c_int))
-                as libc::c_int;
+            let mut at: LONG = lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
+            let mut progress: libc::c_int =
+                ((at >> 8 as libc::c_int) * 100 as libc::c_int as libc::c_long
+                    / (inputsize >> 8 as libc::c_int)) as libc::c_int;
             if last_reported_progress != progress {
                 printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
-                cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double
-                    / 29.97f64) as libc::c_int;
+                cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double / 29.97f64)
+                    as libc::c_int;
                 printf(
                     b"  |  %02d:%02d\0" as *const u8 as *const libc::c_char,
                     cur_sec / 60 as libc::c_int,
