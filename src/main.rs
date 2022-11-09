@@ -35,7 +35,6 @@ extern "C" {
     pub type AVDeviceInfoList;
     pub type AVCodecTag;
     pub type SwsContext;
-    fn usleep(_: useconds_t) -> libc::c_int;
     static mut __stderrp: *mut FILE;
     fn fclose(_: *mut FILE) -> libc::c_int;
     fn fflush(_: *mut FILE) -> libc::c_int;
@@ -4278,7 +4277,7 @@ pub unsafe extern "C" fn file_open() {
                     let fresh28 = openretries;
                     openretries = openretries + 1;
                     if fresh28 < live_tv_retries {
-                        usleep((1000 as libc::c_long * 1000 as libc::c_long) as useconds_t);
+                        std::thread::sleep(std::time::Duration::from_millis(1000));
                     } else {
                         exit(-(1 as libc::c_int));
                     }
@@ -4732,7 +4731,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                     last_packet_pts,
                 );
                 if selftest == 0 as libc::c_int {
-                    usleep((4000 as libc::c_long * 1000 as libc::c_long) as useconds_t);
+                    std::thread::sleep(std::time::Duration::from_millis(4000));
                 }
                 file_open();
                 Set_seek(is, retry_target);
