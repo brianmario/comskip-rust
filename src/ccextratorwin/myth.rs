@@ -1,0 +1,931 @@
+#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
+#![register_tool(c2rust)]
+#![feature(register_tool)]
+extern "C" {
+    fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
+    fn memcmp(
+        _: *const libc::c_void,
+        _: *const libc::c_void,
+        _: libc::c_ulong,
+    ) -> libc::c_int;
+    fn memcpy(
+        _: *mut libc::c_void,
+        _: *const libc::c_void,
+        _: libc::c_ulong,
+    ) -> *mut libc::c_void;
+    fn memmove(
+        _: *mut libc::c_void,
+        _: *const libc::c_void,
+        _: libc::c_ulong,
+    ) -> *mut libc::c_void;
+    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
+    fn free(_: *mut libc::c_void);
+    fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
+    fn exit(_: libc::c_int) -> !;
+    fn lseek(_: libc::c_int, _: off_t, _: libc::c_int) -> off_t;
+    static mut current_pts: LONG;
+    static mut pts_set: libc::c_int;
+    static mut c1count: libc::c_uint;
+    static mut c2count: libc::c_uint;
+    static mut c1count_total: libc::c_uint;
+    fn buffered_read_opt(buffer: *mut libc::c_uchar, bytes: libc::c_uint) -> LONG;
+    static mut filebuffer: *mut libc::c_uchar;
+    static mut filebuffer_pos: libc::c_int;
+    static mut bytesinbuffer: libc::c_int;
+    #[link_name = "in"]
+    static mut in_0: libc::c_int;
+    static mut inputsize: LONG;
+    static mut processed_enough: libc::c_int;
+    fn printdata(
+        data1: *const libc::c_uchar,
+        length1: libc::c_int,
+        data2: *const libc::c_uchar,
+        length2: libc::c_int,
+    );
+    fn init_file_buffer() -> libc::c_int;
+    fn buffered_seek(offset: libc::c_int);
+    static mut last_reported_progress: libc::c_int;
+    static mut buffer_input: libc::c_int;
+    fn process_block(data: *mut libc::c_uchar, length: LONG) -> LONG;
+    static mut result: LONG;
+}
+pub type __int64_t = libc::c_longlong;
+pub type __darwin_off_t = __int64_t;
+pub type int64_t = libc::c_longlong;
+pub type off_t = __darwin_off_t;
+pub type LONG = libc::c_long;
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct AVPacket {
+    pub pts: LONG,
+    pub dts: LONG,
+    pub data: *mut libc::c_uchar,
+    pub size: libc::c_int,
+    pub stream_index: libc::c_int,
+    pub flags: libc::c_int,
+    pub duration: libc::c_int,
+    pub destruct: Option::<unsafe extern "C" fn(*mut AVPacket) -> ()>,
+    pub priv_0: *mut libc::c_void,
+    pub pos: LONG,
+    pub codec_id: libc::c_int,
+    pub type_0: libc::c_int,
+}
+pub const CODEC_TYPE_VIDEO: CodecType = 0;
+pub const CODEC_ID_MPEG2VIDEO: CodecID = 2;
+pub const CODEC_TYPE_DATA: CodecType = 2;
+pub const CODEC_ID_MPEG2VBI: CodecID = 94210;
+pub const CODEC_ID_DVD_SUBTITLE: CodecID = 94208;
+pub const CODEC_TYPE_SUBTITLE: CodecType = 3;
+pub const CODEC_ID_PCM_S16BE: CodecID = 65537;
+pub const CODEC_TYPE_AUDIO: CodecType = 1;
+pub const CODEC_ID_DTS: CodecID = 86021;
+pub const CODEC_ID_AC3: CodecID = 86020;
+pub const CODEC_ID_MP2: CodecID = 86016;
+pub const CODEC_ID_CAVS: CodecID = 91;
+pub const CODEC_ID_H264: CodecID = 29;
+pub const CODEC_ID_MPEG4: CodecID = 14;
+pub const CODEC_ID_AAC: CodecID = 86018;
+pub const CODEC_ID_MP3: CodecID = 86017;
+pub type CodecType = libc::c_int;
+pub const CODEC_TYPE_UNKNOWN: CodecType = -1;
+pub type CodecID = libc::c_uint;
+pub const CODEC_ID_MPEG2TS: CodecID = 131072;
+pub const CODEC_ID_DSMCC_B: CodecID = 94212;
+pub const CODEC_ID_DVB_VBI: CodecID = 94211;
+pub const CODEC_ID_DVB_SUBTITLE: CodecID = 94209;
+pub const CODEC_ID_QCELP: CodecID = 86043;
+pub const CODEC_ID_SMACKAUDIO: CodecID = 86042;
+pub const CODEC_ID_TTA: CodecID = 86041;
+pub const CODEC_ID_TRUESPEECH: CodecID = 86040;
+pub const CODEC_ID_COOK: CodecID = 86039;
+pub const CODEC_ID_QDM2: CodecID = 86038;
+pub const CODEC_ID_GSM: CodecID = 86037;
+pub const CODEC_ID_WESTWOOD_SND1: CodecID = 86036;
+pub const CODEC_ID_ALAC: CodecID = 86035;
+pub const CODEC_ID_SHORTEN: CodecID = 86034;
+pub const CODEC_ID_MP3ON4: CodecID = 86033;
+pub const CODEC_ID_MP3ADU: CodecID = 86032;
+pub const CODEC_ID_FLAC: CodecID = 86031;
+pub const CODEC_ID_SONIC_LS: CodecID = 86030;
+pub const CODEC_ID_SONIC: CodecID = 86029;
+pub const CODEC_ID_VMDAUDIO: CodecID = 86028;
+pub const CODEC_ID_MACE6: CodecID = 86027;
+pub const CODEC_ID_MACE3: CodecID = 86026;
+pub const CODEC_ID_WMAV2: CodecID = 86025;
+pub const CODEC_ID_WMAV1: CodecID = 86024;
+pub const CODEC_ID_DVAUDIO: CodecID = 86023;
+pub const CODEC_ID_VORBIS: CodecID = 86022;
+pub const CODEC_ID_MPEG4AAC: CodecID = 86019;
+pub const CODEC_ID_SOL_DPCM: CodecID = 81923;
+pub const CODEC_ID_XAN_DPCM: CodecID = 81922;
+pub const CODEC_ID_INTERPLAY_DPCM: CodecID = 81921;
+pub const CODEC_ID_ROQ_DPCM: CodecID = 81920;
+pub const CODEC_ID_RA_288: CodecID = 77825;
+pub const CODEC_ID_RA_144: CodecID = 77824;
+pub const CODEC_ID_AMR_WB: CodecID = 73729;
+pub const CODEC_ID_AMR_NB: CodecID = 73728;
+pub const CODEC_ID_ADPCM_SBPRO_2: CodecID = 69649;
+pub const CODEC_ID_ADPCM_SBPRO_3: CodecID = 69648;
+pub const CODEC_ID_ADPCM_SBPRO_4: CodecID = 69647;
+pub const CODEC_ID_ADPCM_YAMAHA: CodecID = 69646;
+pub const CODEC_ID_ADPCM_SWF: CodecID = 69645;
+pub const CODEC_ID_ADPCM_CT: CodecID = 69644;
+pub const CODEC_ID_ADPCM_G726: CodecID = 69643;
+pub const CODEC_ID_ADPCM_EA: CodecID = 69642;
+pub const CODEC_ID_ADPCM_ADX: CodecID = 69641;
+pub const CODEC_ID_ADPCM_XA: CodecID = 69640;
+pub const CODEC_ID_ADPCM_4XM: CodecID = 69639;
+pub const CODEC_ID_ADPCM_MS: CodecID = 69638;
+pub const CODEC_ID_ADPCM_IMA_SMJPEG: CodecID = 69637;
+pub const CODEC_ID_ADPCM_IMA_WS: CodecID = 69636;
+pub const CODEC_ID_ADPCM_IMA_DK4: CodecID = 69635;
+pub const CODEC_ID_ADPCM_IMA_DK3: CodecID = 69634;
+pub const CODEC_ID_ADPCM_IMA_WAV: CodecID = 69633;
+pub const CODEC_ID_ADPCM_IMA_QT: CodecID = 69632;
+pub const CODEC_ID_PCM_S24DAUD: CodecID = 65552;
+pub const CODEC_ID_PCM_U24BE: CodecID = 65551;
+pub const CODEC_ID_PCM_U24LE: CodecID = 65550;
+pub const CODEC_ID_PCM_S24BE: CodecID = 65549;
+pub const CODEC_ID_PCM_S24LE: CodecID = 65548;
+pub const CODEC_ID_PCM_U32BE: CodecID = 65547;
+pub const CODEC_ID_PCM_U32LE: CodecID = 65546;
+pub const CODEC_ID_PCM_S32BE: CodecID = 65545;
+pub const CODEC_ID_PCM_S32LE: CodecID = 65544;
+pub const CODEC_ID_PCM_ALAW: CodecID = 65543;
+pub const CODEC_ID_PCM_MULAW: CodecID = 65542;
+pub const CODEC_ID_PCM_U8: CodecID = 65541;
+pub const CODEC_ID_PCM_S8: CodecID = 65540;
+pub const CODEC_ID_PCM_U16BE: CodecID = 65539;
+pub const CODEC_ID_PCM_U16LE: CodecID = 65538;
+pub const CODEC_ID_PCM_S16LE: CodecID = 65536;
+pub const CODEC_ID_FLASHSV: CodecID = 90;
+pub const CODEC_ID_KMVC: CodecID = 89;
+pub const CODEC_ID_NUV: CodecID = 88;
+pub const CODEC_ID_SMACKVIDEO: CodecID = 87;
+pub const CODEC_ID_AVS: CodecID = 86;
+pub const CODEC_ID_ZMBV: CodecID = 85;
+pub const CODEC_ID_MMVIDEO: CodecID = 84;
+pub const CODEC_ID_CSCD: CodecID = 83;
+pub const CODEC_ID_BMP: CodecID = 82;
+pub const CODEC_ID_TRUEMOTION2: CodecID = 81;
+pub const CODEC_ID_FRAPS: CodecID = 80;
+pub const CODEC_ID_INDEO2: CodecID = 79;
+pub const CODEC_ID_AASC: CodecID = 78;
+pub const CODEC_ID_WNV1: CodecID = 77;
+pub const CODEC_ID_LOCO: CodecID = 76;
+pub const CODEC_ID_WMV3: CodecID = 75;
+pub const CODEC_ID_VC1: CodecID = 74;
+pub const CODEC_ID_RV40: CodecID = 73;
+pub const CODEC_ID_RV30: CodecID = 72;
+pub const CODEC_ID_FFVHUFF: CodecID = 71;
+pub const CODEC_ID_PAM: CodecID = 70;
+pub const CODEC_ID_PGMYUV: CodecID = 69;
+pub const CODEC_ID_PGM: CodecID = 68;
+pub const CODEC_ID_PBM: CodecID = 67;
+pub const CODEC_ID_PPM: CodecID = 66;
+pub const CODEC_ID_PNG: CodecID = 65;
+pub const CODEC_ID_XVID: CodecID = 64;
+pub const CODEC_ID_QPEG: CodecID = 63;
+pub const CODEC_ID_VIXL: CodecID = 62;
+pub const CODEC_ID_QDRAW: CodecID = 61;
+pub const CODEC_ID_ULTI: CodecID = 60;
+pub const CODEC_ID_TSCC: CodecID = 59;
+pub const CODEC_ID_SNOW: CodecID = 58;
+pub const CODEC_ID_QTRLE: CodecID = 57;
+pub const CODEC_ID_ZLIB: CodecID = 56;
+pub const CODEC_ID_MSZH: CodecID = 55;
+pub const CODEC_ID_VMDVIDEO: CodecID = 54;
+pub const CODEC_ID_TRUEMOTION1: CodecID = 53;
+pub const CODEC_ID_FLIC: CodecID = 52;
+pub const CODEC_ID_SMC: CodecID = 51;
+pub const CODEC_ID_8BPS: CodecID = 50;
+pub const CODEC_ID_IDCIN: CodecID = 49;
+pub const CODEC_ID_MSVIDEO1: CodecID = 48;
+pub const CODEC_ID_MSRLE: CodecID = 47;
+pub const CODEC_ID_WS_VQA: CodecID = 46;
+pub const CODEC_ID_CINEPAK: CodecID = 45;
+pub const CODEC_ID_RPZA: CodecID = 44;
+pub const CODEC_ID_XAN_WC4: CodecID = 43;
+pub const CODEC_ID_XAN_WC3: CodecID = 42;
+pub const CODEC_ID_INTERPLAY_VIDEO: CodecID = 41;
+pub const CODEC_ID_ROQ: CodecID = 40;
+pub const CODEC_ID_MDEC: CodecID = 39;
+pub const CODEC_ID_CLJR: CodecID = 38;
+pub const CODEC_ID_VCR1: CodecID = 37;
+pub const CODEC_ID_4XM: CodecID = 36;
+pub const CODEC_ID_FFV1: CodecID = 35;
+pub const CODEC_ID_ASV2: CodecID = 34;
+pub const CODEC_ID_ASV1: CodecID = 33;
+pub const CODEC_ID_THEORA: CodecID = 32;
+pub const CODEC_ID_VP3: CodecID = 31;
+pub const CODEC_ID_INDEO3: CodecID = 30;
+pub const CODEC_ID_CYUV: CodecID = 28;
+pub const CODEC_ID_HUFFYUV: CodecID = 27;
+pub const CODEC_ID_DVVIDEO: CodecID = 26;
+pub const CODEC_ID_SVQ3: CodecID = 25;
+pub const CODEC_ID_SVQ1: CodecID = 24;
+pub const CODEC_ID_FLV1: CodecID = 23;
+pub const CODEC_ID_H263I: CodecID = 22;
+pub const CODEC_ID_H263P: CodecID = 21;
+pub const CODEC_ID_WMV2: CodecID = 20;
+pub const CODEC_ID_WMV1: CodecID = 19;
+pub const CODEC_ID_MSMPEG4V3: CodecID = 18;
+pub const CODEC_ID_MSMPEG4V2: CodecID = 17;
+pub const CODEC_ID_MSMPEG4V1: CodecID = 16;
+pub const CODEC_ID_RAWVIDEO: CodecID = 15;
+pub const CODEC_ID_JPEGLS: CodecID = 13;
+pub const CODEC_ID_SP5X: CodecID = 12;
+pub const CODEC_ID_LJPEG: CodecID = 11;
+pub const CODEC_ID_MJPEGB: CodecID = 10;
+pub const CODEC_ID_MJPEG: CodecID = 9;
+pub const CODEC_ID_RV20: CodecID = 8;
+pub const CODEC_ID_RV10: CodecID = 7;
+pub const CODEC_ID_H263: CodecID = 6;
+pub const CODEC_ID_H261: CodecID = 5;
+pub const CODEC_ID_MPEG2VIDEO_XVMC_VLD: CodecID = 4;
+pub const CODEC_ID_MPEG2VIDEO_XVMC: CodecID = 3;
+pub const CODEC_ID_MPEG1VIDEO: CodecID = 1;
+pub const CODEC_ID_NONE: CodecID = 0;
+#[no_mangle]
+pub static mut header_state: libc::c_uint = 0;
+#[no_mangle]
+pub static mut psm_es_type: [libc::c_uchar; 256] = [0; 256];
+#[no_mangle]
+pub static mut cc608_parity_table: [libc::c_int; 256] = [0; 256];
+#[no_mangle]
+pub static mut av: AVPacket = AVPacket {
+    pts: 0,
+    dts: 0,
+    data: 0 as *const libc::c_uchar as *mut libc::c_uchar,
+    size: 0,
+    stream_index: 0,
+    flags: 0,
+    duration: 0,
+    destruct: None,
+    priv_0: 0 as *const libc::c_void as *mut libc::c_void,
+    pos: 0,
+    codec_id: 0,
+    type_0: 0,
+};
+#[no_mangle]
+pub unsafe extern "C" fn get_be16() -> libc::c_int {
+    let mut a: libc::c_uchar = 0;
+    let mut b: libc::c_uchar = 0;
+    if bytesinbuffer - filebuffer_pos != 0 {
+        if !(&mut a as *mut libc::c_uchar).is_null() {
+            a = *filebuffer.offset(filebuffer_pos as isize);
+            filebuffer_pos += 1;
+            result = 1 as libc::c_int as LONG;
+        }
+    } else {
+        result = buffered_read_opt(&mut a, 1 as libc::c_int as libc::c_uint);
+    }
+    if bytesinbuffer - filebuffer_pos != 0 {
+        if !(&mut b as *mut libc::c_uchar).is_null() {
+            b = *filebuffer.offset(filebuffer_pos as isize);
+            filebuffer_pos += 1;
+            result = 1 as libc::c_int as LONG;
+        }
+    } else {
+        result = buffered_read_opt(&mut b, 1 as libc::c_int as libc::c_uint);
+    }
+    return (a as libc::c_int) << 8 as libc::c_int | b as libc::c_int;
+}
+#[no_mangle]
+pub unsafe extern "C" fn get_byte() -> libc::c_int {
+    let mut b: libc::c_uchar = 0;
+    if bytesinbuffer - filebuffer_pos != 0 {
+        if !(&mut b as *mut libc::c_uchar).is_null() {
+            b = *filebuffer.offset(filebuffer_pos as isize);
+            filebuffer_pos += 1;
+            result = 1 as libc::c_int as LONG;
+        }
+    } else {
+        result = buffered_read_opt(&mut b, 1 as libc::c_int as libc::c_uint);
+    }
+    if result == 1 as libc::c_int as libc::c_long {
+        return b as libc::c_int
+    } else {
+        return 0 as libc::c_int
+    };
+}
+#[no_mangle]
+pub unsafe extern "C" fn get_be32() -> libc::c_uint {
+    let mut val: libc::c_uint = 0;
+    val = (get_be16() << 16 as libc::c_int) as libc::c_uint;
+    val |= get_be16() as libc::c_uint;
+    return val;
+}
+unsafe extern "C" fn get_pts(mut c: libc::c_int) -> LONG {
+    let mut pts: LONG = 0;
+    let mut val: libc::c_int = 0;
+    if c < 0 as libc::c_int {
+        c = get_byte();
+    }
+    pts = ((c >> 1 as libc::c_int & 0x7 as libc::c_int) as LONG) << 30 as libc::c_int;
+    val = get_be16();
+    pts |= ((val >> 1 as libc::c_int) as LONG) << 15 as libc::c_int;
+    val = get_be16();
+    pts |= (val >> 1 as libc::c_int) as LONG;
+    return pts;
+}
+unsafe extern "C" fn find_next_start_code(
+    mut size_ptr: *mut libc::c_int,
+    mut header_state_0: *mut libc::c_uint,
+) -> libc::c_int {
+    let mut current_block: u64;
+    let mut state: libc::c_uint = 0;
+    let mut v: libc::c_uint = 0;
+    let mut val: libc::c_int = 0;
+    let mut n: libc::c_int = 0;
+    state = *header_state_0;
+    n = *size_ptr;
+    loop {
+        if !(n > 0 as libc::c_int) {
+            current_block = 13797916685926291137;
+            break;
+        }
+        let mut cx: libc::c_uchar = 0;
+        if bytesinbuffer - filebuffer_pos != 0 {
+            if !(&mut cx as *mut libc::c_uchar).is_null() {
+                cx = *filebuffer.offset(filebuffer_pos as isize);
+                filebuffer_pos += 1;
+                result = 1 as libc::c_int as LONG;
+            }
+        } else {
+            result = buffered_read_opt(&mut cx, 1 as libc::c_int as libc::c_uint);
+        }
+        if result != 1 as libc::c_int as libc::c_long {
+            current_block = 13797916685926291137;
+            break;
+        }
+        v = cx as libc::c_uint;
+        n -= 1;
+        if state == 0x1 as libc::c_int as libc::c_uint {
+            state = (state << 8 as libc::c_int | v)
+                & 0xffffff as libc::c_int as libc::c_uint;
+            val = state as libc::c_int;
+            current_block = 18295522109918506392;
+            break;
+        } else {
+            state = (state << 8 as libc::c_int | v)
+                & 0xffffff as libc::c_int as libc::c_uint;
+        }
+    }
+    match current_block {
+        13797916685926291137 => {
+            val = -(1 as libc::c_int);
+        }
+        _ => {}
+    }
+    *header_state_0 = state;
+    *size_ptr = n;
+    return val;
+}
+#[no_mangle]
+pub unsafe extern "C" fn url_fskip(mut length: libc::c_int) {
+    buffered_seek(length);
+}
+unsafe extern "C" fn mpegps_psm_parse() -> libc::c_long {
+    let mut psm_length: libc::c_int = 0;
+    let mut ps_info_length: libc::c_int = 0;
+    let mut es_map_length: libc::c_int = 0;
+    psm_length = get_be16();
+    get_byte();
+    get_byte();
+    ps_info_length = get_be16();
+    url_fskip(ps_info_length);
+    es_map_length = get_be16();
+    while es_map_length >= 4 as libc::c_int {
+        let mut type_0: libc::c_uchar = get_byte() as libc::c_uchar;
+        let mut es_id: libc::c_uchar = get_byte() as libc::c_uchar;
+        let mut es_info_length: libc::c_uint = get_be16() as libc::c_uint;
+        psm_es_type[es_id as usize] = type_0;
+        url_fskip(es_info_length as libc::c_int);
+        es_map_length = (es_map_length as libc::c_uint)
+            .wrapping_sub(
+                (4 as libc::c_int as libc::c_uint).wrapping_add(es_info_length),
+            ) as libc::c_int as libc::c_int;
+    }
+    get_be32();
+    return (2 as libc::c_int + psm_length) as libc::c_long;
+}
+unsafe extern "C" fn mpegps_read_pes_header(
+    mut pstart_code: *mut libc::c_int,
+    mut ppts: *mut LONG,
+    mut pdts: *mut LONG,
+) -> libc::c_int {
+    let mut len: libc::c_int = 0;
+    let mut size: libc::c_int = 0;
+    let mut startcode: libc::c_int = 0;
+    let mut c: libc::c_int = 0;
+    let mut flags: libc::c_int = 0;
+    let mut header_len: libc::c_int = 0;
+    let mut pts: LONG = 0;
+    let mut dts: LONG = 0;
+    'c_8550: loop {
+        header_state = 0xff as libc::c_int as libc::c_uint;
+        size = 100000 as libc::c_int;
+        startcode = find_next_start_code(&mut size, &mut header_state);
+        if startcode < 0 as libc::c_int {
+            return -(2 as libc::c_int);
+        }
+        if startcode as libc::c_uint == 0x1ba as libc::c_int as libc::c_uint {
+            continue;
+        }
+        if startcode as libc::c_uint == 0x1bb as libc::c_int as libc::c_uint {
+            continue;
+        }
+        if startcode == 0x1be as libc::c_int || startcode == 0x1bf as libc::c_int {
+            len = get_be16();
+        } else if startcode == 0x1bc as libc::c_int {
+            mpegps_psm_parse();
+        } else {
+            if !(startcode >= 0x1c0 as libc::c_int && startcode <= 0x1df as libc::c_int
+                || startcode >= 0x1e0 as libc::c_int && startcode <= 0x1ef as libc::c_int
+                || startcode == 0x1bd as libc::c_int)
+            {
+                continue;
+            }
+            len = get_be16();
+            pts = 0x8000000000000000 as libc::c_ulong as int64_t as LONG;
+            dts = 0x8000000000000000 as libc::c_ulong as int64_t as LONG;
+            loop {
+                if len < 1 as libc::c_int {
+                    continue 'c_8550;
+                }
+                c = get_byte();
+                len -= 1;
+                if c != 0xff as libc::c_int {
+                    break;
+                }
+            }
+            if c & 0xc0 as libc::c_int == 0x40 as libc::c_int {
+                if len < 2 as libc::c_int {
+                    continue;
+                }
+                get_byte();
+                c = get_byte();
+                len -= 2 as libc::c_int;
+            }
+            if c & 0xf0 as libc::c_int == 0x20 as libc::c_int {
+                if len < 4 as libc::c_int {
+                    continue;
+                }
+                pts = get_pts(c);
+                dts = pts;
+                len -= 4 as libc::c_int;
+            } else if c & 0xf0 as libc::c_int == 0x30 as libc::c_int {
+                if len < 9 as libc::c_int {
+                    continue;
+                }
+                pts = get_pts(c);
+                dts = get_pts(-(1 as libc::c_int));
+                len -= 9 as libc::c_int;
+            } else if c & 0xc0 as libc::c_int == 0x80 as libc::c_int {
+                flags = get_byte();
+                header_len = get_byte();
+                len -= 2 as libc::c_int;
+                if header_len > len {
+                    continue;
+                }
+                if flags & 0xc0 as libc::c_int == 0x80 as libc::c_int {
+                    pts = get_pts(-(1 as libc::c_int));
+                    dts = pts;
+                    if header_len < 5 as libc::c_int {
+                        continue;
+                    }
+                    header_len -= 5 as libc::c_int;
+                    len -= 5 as libc::c_int;
+                }
+                if flags & 0xc0 as libc::c_int == 0xc0 as libc::c_int {
+                    pts = get_pts(-(1 as libc::c_int));
+                    dts = get_pts(-(1 as libc::c_int));
+                    if header_len < 10 as libc::c_int {
+                        continue;
+                    }
+                    header_len -= 10 as libc::c_int;
+                    len -= 10 as libc::c_int;
+                }
+                len -= header_len;
+                while header_len > 0 as libc::c_int {
+                    get_byte();
+                    header_len -= 1;
+                }
+            } else if c != 0xf as libc::c_int {
+                continue;
+            }
+            if !(startcode == 0x1bd as libc::c_int) {
+                break;
+            }
+            if len < 1 as libc::c_int {
+                continue;
+            }
+            startcode = get_byte();
+            len -= 1;
+            if !(startcode >= 0x80 as libc::c_int && startcode <= 0xbf as libc::c_int) {
+                break;
+            }
+            if len < 3 as libc::c_int {
+                continue;
+            }
+            get_byte();
+            get_byte();
+            get_byte();
+            len -= 3 as libc::c_int;
+            break;
+        }
+    }
+    *pstart_code = startcode;
+    *ppts = pts;
+    *pdts = dts;
+    return len;
+}
+unsafe extern "C" fn cc608_good_parity(
+    mut parity_table: *const libc::c_int,
+    mut data: libc::c_uint,
+) -> libc::c_int {
+    let mut ret: libc::c_int = (*parity_table
+        .offset((data & 0xff as libc::c_int as libc::c_uint) as isize) != 0
+        && *parity_table
+            .offset(
+                ((data & 0xff00 as libc::c_int as libc::c_uint) >> 8 as libc::c_int)
+                    as isize,
+            ) != 0) as libc::c_int;
+    ret == 0;
+    return ret;
+}
+#[no_mangle]
+pub unsafe extern "C" fn ProcessVBIDataPacket() {
+    static mut min_blank: libc::c_uint = 6 as libc::c_int as libc::c_uint;
+    let mut linemask: LONG = 0 as libc::c_int as LONG;
+    let mut meat: *const libc::c_uchar = av.data;
+    let mut i: libc::c_uint = 0;
+    if meat.is_null() {
+        printf(
+            b"Warning: ProcessVBIDataPacket called with NULL data, ignoring.\n\0"
+                as *const u8 as *const libc::c_char,
+        );
+        return;
+    }
+    if *meat.offset(0 as libc::c_int as isize) as libc::c_int == 't' as i32
+        && *meat.offset(1 as libc::c_int as isize) as libc::c_int == 'v' as i32
+        && *meat.offset(2 as libc::c_int as isize) as libc::c_int == '0' as i32
+    {
+        memcpy(
+            &mut linemask as *mut LONG as *mut libc::c_void,
+            meat.offset(3 as libc::c_int as isize) as *const libc::c_void,
+            8 as libc::c_int as libc::c_ulong,
+        );
+        meat = meat.offset(11 as libc::c_int as isize);
+    } else if *meat.offset(0 as libc::c_int as isize) as libc::c_int == 'T' as i32
+            && *meat.offset(1 as libc::c_int as isize) as libc::c_int == 'V' as i32
+            && *meat.offset(2 as libc::c_int as isize) as libc::c_int == '0' as i32
+        {
+        linemask = 0xffffffffffffffff as libc::c_ulong as LONG;
+        meat = meat.offset(3 as libc::c_int as isize);
+    } else {
+        printf(b"Unknown VBI data stream\n\0" as *const u8 as *const libc::c_char);
+        return;
+    }
+    i = 0 as libc::c_int as libc::c_uint;
+    while i < 36 as libc::c_int as libc::c_uint {
+        let mut line: libc::c_uint = 0;
+        let mut field: libc::c_uint = 0;
+        let mut id2: libc::c_uint = 0;
+        if !(linemask >> i & 0x1 as libc::c_int as libc::c_long == 0) {
+            line = (if i < 18 as libc::c_int as libc::c_uint {
+                i
+            } else {
+                i.wrapping_sub(18 as libc::c_int as libc::c_uint)
+            })
+                .wrapping_add(min_blank);
+            field = (if i < 18 as libc::c_int as libc::c_uint {
+                0 as libc::c_int
+            } else {
+                1 as libc::c_int
+            }) as libc::c_uint;
+            id2 = (*meat as libc::c_int & 0xf as libc::c_int) as libc::c_uint;
+            match id2 {
+                4 => {
+                    if 21 as libc::c_int as libc::c_uint == line {
+                        let mut data: libc::c_int = (*meat
+                            .offset(2 as libc::c_int as isize) as libc::c_int)
+                            << 8 as libc::c_int
+                            | *meat.offset(1 as libc::c_int as isize) as libc::c_int;
+                        if cc608_good_parity(
+                            cc608_parity_table.as_mut_ptr(),
+                            data as libc::c_uint,
+                        ) != 0
+                        {
+                            if field == 0 as libc::c_int as libc::c_uint {
+                                printdata(
+                                    meat.offset(1 as libc::c_int as isize),
+                                    2 as libc::c_int,
+                                    0 as *const libc::c_uchar,
+                                    0 as libc::c_int,
+                                );
+                                c1count = c1count.wrapping_add(1);
+                            } else {
+                                printdata(
+                                    0 as *const libc::c_uchar,
+                                    0 as libc::c_int,
+                                    meat.offset(1 as libc::c_int as isize),
+                                    2 as libc::c_int,
+                                );
+                                c2count = c2count.wrapping_add(1);
+                            }
+                        }
+                    }
+                }
+                7 => {}
+                5 => {}
+                1 | _ => {}
+            }
+            meat = meat.offset(43 as libc::c_int as isize);
+        }
+        i = i.wrapping_add(1);
+    }
+}
+unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
+    let mut current_block: u64;
+    let mut pts: LONG = 0;
+    let mut dts: LONG = 0;
+    let mut len: libc::c_int = 0;
+    let mut startcode: libc::c_int = 0;
+    let mut type_0: libc::c_int = 0;
+    let mut codec_id: libc::c_int = 0 as libc::c_int;
+    let mut es_type: libc::c_int = 0;
+    loop {
+        len = mpegps_read_pes_header(&mut startcode, &mut pts, &mut dts);
+        if len < 0 as libc::c_int {
+            return len;
+        }
+        es_type = psm_es_type[(startcode & 0xff as libc::c_int) as usize] as libc::c_int;
+        if es_type > 0 as libc::c_int {
+            if es_type == 0x1 as libc::c_int {
+                codec_id = CODEC_ID_MPEG2VIDEO as libc::c_int;
+                type_0 = CODEC_TYPE_VIDEO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else if es_type == 0x2 as libc::c_int {
+                codec_id = CODEC_ID_MPEG2VIDEO as libc::c_int;
+                type_0 = CODEC_TYPE_VIDEO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else if es_type == 0x3 as libc::c_int || es_type == 0x4 as libc::c_int {
+                codec_id = CODEC_ID_MP3 as libc::c_int;
+                type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else if es_type == 0xf as libc::c_int {
+                codec_id = CODEC_ID_AAC as libc::c_int;
+                type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else if es_type == 0x10 as libc::c_int {
+                codec_id = CODEC_ID_MPEG4 as libc::c_int;
+                type_0 = CODEC_TYPE_VIDEO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else if es_type == 0x1b as libc::c_int {
+                codec_id = CODEC_ID_H264 as libc::c_int;
+                type_0 = CODEC_TYPE_VIDEO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else if es_type == 0x81 as libc::c_int {
+                codec_id = CODEC_ID_AC3 as libc::c_int;
+                type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+                current_block = 5028470053297453708;
+            } else {
+                current_block = 16088375578540436547;
+            }
+        } else if startcode >= 0x1e0 as libc::c_int && startcode <= 0x1ef as libc::c_int
+            {
+            static mut avs_seqh: [libc::c_uchar; 4] = [
+                0 as libc::c_int as libc::c_uchar,
+                0 as libc::c_int as libc::c_uchar,
+                1 as libc::c_int as libc::c_uchar,
+                0xb0 as libc::c_int as libc::c_uchar,
+            ];
+            let mut buf: [libc::c_uchar; 8] = [0; 8];
+            if 8 as libc::c_int <= bytesinbuffer - filebuffer_pos {
+                if !buf.as_mut_ptr().is_null() {
+                    memcpy(
+                        buf.as_mut_ptr() as *mut libc::c_void,
+                        filebuffer.offset(filebuffer_pos as isize)
+                            as *const libc::c_void,
+                        8 as libc::c_int as libc::c_ulong,
+                    );
+                }
+                filebuffer_pos += 8 as libc::c_int;
+                result = 8 as libc::c_int as LONG;
+            } else {
+                result = buffered_read_opt(
+                    buf.as_mut_ptr(),
+                    8 as libc::c_int as libc::c_uint,
+                );
+            }
+            buffered_seek(-(8 as libc::c_int));
+            if memcmp(
+                buf.as_mut_ptr() as *const libc::c_void,
+                avs_seqh.as_ptr() as *const libc::c_void,
+                4 as libc::c_int as libc::c_ulong,
+            ) == 0
+                && (buf[6 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
+                    || buf[7 as libc::c_int as usize] as libc::c_int != 1 as libc::c_int)
+            {
+                codec_id = CODEC_ID_CAVS as libc::c_int;
+            } else {
+                codec_id = CODEC_ID_MPEG2VIDEO as libc::c_int;
+            }
+            type_0 = CODEC_TYPE_VIDEO as libc::c_int;
+            current_block = 5028470053297453708;
+        } else if startcode >= 0x1c0 as libc::c_int && startcode <= 0x1df as libc::c_int
+            {
+            type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+            codec_id = CODEC_ID_MP2 as libc::c_int;
+            current_block = 5028470053297453708;
+        } else if startcode >= 0x80 as libc::c_int && startcode <= 0x87 as libc::c_int {
+            type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+            codec_id = CODEC_ID_AC3 as libc::c_int;
+            current_block = 5028470053297453708;
+        } else if startcode >= 0x88 as libc::c_int && startcode <= 0x9f as libc::c_int {
+            type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+            codec_id = CODEC_ID_DTS as libc::c_int;
+            current_block = 5028470053297453708;
+        } else if startcode >= 0xa0 as libc::c_int && startcode <= 0xbf as libc::c_int {
+            type_0 = CODEC_TYPE_AUDIO as libc::c_int;
+            codec_id = CODEC_ID_PCM_S16BE as libc::c_int;
+            current_block = 5028470053297453708;
+        } else if startcode >= 0x20 as libc::c_int && startcode <= 0x3f as libc::c_int {
+            type_0 = CODEC_TYPE_SUBTITLE as libc::c_int;
+            codec_id = CODEC_ID_DVD_SUBTITLE as libc::c_int;
+            current_block = 5028470053297453708;
+        } else if startcode == 0x69 as libc::c_int || startcode == 0x49 as libc::c_int {
+            type_0 = CODEC_TYPE_DATA as libc::c_int;
+            codec_id = CODEC_ID_MPEG2VBI as libc::c_int;
+            current_block = 5028470053297453708;
+        } else {
+            current_block = 16088375578540436547;
+        }
+        match current_block {
+            5028470053297453708 => {
+                if !(startcode >= 0xa0 as libc::c_int
+                    && startcode <= 0xbf as libc::c_int)
+                {
+                    break;
+                }
+                if !(len <= 3 as libc::c_int) {
+                    get_byte();
+                    get_byte();
+                    get_byte();
+                    len -= 3 as libc::c_int;
+                    break;
+                }
+            }
+            _ => {}
+        }
+        url_fskip(len);
+    }
+    av.size = len;
+    av
+        .data = realloc(av.data as *mut libc::c_void, av.size as libc::c_ulong)
+        as *mut libc::c_uchar;
+    if (av.data).is_null() {
+        printf(
+            b"\rNot enough memory, realloc() failed. Giving up.\n\0" as *const u8
+                as *const libc::c_char,
+        );
+        exit(-(3 as libc::c_int));
+    }
+    av.codec_id = codec_id;
+    av.type_0 = type_0;
+    if av.size <= bytesinbuffer - filebuffer_pos {
+        if !(av.data).is_null() {
+            memcpy(
+                av.data as *mut libc::c_void,
+                filebuffer.offset(filebuffer_pos as isize) as *const libc::c_void,
+                av.size as libc::c_ulong,
+            );
+        }
+        filebuffer_pos += av.size;
+        result = av.size as LONG;
+    } else {
+        result = buffered_read_opt(av.data, av.size as libc::c_uint);
+    }
+    av.pts = pts;
+    av.dts = dts;
+    return 0 as libc::c_int;
+}
+unsafe extern "C" fn cc608_parity(mut byte: libc::c_uint) -> libc::c_int {
+    let mut ones: libc::c_int = 0 as libc::c_int;
+    let mut i: libc::c_int = 0;
+    i = 0 as libc::c_int;
+    while i < 7 as libc::c_int {
+        if byte & ((1 as libc::c_int) << i) as libc::c_uint != 0 {
+            ones += 1;
+        }
+        i += 1;
+    }
+    return ones & 1 as libc::c_int;
+}
+unsafe extern "C" fn cc608_build_parity_table(mut parity_table: *mut libc::c_int) {
+    let mut byte: libc::c_uint = 0;
+    let mut parity_v: libc::c_int = 0;
+    byte = 0 as libc::c_int as libc::c_uint;
+    while byte <= 127 as libc::c_int as libc::c_uint {
+        parity_v = cc608_parity(byte);
+        *parity_table.offset(byte as isize) = parity_v;
+        *parity_table
+            .offset(
+                (byte | 0x80 as libc::c_int as libc::c_uint) as isize,
+            ) = (parity_v == 0) as libc::c_int;
+        byte = byte.wrapping_add(1);
+    }
+}
+#[no_mangle]
+pub unsafe extern "C" fn build_parity_table() {
+    cc608_build_parity_table(cc608_parity_table.as_mut_ptr());
+}
+#[no_mangle]
+pub unsafe extern "C" fn myth_loop() {
+    let mut rc: libc::c_int = 0;
+    let mut has_vbi: libc::c_int = 0 as libc::c_int;
+    let mut desp: *mut libc::c_uchar = 0 as *mut libc::c_uchar;
+    let mut saved: LONG = 0;
+    av.data = 0 as *mut libc::c_uchar;
+    buffer_input = 1 as libc::c_int;
+    if init_file_buffer() != 0 {
+        printf(b"Not enough memory.\n\0" as *const u8 as *const libc::c_char);
+        exit(-(3 as libc::c_int));
+    }
+    desp = malloc(65536 as libc::c_int as libc::c_ulong) as *mut libc::c_uchar;
+    saved = 0 as libc::c_int as LONG;
+    while processed_enough == 0
+        && {
+            rc = mpegps_read_packet();
+            rc == 0 as libc::c_int
+        }
+    {
+        if av.codec_id == CODEC_ID_MPEG2VBI as libc::c_int
+            && av.type_0 == CODEC_TYPE_DATA as libc::c_int
+        {
+            if has_vbi == 0 {
+                printf(
+                    b"\rDetected VBI data, disabling user-data packet analysis (not needed).\n\0"
+                        as *const u8 as *const libc::c_char,
+                );
+                has_vbi = 1 as libc::c_int;
+            }
+            ProcessVBIDataPacket();
+        }
+        if av.codec_id == CODEC_ID_MPEG2VIDEO as libc::c_int
+            && av.type_0 == CODEC_TYPE_VIDEO as libc::c_int && has_vbi == 0
+        {
+            let mut length: LONG = saved + av.size as libc::c_long;
+            let mut used: LONG = 0;
+            if length > 65536 as libc::c_int as libc::c_long {
+                printf(
+                    b"Not enough memory. Please report this: 65536 bytes is not enough!\0"
+                        as *const u8 as *const libc::c_char,
+                );
+                exit(-(500 as libc::c_int));
+            }
+            if av.pts as libc::c_longlong
+                != 0x8000000000000000 as libc::c_ulong as int64_t
+            {
+                current_pts = av.pts;
+                if pts_set == 0 as libc::c_int {
+                    pts_set = 1 as libc::c_int;
+                }
+            }
+            memcpy(
+                desp.offset(saved as isize) as *mut libc::c_void,
+                av.data as *const libc::c_void,
+                av.size as libc::c_ulong,
+            );
+            used = process_block(desp, length);
+            memmove(
+                desp as *mut libc::c_void,
+                desp.offset(used as isize) as *const libc::c_void,
+                (length - used) as libc::c_uint as libc::c_ulong,
+            );
+            saved = length - used;
+        }
+        if inputsize > 0 as libc::c_int as libc::c_long {
+            let mut cur_sec: libc::c_int = 0;
+            let mut at: LONG = lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int)
+                as LONG;
+            let mut progress: libc::c_int = ((at >> 8 as libc::c_int)
+                * 100 as libc::c_int as libc::c_long / (inputsize >> 8 as libc::c_int))
+                as libc::c_int;
+            if last_reported_progress != progress {
+                printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
+                cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double
+                    / 29.97f64) as libc::c_int;
+                printf(
+                    b"  |  %02d:%02d\0" as *const u8 as *const libc::c_char,
+                    cur_sec / 60 as libc::c_int,
+                    cur_sec % 60 as libc::c_int,
+                );
+                last_reported_progress = progress;
+            }
+        }
+    }
+    free(av.data as *mut libc::c_void);
+}
