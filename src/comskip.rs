@@ -1,4 +1,4 @@
-#![allow(unused_parens, path_statements)]
+#![allow(path_statements)]
 extern "C" {
     pub type __sFILEX;
     pub type dispatch_semaphore_s;
@@ -1832,12 +1832,12 @@ pub unsafe extern "C" fn ValidateBlackFrames(
         }
         if (i as libc::c_long) < black_count {
             length = (if !frame.is_null() {
-                (if (*black.offset(((i + k) / 2 as libc::c_int) as isize)).frame
+                if (*black.offset(((i + k) / 2 as libc::c_int) as isize)).frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*black.offset(((i + k) / 2 as libc::c_int) as isize)).frame
+                    if (*black.offset(((i + k) / 2 as libc::c_int) as isize)).frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -1846,20 +1846,20 @@ pub unsafe extern "C" fn ValidateBlackFrames(
                             (*black.offset(((i + k) / 2 as libc::c_int) as isize)).frame as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*black.offset(((i + k) / 2 as libc::c_int) as isize)).frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if (*black.offset(last as isize)).frame <= 0 as libc::c_int as libc::c_long {
+                if (*black.offset(last as isize)).frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*black.offset(last as isize)).frame >= framenum_real as libc::c_long {
+                    if (*black.offset(last as isize)).frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*black.offset(last as isize)).frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*black.offset(last as isize)).frame as libc::c_double / fps
             });
@@ -1985,24 +1985,24 @@ pub unsafe extern "C" fn ValidateBlackFrames(
                 j -= 1;
             }
             length = (if !frame.is_null() {
-                (if (*black.offset(i as isize)).frame <= 0 as libc::c_int as libc::c_long {
+                if (*black.offset(i as isize)).frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*black.offset(i as isize)).frame >= framenum_real as libc::c_long {
+                    if (*black.offset(i as isize)).frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*black.offset(i as isize)).frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*black.offset(i as isize)).frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if (*black.offset(((i - 1 as libc::c_int + j) / 2 as libc::c_int) as isize)).frame
+                if (*black.offset(((i - 1 as libc::c_int + j) / 2 as libc::c_int) as isize)).frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*black.offset(((i - 1 as libc::c_int + j) / 2 as libc::c_int) as isize))
+                    if (*black.offset(((i - 1 as libc::c_int + j) / 2 as libc::c_int) as isize))
                         .frame
                         >= framenum_real as libc::c_long
                     {
@@ -2014,8 +2014,8 @@ pub unsafe extern "C" fn ValidateBlackFrames(
                             .frame as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*black.offset(((i - 1 as libc::c_int + j) / 2 as libc::c_int) as isize)).frame
                     as libc::c_double
@@ -2026,27 +2026,27 @@ pub unsafe extern "C" fn ValidateBlackFrames(
                 if IsStandardCommercialLength(
                     length,
                     (if !frame.is_null() {
-                        (if i <= 0 as libc::c_int {
+                        if i <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if i >= framenum_real {
+                            if i >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(i as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         i as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if j <= 0 as libc::c_int {
+                        if j <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if j >= framenum_real {
+                            if j >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(j as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         j as libc::c_double / fps
                     }) + 0.8f64,
@@ -2565,27 +2565,27 @@ pub unsafe extern "C" fn BuildBlocks(recalc: bool) -> bool {
         black_end = 0 as libc::c_int;
         while (j as libc::c_long) < black_count
             && (if !frame.is_null() {
-                (if (*black.offset(j as isize)).frame <= 0 as libc::c_int as libc::c_long {
+                if (*black.offset(j as isize)).frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*black.offset(j as isize)).frame >= framenum_real as libc::c_long {
+                    if (*black.offset(j as isize)).frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*black.offset(j as isize)).frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*black.offset(j as isize)).frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if b_end <= 0 as libc::c_int as libc::c_long {
+                if b_end <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if b_end >= framenum_real as libc::c_long {
+                    if b_end >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(b_end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 b_end as libc::c_double / fps
             }) < 1.0f64
@@ -2679,53 +2679,53 @@ pub unsafe extern "C" fn BuildBlocks(recalc: bool) -> bool {
         cblock[block_count as usize].bframe_count =
             (cblock[block_count as usize].b_head).wrapping_add(cblock[block_count as usize].b_tail);
         cblock[block_count as usize].length = (if !frame.is_null() {
-            (if cblock[block_count as usize].f_end <= 0 as libc::c_int as libc::c_long {
+            if cblock[block_count as usize].f_end <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if cblock[block_count as usize].f_end >= framenum_real as libc::c_long {
+                if cblock[block_count as usize].f_end >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(cblock[block_count as usize].f_end as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             cblock[block_count as usize].f_end as libc::c_double / fps
         }) - (if !frame.is_null() {
-            (if cblock[block_count as usize].f_start <= 0 as libc::c_int as libc::c_long {
+            if cblock[block_count as usize].f_start <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if cblock[block_count as usize].f_start >= framenum_real as libc::c_long {
+                if cblock[block_count as usize].f_start >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(cblock[block_count as usize].f_start as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             cblock[block_count as usize].f_start as libc::c_double / fps
         });
         if block_count > 0 as libc::c_int as libc::c_long
             || (if !frame.is_null() {
-                (if cblock[block_count as usize].f_end <= 0 as libc::c_int as libc::c_long {
+                if cblock[block_count as usize].f_end <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[block_count as usize].f_end >= framenum_real as libc::c_long {
+                    if cblock[block_count as usize].f_end >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[block_count as usize].f_end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[block_count as usize].f_end as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if cblock[block_count as usize].f_start <= 0 as libc::c_int as libc::c_long {
+                if cblock[block_count as usize].f_start <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[block_count as usize].f_start >= framenum_real as libc::c_long {
+                    if cblock[block_count as usize].f_start >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[block_count as usize].f_start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[block_count as usize].f_start as libc::c_double / fps
             }) > 1.0f64
@@ -2773,36 +2773,35 @@ pub unsafe extern "C" fn BuildBlocks(recalc: bool) -> bool {
             cblock[(i - 1 as libc::c_int) as usize].f_end = cblock[i as usize].f_end;
             cblock[(i - 1 as libc::c_int) as usize].b_tail = cblock[i as usize].b_tail;
             cblock[(i - 1 as libc::c_int) as usize].length = (if !frame.is_null() {
-                (if cblock[(i - 1 as libc::c_int) as usize].f_end
-                    <= 0 as libc::c_int as libc::c_long
+                if cblock[(i - 1 as libc::c_int) as usize].f_end <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[(i - 1 as libc::c_int) as usize].f_end
+                    if cblock[(i - 1 as libc::c_int) as usize].f_end
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[(i - 1 as libc::c_int) as usize].f_end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[(i - 1 as libc::c_int) as usize].f_end as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if cblock[(i - 1 as libc::c_int) as usize].f_start
+                if cblock[(i - 1 as libc::c_int) as usize].f_start
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[(i - 1 as libc::c_int) as usize].f_start
+                    if cblock[(i - 1 as libc::c_int) as usize].f_start
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[(i - 1 as libc::c_int) as usize].f_start as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[(i - 1 as libc::c_int) as usize].f_start as libc::c_double / fps
             });
@@ -2910,29 +2909,29 @@ pub unsafe extern "C" fn CleanLogoBlocks() {
                     cblock[(i - 1 as libc::c_int) as usize].ar_ratio = cblock[i as usize].ar_ratio;
                 }
                 cblock[(i - 1 as libc::c_int) as usize].length = (if !frame.is_null() {
-                    (if cblock[(i - 1 as libc::c_int) as usize].f_end
+                    if cblock[(i - 1 as libc::c_int) as usize].f_end
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[(i - 1 as libc::c_int) as usize].f_end
+                        if cblock[(i - 1 as libc::c_int) as usize].f_end
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(cblock[(i - 1 as libc::c_int) as usize].f_end as isize))
                                 .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[(i - 1 as libc::c_int) as usize].f_end as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if cblock[(i - 1 as libc::c_int) as usize].f_start
+                    if cblock[(i - 1 as libc::c_int) as usize].f_start
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[(i - 1 as libc::c_int) as usize].f_start
+                        if cblock[(i - 1 as libc::c_int) as usize].f_start
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -2940,8 +2939,8 @@ pub unsafe extern "C" fn CleanLogoBlocks() {
                             (*frame
                                 .offset(cblock[(i - 1 as libc::c_int) as usize].f_start as isize))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[(i - 1 as libc::c_int) as usize].f_start as libc::c_double / fps
                 });
@@ -3744,28 +3743,28 @@ pub unsafe extern "C" fn DetectCommercials(f: libc::c_int, mut pts: libc::c_doub
             if delay_logo_search == 0 as libc::c_int
                 || delay_logo_search == 1 as libc::c_int
                     && (if !frame.is_null() {
-                        (if frame_count <= 0 as libc::c_int as libc::c_long {
+                        if frame_count <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if frame_count >= framenum_real as libc::c_long {
+                            if frame_count >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(frame_count as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         frame_count as libc::c_double / fps
                     }) > (added_recording * 60 as libc::c_int) as libc::c_double
                 || (if !frame.is_null() {
-                    (if frame_count <= 0 as libc::c_int as libc::c_long {
+                    if frame_count <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if frame_count >= framenum_real as libc::c_long {
+                        if frame_count >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(frame_count as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     frame_count as libc::c_double / fps
                 }) > delay_logo_search as libc::c_double
@@ -3807,25 +3806,25 @@ pub unsafe extern "C" fn DetectCommercials(f: libc::c_int, mut pts: libc::c_doub
                 && logo_block_count > 0 as libc::c_int as libc::c_long
                 && !lastLogoTest
                 && (if !frame.is_null() {
-                    (if frame_count <= 0 as libc::c_int as libc::c_long {
+                    if frame_count <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if frame_count >= framenum_real as libc::c_long {
+                        if frame_count >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(frame_count as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     frame_count as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if (*logo_block
+                    if (*logo_block
                         .offset((logo_block_count - 1 as libc::c_int as libc::c_long) as isize))
                     .end <= 0 as libc::c_int
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*logo_block
+                        if (*logo_block
                             .offset((logo_block_count - 1 as libc::c_int as libc::c_long) as isize))
                         .end >= framenum_real
                         {
@@ -3838,8 +3837,8 @@ pub unsafe extern "C" fn DetectCommercials(f: libc::c_int, mut pts: libc::c_doub
                                 .end as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*logo_block
                         .offset((logo_block_count - 1 as libc::c_int as libc::c_long) as isize))
@@ -4239,27 +4238,27 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
             as *const libc::c_char as *mut libc::c_char,
     );
     length = (if !frame.is_null() {
-        (if frame_count - 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
+        if frame_count - 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
             (*frame.offset(1 as libc::c_int as isize)).pts
         } else {
-            (if frame_count - 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
+            if frame_count - 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
             } else {
                 (*frame.offset((frame_count - 1 as libc::c_int as libc::c_long) as isize)).pts
-            })
-        })
+            }
+        }
     } else {
         (frame_count - 1 as libc::c_int as libc::c_long) as libc::c_double / fps
     }) - (if !frame.is_null() {
-        (if 1 as libc::c_int <= 0 as libc::c_int {
+        if 1 as libc::c_int <= 0 as libc::c_int {
             (*frame.offset(1 as libc::c_int as isize)).pts
         } else {
-            (if 1 as libc::c_int >= framenum_real {
+            if 1 as libc::c_int >= framenum_real {
                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
             } else {
                 (*frame.offset(1 as libc::c_int as isize)).pts
-            })
-        })
+            }
+        }
     } else {
         1 as libc::c_int as libc::c_double / fps
     });
@@ -4411,33 +4410,33 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                         k + a,
                                         (*frame.offset(i as isize)).volume,
                                         ((if !frame.is_null() {
-                                            (if i <= 0 as libc::c_int {
+                                            if i <= 0 as libc::c_int {
                                                 (*frame.offset(1 as libc::c_int as isize)).pts
                                             } else {
-                                                (if i >= framenum_real {
+                                                if i >= framenum_real {
                                                     (*frame.offset(
                                                         (framenum_real - 1 as libc::c_int) as isize,
                                                     ))
                                                     .pts
                                                 } else {
                                                     (*frame.offset(i as isize)).pts
-                                                })
-                                            })
+                                                }
+                                            }
                                         } else {
                                             i as libc::c_double / fps
                                         }) - (if !frame.is_null() {
-                                            (if j <= 0 as libc::c_int {
+                                            if j <= 0 as libc::c_int {
                                                 (*frame.offset(1 as libc::c_int as isize)).pts
                                             } else {
-                                                (if j >= framenum_real {
+                                                if j >= framenum_real {
                                                     (*frame.offset(
                                                         (framenum_real - 1 as libc::c_int) as isize,
                                                     ))
                                                     .pts
                                                 } else {
                                                     (*frame.offset(j as isize)).pts
-                                                })
-                                            })
+                                                }
+                                            }
                                         } else {
                                             j as libc::c_double / fps
                                         })) as libc::c_int,
@@ -4601,27 +4600,27 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
         i = (logo_block_count - 1 as libc::c_int as libc::c_long) as libc::c_int;
         while i >= 0 as libc::c_int {
             if (if !frame.is_null() {
-                (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                    if (*logo_block.offset(i as isize)).end >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*logo_block.offset(i as isize)).end as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                    if (*logo_block.offset(i as isize)).start >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*logo_block.offset(i as isize)).start as libc::c_double / fps
             }) < min_commercial_size - 2 as libc::c_int as libc::c_double * shrink_logo
@@ -4632,27 +4631,27 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                         as *const libc::c_char as *mut libc::c_char,
                     i,
                     ((if !frame.is_null() {
-                        (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                        if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                            if (*logo_block.offset(i as isize)).end >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset(i as isize)).end as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                        if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                            if (*logo_block.offset(i as isize)).start >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset(i as isize)).start as libc::c_double / fps
                     })) as libc::c_int,
@@ -4676,12 +4675,12 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
             while (i as libc::c_long) < logo_block_count {
                 if !((i as libc::c_long) < logo_block_count - 1 as libc::c_int as libc::c_long
                     && (if !frame.is_null() {
-                        (if (*logo_block.offset((i + 1 as libc::c_int) as isize)).start
+                        if (*logo_block.offset((i + 1 as libc::c_int) as isize)).start
                             <= 0 as libc::c_int
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset((i + 1 as libc::c_int) as isize)).start
+                            if (*logo_block.offset((i + 1 as libc::c_int) as isize)).start
                                 >= framenum_real
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -4691,50 +4690,50 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                         as isize,
                                 ))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset((i + 1 as libc::c_int) as isize)).start
                             as libc::c_double
                             / fps
                     }) - (if !frame.is_null() {
-                        (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                        if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                            if (*logo_block.offset(i as isize)).end >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset(i as isize)).end as libc::c_double / fps
                     }) < max_commercialbreak / 4 as libc::c_int as libc::c_double)
                 {
                     if !(i as libc::c_long == logo_block_count - 1 as libc::c_int as libc::c_long
                         && (if !frame.is_null() {
-                            (if frame_count <= 0 as libc::c_int as libc::c_long {
+                            if frame_count <= 0 as libc::c_int as libc::c_long {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if frame_count >= framenum_real as libc::c_long {
+                                if frame_count >= framenum_real as libc::c_long {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset(frame_count as isize)).pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             frame_count as libc::c_double / fps
                         }) - (if !frame.is_null() {
-                            (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                            if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                                if (*logo_block.offset(i as isize)).end >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset((*logo_block.offset(i as isize)).end as isize))
                                         .pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             (*logo_block.offset(i as isize)).end as libc::c_double / fps
                         }) < max_commercialbreak / 4 as libc::c_int as libc::c_double)
@@ -4847,33 +4846,33 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                     cp,
                                     get_frame_pts(cp),
                                     ((if !frame.is_null() {
-                                        (if cp <= 0 as libc::c_int {
+                                        if cp <= 0 as libc::c_int {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if cp >= framenum_real {
+                                            if cp >= framenum_real {
                                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                                     .pts
                                             } else {
                                                 (*frame.offset(cp as isize)).pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         cp as libc::c_double / fps
                                     })
                                         - (if !frame.is_null() {
-                                            (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int
+                                            if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int
                                             {
                                                 (*frame.offset(1 as libc::c_int as isize)).pts
                                             } else {
-                                                (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                                                if (*logo_block.offset(i as isize)).end >= framenum_real {
                                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                                         .pts
                                                 } else {
                                                     (*frame
                                                         .offset((*logo_block.offset(i as isize)).end as isize))
                                                         .pts
-                                                })
-                                            })
+                                                }
+                                            }
                                         } else {
                                             (*logo_block.offset(i as isize)).end as libc::c_double / fps
                                         })) as libc::c_int,
@@ -4895,24 +4894,24 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
             while (i as libc::c_long) < logo_block_count {
                 if !(i > 0 as libc::c_int
                     && (if !frame.is_null() {
-                        (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                        if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                            if (*logo_block.offset(i as isize)).start >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset(i as isize)).start as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if (*logo_block.offset((i - 1 as libc::c_int) as isize)).end
+                        if (*logo_block.offset((i - 1 as libc::c_int) as isize)).end
                             <= 0 as libc::c_int
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset((i - 1 as libc::c_int) as isize)).end
+                            if (*logo_block.offset((i - 1 as libc::c_int) as isize)).end
                                 >= framenum_real
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -4922,8 +4921,8 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                         as isize,
                                 ))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset((i - 1 as libc::c_int) as isize)).end as libc::c_double
                             / fps
@@ -4931,16 +4930,16 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                 {
                     if !(i == 0 as libc::c_int
                         && (if !frame.is_null() {
-                            (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                            if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                                if (*logo_block.offset(i as isize)).start >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset((*logo_block.offset(i as isize)).start as isize))
                                         .pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             (*logo_block.offset(i as isize)).start as libc::c_double / fps
                         }) < max_commercialbreak / 4 as libc::c_int as libc::c_double)
@@ -5054,12 +5053,12 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                     cp,
                                     get_frame_pts(cp),
                                     ((if !frame.is_null() {
-                                        (if (*logo_block.offset(i as isize)).start
+                                        if (*logo_block.offset(i as isize)).start
                                             <= 0 as libc::c_int
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if (*logo_block.offset(i as isize)).start >= framenum_real
+                                            if (*logo_block.offset(i as isize)).start >= framenum_real
                                             {
                                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                                     .pts
@@ -5067,23 +5066,23 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                                 (*frame
                                                     .offset((*logo_block.offset(i as isize)).start as isize))
                                                     .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         (*logo_block.offset(i as isize)).start as libc::c_double
                                             / fps
                                     })
                                         - (if !frame.is_null() {
-                                            (if cp <= 0 as libc::c_int {
+                                            if cp <= 0 as libc::c_int {
                                                 (*frame.offset(1 as libc::c_int as isize)).pts
                                             } else {
-                                                (if cp >= framenum_real {
+                                                if cp >= framenum_real {
                                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                                         .pts
                                                 } else {
                                                     (*frame.offset(cp as isize)).pts
-                                                })
-                                            })
+                                                }
+                                            }
                                         } else {
                                             cp as libc::c_double / fps
                                         })) as libc::c_int,
@@ -5316,27 +5315,27 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                 (*ac_block.offset(i as isize)).audio_channels,
                 dblSecondsToStrMinutes(
                     (if !frame.is_null() {
-                        (if (*ac_block.offset(i as isize)).end <= 0 as libc::c_int {
+                        if (*ac_block.offset(i as isize)).end <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*ac_block.offset(i as isize)).end >= framenum_real {
+                            if (*ac_block.offset(i as isize)).end >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*ac_block.offset(i as isize)).end as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*ac_block.offset(i as isize)).end as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if (*ac_block.offset(i as isize)).start <= 0 as libc::c_int {
+                        if (*ac_block.offset(i as isize)).start <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*ac_block.offset(i as isize)).start >= framenum_real {
+                            if (*ac_block.offset(i as isize)).start >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*ac_block.offset(i as isize)).start as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*ac_block.offset(i as isize)).start as libc::c_double / fps
                     }),
@@ -5372,34 +5371,34 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                 (*ar_block.offset(i as isize)).ar_ratio,
                 dblSecondsToStrMinutes(
                     (if !frame.is_null() {
-                        (if (*ar_block.offset(i as isize)).end <= 0 as libc::c_int {
+                        if (*ar_block.offset(i as isize)).end <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*ar_block.offset(i as isize)).end >= framenum_real {
+                            if (*ar_block.offset(i as isize)).end >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                     .pts
                             } else {
                                 (*frame.offset((*ar_block.offset(i as isize)).end as isize))
                                     .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*ar_block.offset(i as isize)).end as libc::c_double / fps
                     })
                         - (if !frame.is_null() {
-                            (if (*ar_block.offset(i as isize)).start <= 0 as libc::c_int
+                            if (*ar_block.offset(i as isize)).start <= 0 as libc::c_int
                             {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if (*ar_block.offset(i as isize)).start >= framenum_real {
+                                if (*ar_block.offset(i as isize)).start >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                         .pts
                                 } else {
                                     (*frame
                                         .offset((*ar_block.offset(i as isize)).start as isize))
                                         .pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             (*ar_block.offset(i as isize)).start as libc::c_double / fps
                         }),
@@ -5593,34 +5592,34 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                 (*ar_block.offset(i as isize)).ar_ratio,
                 dblSecondsToStrMinutes(
                     (if !frame.is_null() {
-                        (if (*ar_block.offset(i as isize)).end <= 0 as libc::c_int {
+                        if (*ar_block.offset(i as isize)).end <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*ar_block.offset(i as isize)).end >= framenum_real {
+                            if (*ar_block.offset(i as isize)).end >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                     .pts
                             } else {
                                 (*frame.offset((*ar_block.offset(i as isize)).end as isize))
                                     .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*ar_block.offset(i as isize)).end as libc::c_double / fps
                     })
                         - (if !frame.is_null() {
-                            (if (*ar_block.offset(i as isize)).start <= 0 as libc::c_int
+                            if (*ar_block.offset(i as isize)).start <= 0 as libc::c_int
                             {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if (*ar_block.offset(i as isize)).start >= framenum_real {
+                                if (*ar_block.offset(i as isize)).start >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                         .pts
                                 } else {
                                     (*frame
                                         .offset((*ar_block.offset(i as isize)).start as isize))
                                         .pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             (*ar_block.offset(i as isize)).start as libc::c_double / fps
                         }),
@@ -7231,27 +7230,27 @@ pub unsafe extern "C" fn WeighBlocks() {
                 }
                 if k - j > 10 as libc::c_int
                     && (if !frame.is_null() {
-                        (if k <= 0 as libc::c_int {
+                        if k <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if k >= framenum_real {
+                            if k >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(k as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         k as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if j <= 0 as libc::c_int {
+                        if j <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if j >= framenum_real {
+                            if j >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(j as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         j as libc::c_double / fps
                     }) > 5.0f64
@@ -7697,20 +7696,20 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"FILE PROCESSING COMPLETE %6li FRAMES AT %5i\n-------------------\n\0" as *const u8
                 as *const libc::c_char,
             ((if !frame.is_null() {
-                (if frame_count - 1 as libc::c_int as libc::c_long
+                if frame_count - 1 as libc::c_int as libc::c_long
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if frame_count - 1 as libc::c_int as libc::c_long
+                    if frame_count - 1 as libc::c_int as libc::c_long
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((frame_count - 1 as libc::c_int as libc::c_long) as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 (frame_count - 1 as libc::c_int as libc::c_long) as libc::c_double / fps
             }) * fps
@@ -8577,15 +8576,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
     let mut s_end: libc::c_int = 0;
     let mut count: libc::c_int = 0;
     let minutes: libc::c_double = (if !frame.is_null() {
-        (if frame_count <= 0 as libc::c_int as libc::c_long {
+        if frame_count <= 0 as libc::c_int as libc::c_long {
             (*frame.offset(1 as libc::c_int as isize)).pts
         } else {
-            (if frame_count >= framenum_real as libc::c_long {
+            if frame_count >= framenum_real as libc::c_long {
                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
             } else {
                 (*frame.offset(frame_count as isize)).pts
-            })
-        })
+            }
+        }
     } else {
         frame_count as libc::c_double / fps
     }) / 60 as libc::c_int as libc::c_double;
@@ -8611,7 +8610,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 out_file,
                 b"%li\t%li\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if (if sage_framenumber_bug as libc::c_int != 0 {
+                    if (if sage_framenumber_bug as libc::c_int != 0 {
                         s_start / 2 as libc::c_int
                     } else {
                         s_start
@@ -8619,7 +8618,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (if sage_framenumber_bug as libc::c_int != 0 {
+                        if (if sage_framenumber_bug as libc::c_int != 0 {
                             s_start / 2 as libc::c_int
                         } else {
                             s_start
@@ -8635,8 +8634,8 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                                 }) as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (if sage_framenumber_bug as libc::c_int != 0 {
                         s_start / 2 as libc::c_int
@@ -8647,7 +8646,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 }) * fps
                     + 1.5f64) as libc::c_long,
                 ((if !frame.is_null() {
-                    (if (if sage_framenumber_bug as libc::c_int != 0 {
+                    if (if sage_framenumber_bug as libc::c_int != 0 {
                         s_end / 2 as libc::c_int
                     } else {
                         s_end
@@ -8655,7 +8654,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (if sage_framenumber_bug as libc::c_int != 0 {
+                        if (if sage_framenumber_bug as libc::c_int != 0 {
                             s_end / 2 as libc::c_int
                         } else {
                             s_end
@@ -8671,8 +8670,8 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                                 }) as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (if sage_framenumber_bug as libc::c_int != 0 {
                         s_end / 2 as libc::c_int
@@ -8695,7 +8694,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     out_file,
                     b"%li\t%li\n\0" as *const u8 as *const libc::c_char,
                     ((if !frame.is_null() {
-                        (if (if sage_framenumber_bug as libc::c_int != 0 {
+                        if (if sage_framenumber_bug as libc::c_int != 0 {
                             s_start / 2 as libc::c_int
                         } else {
                             s_start
@@ -8703,7 +8702,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (if sage_framenumber_bug as libc::c_int != 0 {
+                            if (if sage_framenumber_bug as libc::c_int != 0 {
                                 s_start / 2 as libc::c_int
                             } else {
                                 s_start
@@ -8719,8 +8718,8 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                                     }) as isize,
                                 ))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (if sage_framenumber_bug as libc::c_int != 0 {
                             s_start / 2 as libc::c_int
@@ -8731,7 +8730,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     }) * fps
                         + 1.5f64) as libc::c_long,
                     ((if !frame.is_null() {
-                        (if (if sage_framenumber_bug as libc::c_int != 0 {
+                        if (if sage_framenumber_bug as libc::c_int != 0 {
                             s_end / 2 as libc::c_int
                         } else {
                             s_end
@@ -8739,7 +8738,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (if sage_framenumber_bug as libc::c_int != 0 {
+                            if (if sage_framenumber_bug as libc::c_int != 0 {
                                 s_end / 2 as libc::c_int
                             } else {
                                 s_end
@@ -8755,8 +8754,8 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                                     }) as isize,
                                 ))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (if sage_framenumber_bug as libc::c_int != 0 {
                             s_end / 2 as libc::c_int
@@ -8942,43 +8941,43 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             vcf_file,
             b"VirtualDub.subset.AddRange(%li,%li);\n\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
-                (if prev - 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
+                if prev - 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if prev - 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
+                    if prev - 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((prev - 1 as libc::c_int as libc::c_long) as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (prev - 1 as libc::c_int as libc::c_long) as libc::c_double / fps
             }) * fps
                 + 1.5f64) as libc::c_long,
             ((if !frame.is_null() {
-                (if start <= 0 as libc::c_int as libc::c_long {
+                if start <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if start >= framenum_real as libc::c_long {
+                    if start >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 start as libc::c_double / fps
             }) * fps
                 + 1.5f64) as libc::c_long
                 - ((if !frame.is_null() {
-                    (if prev <= 0 as libc::c_int as libc::c_long {
+                    if prev <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if prev >= framenum_real as libc::c_long {
+                        if prev >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(prev as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     prev as libc::c_double / fps
                 }) * fps
@@ -9011,15 +9010,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             projectx_file,
             b"%ld\n\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
-                (if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
+                if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
+                    if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((prev + 1 as libc::c_int as libc::c_long) as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (prev + 1 as libc::c_int as libc::c_long) as libc::c_double / fps
             }) * fps
@@ -9029,15 +9028,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             projectx_file,
             b"%ld\n\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
-                (if start <= 0 as libc::c_int as libc::c_long {
+                if start <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if start >= framenum_real as libc::c_long {
+                    if start >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 start as libc::c_double / fps
             }) * fps
@@ -9057,15 +9056,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 b" ++ \0" as *const u8 as *const libc::c_char
             },
             ((if !frame.is_null() {
-                (if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
+                if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
+                    if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((prev + 1 as libc::c_int as libc::c_long) as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (prev + 1 as libc::c_int as libc::c_long) as libc::c_double / fps
             }) * fps
@@ -9075,15 +9074,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             avisynth_file,
             b"%ld)\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
-                (if start <= 0 as libc::c_int as libc::c_long {
+                if start <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if start >= framenum_real as libc::c_long {
+                    if start >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 start as libc::c_double / fps
             }) * fps
@@ -9214,29 +9213,29 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(s_start)
                     + (if !frame.is_null() {
-                        (if 1 as libc::c_int <= 0 as libc::c_int {
+                        if 1 as libc::c_int <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if 1 as libc::c_int >= framenum_real {
+                            if 1 as libc::c_int >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         1 as libc::c_int as libc::c_double / fps
                     }),
                 get_frame_pts(s_end)
                     + (if !frame.is_null() {
-                        (if 1 as libc::c_int <= 0 as libc::c_int {
+                        if 1 as libc::c_int <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if 1 as libc::c_int >= framenum_real {
+                            if 1 as libc::c_int >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         1 as libc::c_int as libc::c_double / fps
                     }),
@@ -9273,29 +9272,29 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(s_start)
                     + (if !frame.is_null() {
-                        (if 1 as libc::c_int <= 0 as libc::c_int {
+                        if 1 as libc::c_int <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if 1 as libc::c_int >= framenum_real {
+                            if 1 as libc::c_int >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         1 as libc::c_int as libc::c_double / fps
                     }),
                 get_frame_pts(s_end)
                     + (if !frame.is_null() {
-                        (if 1 as libc::c_int <= 0 as libc::c_int {
+                        if 1 as libc::c_int <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if 1 as libc::c_int >= framenum_real {
+                            if 1 as libc::c_int >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         1 as libc::c_int as libc::c_double / fps
                     }),
@@ -9336,29 +9335,29 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
             get_frame_pts(start as libc::c_int)
                 + (if !frame.is_null() {
-                    (if 1 as libc::c_int <= 0 as libc::c_int {
+                    if 1 as libc::c_int <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if 1 as libc::c_int >= framenum_real {
+                        if 1 as libc::c_int >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(1 as libc::c_int as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     1 as libc::c_int as libc::c_double / fps
                 }),
             get_frame_pts(end as libc::c_int)
                 + (if !frame.is_null() {
-                    (if 1 as libc::c_int <= 0 as libc::c_int {
+                    if 1 as libc::c_int <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if 1 as libc::c_int >= framenum_real {
+                        if 1 as libc::c_int >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(1 as libc::c_int as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     1 as libc::c_int as libc::c_double / fps
                 }),
@@ -9408,48 +9407,48 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     i + 1 as libc::c_int,
                     mpegfilename.as_mut_ptr(),
                     ((if !frame.is_null() {
-                        (if prev + 1 as libc::c_int as libc::c_long
+                        if prev + 1 as libc::c_int as libc::c_long
                             <= 0 as libc::c_int as libc::c_long
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if prev + 1 as libc::c_int as libc::c_long
+                            if prev + 1 as libc::c_int as libc::c_long
                                 >= framenum_real as libc::c_long
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((prev + 1 as libc::c_int as libc::c_long) as isize))
                                     .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (prev + 1 as libc::c_int as libc::c_long) as libc::c_double / fps
                     }) * fps
                         + 1.5f64) as libc::c_long,
                     ((if !frame.is_null() {
-                        (if start <= 0 as libc::c_int as libc::c_long {
+                        if start <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if start >= framenum_real as libc::c_long {
+                            if start >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(start as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         start as libc::c_double / fps
                     }) * fps
                         + 1.5f64) as libc::c_long
                         - ((if !frame.is_null() {
-                            (if prev <= 0 as libc::c_int as libc::c_long {
+                            if prev <= 0 as libc::c_int as libc::c_long {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if prev >= framenum_real as libc::c_long {
+                                if prev >= framenum_real as libc::c_long {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset(prev as isize)).pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             prev as libc::c_double / fps
                         }) * fps
@@ -9463,43 +9462,43 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 i + 1 as libc::c_int,
                 mpegfilename.as_mut_ptr(),
                 ((if !frame.is_null() {
-                    (if start <= 0 as libc::c_int as libc::c_long {
+                    if start <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if start >= framenum_real as libc::c_long {
+                        if start >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(start as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     start as libc::c_double / fps
                 }) * fps
                     + 1.5f64) as libc::c_long,
                 ((if !frame.is_null() {
-                    (if end <= 0 as libc::c_int as libc::c_long {
+                    if end <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if end >= framenum_real as libc::c_long {
+                        if end >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(end as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     end as libc::c_double / fps
                 }) * fps
                     + 1.5f64) as libc::c_long
                     - ((if !frame.is_null() {
-                        (if start <= 0 as libc::c_int as libc::c_long {
+                        if start <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if start >= framenum_real as libc::c_long {
+                            if start >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(start as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         start as libc::c_double / fps
                     }) * fps
@@ -9512,45 +9511,44 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 i + 1 as libc::c_int,
                 mpegfilename.as_mut_ptr(),
                 ((if !frame.is_null() {
-                    (if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long
-                    {
+                    if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long
+                        if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((prev + 1 as libc::c_int as libc::c_long) as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (prev + 1 as libc::c_int as libc::c_long) as libc::c_double / fps
                 }) * fps
                     + 1.5f64) as libc::c_long,
                 ((if !frame.is_null() {
-                    (if end <= 0 as libc::c_int as libc::c_long {
+                    if end <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if end >= framenum_real as libc::c_long {
+                        if end >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(end as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     end as libc::c_double / fps
                 }) * fps
                     + 1.5f64) as libc::c_long
                     - ((if !frame.is_null() {
-                        (if prev <= 0 as libc::c_int as libc::c_long {
+                        if prev <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if prev >= framenum_real as libc::c_long {
+                            if prev >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(prev as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         prev as libc::c_double / fps
                     }) * fps
@@ -9586,15 +9584,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 mls_file,
                 b"%11li 1\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if prev <= 0 as libc::c_int as libc::c_long {
+                    if prev <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if prev >= framenum_real as libc::c_long {
+                        if prev >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(prev as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     prev as libc::c_double / fps
                 }) * fps
@@ -9606,15 +9604,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 mls_file,
                 b"%11li 0\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if start <= 0 as libc::c_int as libc::c_long {
+                    if start <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if start >= framenum_real as libc::c_long {
+                        if start >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(start as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     start as libc::c_double / fps
                 }) * fps
@@ -9625,15 +9623,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 mls_file,
                 b"%11li 0\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if start <= 0 as libc::c_int as libc::c_long {
+                    if start <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if start >= framenum_real as libc::c_long {
+                        if start >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(start as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     start as libc::c_double / fps
                 }) * fps
@@ -9643,15 +9641,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 mls_file,
                 b"%11li 1\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if end <= 0 as libc::c_int as libc::c_long {
+                    if end <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if end >= framenum_real as libc::c_long {
+                        if end >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(end as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     end as libc::c_double / fps
                 }) * fps
@@ -9745,15 +9743,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 mpeg2schnitt_file,
                 b"/o%ld \0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if start <= 0 as libc::c_int as libc::c_long {
+                    if start <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if start >= framenum_real as libc::c_long {
+                        if start >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(start as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     start as libc::c_double / fps
                 }) * fps
@@ -9763,15 +9761,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 mpeg2schnitt_file,
                 b"/i%ld \0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if end <= 0 as libc::c_int as libc::c_long {
+                    if end <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if end >= framenum_real as libc::c_long {
+                        if end >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(end as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     end as libc::c_double / fps
                 }) * fps
@@ -9795,34 +9793,32 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 b"<CutElements refVideoFile=\"0\" StartPosition=\"%li\" EndPosition=\"%li\">\n\0"
                     as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
-                    (if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long
-                    {
+                    if prev + 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long
+                        if prev + 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((prev + 1 as libc::c_int as libc::c_long) as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (prev + 1 as libc::c_int as libc::c_long) as libc::c_double / fps
                 }) * fps
                     + 1.5f64) as libc::c_long,
                 ((if !frame.is_null() {
-                    (if start - 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long
+                    if start - 1 as libc::c_int as libc::c_long <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if start - 1 as libc::c_int as libc::c_long
-                            >= framenum_real as libc::c_long
+                        if start - 1 as libc::c_int as libc::c_long >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((start - 1 as libc::c_int as libc::c_long) as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (start - 1 as libc::c_int as libc::c_long) as libc::c_double / fps
                 }) * fps
@@ -9900,37 +9896,37 @@ pub unsafe extern "C" fn BuildCommercial() {
             commercial[commercial_count as usize].start_frame = cblock[i as usize].f_start;
             commercial[commercial_count as usize].end_frame = cblock[i as usize].f_end;
             commercial[commercial_count as usize].length = (if !frame.is_null() {
-                (if commercial[commercial_count as usize].end_frame
+                if commercial[commercial_count as usize].end_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[commercial_count as usize].end_frame
+                    if commercial[commercial_count as usize].end_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[commercial_count as usize].end_frame as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[commercial_count as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if commercial[commercial_count as usize].start_frame
+                if commercial[commercial_count as usize].start_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[commercial_count as usize].start_frame
+                    if commercial[commercial_count as usize].start_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[commercial_count as usize].start_frame as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[commercial_count as usize].start_frame as libc::c_double / fps
             });
@@ -9941,12 +9937,12 @@ pub unsafe extern "C" fn BuildCommercial() {
             while (i as libc::c_long) < block_count && cblock[i as usize].score > global_threshold {
                 commercial[commercial_count as usize].end_frame = cblock[i as usize].f_end;
                 commercial[commercial_count as usize].length = (if !frame.is_null() {
-                    (if commercial[commercial_count as usize].end_frame
+                    if commercial[commercial_count as usize].end_frame
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[commercial_count as usize].end_frame
+                        if commercial[commercial_count as usize].end_frame
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -9954,17 +9950,17 @@ pub unsafe extern "C" fn BuildCommercial() {
                             (*frame
                                 .offset(commercial[commercial_count as usize].end_frame as isize))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[commercial_count as usize].end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if commercial[commercial_count as usize].start_frame
+                    if commercial[commercial_count as usize].start_frame
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[commercial_count as usize].start_frame
+                        if commercial[commercial_count as usize].start_frame
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -9972,8 +9968,8 @@ pub unsafe extern "C" fn BuildCommercial() {
                             (*frame
                                 .offset(commercial[commercial_count as usize].start_frame as isize))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[commercial_count as usize].start_frame as libc::c_double / fps
                 });
@@ -10031,28 +10027,27 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                     );
                     commercial[k as usize].end_frame = cblock[i as usize].f_end;
                     commercial[k as usize].length = (if !frame.is_null() {
-                        (if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                        if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
+                            if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(commercial[k as usize].end_frame as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         commercial[k as usize].end_frame as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                        if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if commercial[k as usize].start_frame >= framenum_real as libc::c_long
-                            {
+                            if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(commercial[k as usize].start_frame as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         commercial[k as usize].start_frame as libc::c_double / fps
                     });
@@ -10073,12 +10068,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             && (commercial[commercial_count as usize].end_block as libc::c_long)
                 < block_count - 1 as libc::c_int as libc::c_long
             && (if !frame.is_null() {
-                (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                    if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10088,19 +10083,19 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                 as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                     as libc::c_double
                     / fps
             }) - (if !frame.is_null() {
-                (if cblock[commercial[commercial_count as usize].end_block as usize].f_end
+                if cblock[commercial[commercial_count as usize].end_block as usize].f_end
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[commercial[commercial_count as usize].end_block as usize].f_end
+                    if cblock[commercial[commercial_count as usize].end_block as usize].f_end
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10110,8 +10105,8 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                 as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[commercial[commercial_count as usize].end_block as usize].f_end
                     as libc::c_double
@@ -10123,37 +10118,37 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             commercial[commercial_count as usize].end_frame =
                 cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end;
             commercial[commercial_count as usize].length = (if !frame.is_null() {
-                (if commercial[commercial_count as usize].end_frame
+                if commercial[commercial_count as usize].end_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[commercial_count as usize].end_frame
+                    if commercial[commercial_count as usize].end_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[commercial_count as usize].end_frame as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[commercial_count as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if commercial[commercial_count as usize].start_frame
+                if commercial[commercial_count as usize].start_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[commercial_count as usize].start_frame
+                    if commercial[commercial_count as usize].start_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[commercial_count as usize].start_frame as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[commercial_count as usize].start_frame as libc::c_double / fps
             });
@@ -10180,15 +10175,15 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         if commercial_count > -(1 as libc::c_int)
             && commercial[0 as libc::c_int as usize].start_block == 1 as libc::c_int
             && (if !frame.is_null() {
-                (if cblock[0 as libc::c_int as usize].f_end <= 0 as libc::c_int as libc::c_long {
+                if cblock[0 as libc::c_int as usize].f_end <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[0 as libc::c_int as usize].f_end >= framenum_real as libc::c_long {
+                    if cblock[0 as libc::c_int as usize].f_end >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[0 as libc::c_int as usize].f_end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[0 as libc::c_int as usize].f_end as libc::c_double / fps
             }) < min_commercialbreak
@@ -10197,37 +10192,37 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             commercial[0 as libc::c_int as usize].start_frame =
                 cblock[0 as libc::c_int as usize].f_start;
             commercial[0 as libc::c_int as usize].length = (if !frame.is_null() {
-                (if commercial[0 as libc::c_int as usize].end_frame
+                if commercial[0 as libc::c_int as usize].end_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[0 as libc::c_int as usize].end_frame
+                    if commercial[0 as libc::c_int as usize].end_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[0 as libc::c_int as usize].end_frame as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[0 as libc::c_int as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if commercial[0 as libc::c_int as usize].start_frame
+                if commercial[0 as libc::c_int as usize].start_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[0 as libc::c_int as usize].start_frame
+                    if commercial[0 as libc::c_int as usize].start_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[0 as libc::c_int as usize].start_frame as isize))
                             .pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[0 as libc::c_int as usize].start_frame as libc::c_double / fps
             });
@@ -10270,15 +10265,15 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         k = commercial_count;
         while k >= 0 as libc::c_int {
             if ((if !frame.is_null() {
-                (if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
+                    if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[k as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[k as usize].start_frame as libc::c_double / fps
             }) > 1.0f64
@@ -10288,12 +10283,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                     && k != commercial_count
                     || commercial[k as usize].length < min_commercialbreak)
                 && (if !frame.is_null() {
-                    (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                    if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                        if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10303,35 +10298,35 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                     .f_end as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                         as libc::c_double
                         / fps
                 }) - (if !frame.is_null() {
-                    (if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                    if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
+                        if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(commercial[k as usize].start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[k as usize].start_frame as libc::c_double / fps
                 }) > min_commercial_break_at_start_or_end as libc::c_double
                 && (if !frame.is_null() {
-                    (if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                    if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
+                        if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(commercial[k as usize].end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[k as usize].end_frame as libc::c_double / fps
                 }) > min_commercial_break_at_start_or_end as libc::c_double
@@ -10371,12 +10366,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 > before_end as libc::c_long
             || delete_show_after_last_commercial as libc::c_double
                 > (if !frame.is_null() {
-                    (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                    if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                        if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10386,19 +10381,19 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                     .f_end as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                         as libc::c_double
                         / fps
                 }) - (if !frame.is_null() {
-                    (if cblock[commercial[commercial_count as usize].start_block as usize].f_start
+                    if cblock[commercial[commercial_count as usize].start_block as usize].f_start
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[commercial[commercial_count as usize].start_block as usize]
+                        if cblock[commercial[commercial_count as usize].start_block as usize]
                             .f_start
                             >= framenum_real as libc::c_long
                         {
@@ -10409,8 +10404,8 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                     .f_start as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[commercial[commercial_count as usize].start_block as usize].f_start
                         as libc::c_double
@@ -10425,33 +10420,31 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         commercial[commercial_count as usize].end_frame =
             cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end;
         commercial[commercial_count as usize].length = (if !frame.is_null() {
-            (if commercial[commercial_count as usize].end_frame <= 0 as libc::c_int as libc::c_long
-            {
+            if commercial[commercial_count as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if commercial[commercial_count as usize].end_frame >= framenum_real as libc::c_long
+                if commercial[commercial_count as usize].end_frame >= framenum_real as libc::c_long
                 {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(commercial[commercial_count as usize].end_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             commercial[commercial_count as usize].end_frame as libc::c_double / fps
         }) - (if !frame.is_null() {
-            (if commercial[commercial_count as usize].start_frame
-                <= 0 as libc::c_int as libc::c_long
+            if commercial[commercial_count as usize].start_frame <= 0 as libc::c_int as libc::c_long
             {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if commercial[commercial_count as usize].start_frame
+                if commercial[commercial_count as usize].start_frame
                     >= framenum_real as libc::c_long
                 {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(commercial[commercial_count as usize].start_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             commercial[commercial_count as usize].start_frame as libc::c_double / fps
         });
@@ -10481,12 +10474,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 < after_start as libc::c_long
             || delete_show_before_first_commercial as libc::c_double
                 > (if !frame.is_null() {
-                    (if cblock[commercial[0 as libc::c_int as usize].end_block as usize].f_end
+                    if cblock[commercial[0 as libc::c_int as usize].end_block as usize].f_end
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[commercial[0 as libc::c_int as usize].end_block as usize].f_end
+                        if cblock[commercial[0 as libc::c_int as usize].end_block as usize].f_end
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10496,8 +10489,8 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                     .f_end as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[commercial[0 as libc::c_int as usize].end_block as usize].f_end
                         as libc::c_double
@@ -10508,33 +10501,31 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         commercial[0 as libc::c_int as usize].start_frame =
             cblock[0 as libc::c_int as usize].f_start;
         commercial[0 as libc::c_int as usize].length = (if !frame.is_null() {
-            (if commercial[0 as libc::c_int as usize].end_frame <= 0 as libc::c_int as libc::c_long
-            {
+            if commercial[0 as libc::c_int as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if commercial[0 as libc::c_int as usize].end_frame >= framenum_real as libc::c_long
+                if commercial[0 as libc::c_int as usize].end_frame >= framenum_real as libc::c_long
                 {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(commercial[0 as libc::c_int as usize].end_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             commercial[0 as libc::c_int as usize].end_frame as libc::c_double / fps
         }) - (if !frame.is_null() {
-            (if commercial[0 as libc::c_int as usize].start_frame
-                <= 0 as libc::c_int as libc::c_long
+            if commercial[0 as libc::c_int as usize].start_frame <= 0 as libc::c_int as libc::c_long
             {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if commercial[0 as libc::c_int as usize].start_frame
+                if commercial[0 as libc::c_int as usize].start_frame
                     >= framenum_real as libc::c_long
                 {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(commercial[0 as libc::c_int as usize].start_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             commercial[0 as libc::c_int as usize].start_frame as libc::c_double / fps
         });
@@ -10559,15 +10550,15 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         k = 0 as libc::c_int;
         while commercial_count >= 0 as libc::c_int
             && (if !frame.is_null() {
-                (if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
+                    if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[k as usize].end_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[k as usize].end_frame as libc::c_double / fps
             }) < always_keep_first_seconds as libc::c_double
@@ -10589,15 +10580,15 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         }
         if commercial_count >= 0 as libc::c_int
             && (if !frame.is_null() {
-                (if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
+                    if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[k as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[k as usize].start_frame as libc::c_double / fps
             }) < always_keep_first_seconds as libc::c_double
@@ -10610,15 +10601,15 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 always_keep_first_seconds,
             );
             while (if !frame.is_null() {
-                (if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
+                    if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[k as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[k as usize].start_frame as libc::c_double / fps
             }) < always_keep_first_seconds as libc::c_double
@@ -10632,12 +10623,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
     if always_keep_last_seconds != 0 && commercial_count >= 0 as libc::c_int {
         k = commercial_count;
         while (if !frame.is_null() {
-            (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+            if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                 <= 0 as libc::c_int as libc::c_long
             {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                     >= framenum_real as libc::c_long
                 {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10647,22 +10638,22 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             as isize,
                     ))
                     .pts
-                })
-            })
+                }
+            }
         } else {
             cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                 as libc::c_double
                 / fps
         }) - (if !frame.is_null() {
-            (if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+            if commercial[k as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
+                if commercial[k as usize].start_frame >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(commercial[k as usize].start_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             commercial[k as usize].start_frame as libc::c_double / fps
         }) < always_keep_last_seconds as libc::c_double
@@ -10679,12 +10670,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             deleted = 1 as libc::c_int != 0;
         }
         if (if !frame.is_null() {
-            (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+            if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                 <= 0 as libc::c_int as libc::c_long
             {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                     >= framenum_real as libc::c_long
                 {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10694,22 +10685,22 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             as isize,
                     ))
                     .pts
-                })
-            })
+                }
+            }
         } else {
             cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                 as libc::c_double
                 / fps
         }) - (if !frame.is_null() {
-            (if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+            if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
+                if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(commercial[k as usize].end_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             commercial[k as usize].end_frame as libc::c_double / fps
         }) < always_keep_last_seconds as libc::c_double
@@ -10722,12 +10713,12 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 always_keep_last_seconds,
             );
             while (if !frame.is_null() {
-                (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
+                    if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -10737,22 +10728,22 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                 as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize].f_end
                     as libc::c_double
                     / fps
             }) - (if !frame.is_null() {
-                (if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[k as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
+                    if commercial[k as usize].end_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[k as usize].end_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[k as usize].end_frame as libc::c_double / fps
             }) < always_keep_last_seconds as libc::c_double
@@ -10871,7 +10862,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                     b"<SceneMarker %d>%.0f\n\0" as *const u8 as *const libc::c_char,
                     i,
                     (if !frame.is_null() {
-                        (if max(
+                        if max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10881,7 +10872,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if max(
+                            if max(
                                 (cblock[i as usize].f_end
                                     - videoredo_offset as libc::c_long
                                     - 1 as libc::c_int as libc::c_long)
@@ -10899,8 +10890,8 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                     0 as libc::c_int,
                                 ) as isize))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         max(
                             (cblock[i as usize].f_end
@@ -10979,7 +10970,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             / fps
                     }),
                     (if !frame.is_null() {
-                        (if max(
+                        if max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10989,7 +10980,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if max(
+                            if max(
                                 (cblock[i as usize].f_end
                                     - videoredo_offset as libc::c_long
                                     - 1 as libc::c_int as libc::c_long)
@@ -11007,8 +10998,8 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                     0 as libc::c_int,
                                 ) as isize))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         max(
                             (cblock[i as usize].f_end
@@ -11519,12 +11510,12 @@ pub unsafe extern "C" fn OutputTraining() {
                     cblock[i as usize].f_end as libc::c_double / fps
                 },
                 (if !frame.is_null() {
-                    (if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize]
+                    if cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize]
                         .f_end <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[(block_count - 1 as libc::c_int as libc::c_long)
+                        if cblock[(block_count - 1 as libc::c_int as libc::c_long)
                                 as usize]
                             .f_end >= framenum_real as libc::c_long
                         {
@@ -11538,25 +11529,25 @@ pub unsafe extern "C" fn OutputTraining() {
                                         .f_end as isize,
                                 ))
                                 .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[(block_count - 1 as libc::c_int as libc::c_long) as usize]
                         .f_end as libc::c_double / fps
                 })
                     - (if !frame.is_null() {
-                        (if cblock[i as usize].f_end <= 0 as libc::c_int as libc::c_long
+                        if cblock[i as usize].f_end <= 0 as libc::c_int as libc::c_long
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if cblock[i as usize].f_end >= framenum_real as libc::c_long
+                            if cblock[i as usize].f_end >= framenum_real as libc::c_long
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                     .pts
                             } else {
                                 (*frame.offset(cblock[i as usize].f_end as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         cblock[i as usize].f_end as libc::c_double / fps
                     }),
@@ -16152,78 +16143,78 @@ pub unsafe extern "C" fn PrintLogoFrameGroups() {
                 (*logo_block.offset(i as isize)).end,
                 dblSecondsToStrMinutes(
                     (if !frame.is_null() {
-                        (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                        if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                            if (*logo_block.offset(i as isize)).end >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset(i as isize)).end as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                        if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                            if (*logo_block.offset(i as isize)).start >= framenum_real {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*logo_block.offset(i as isize)).start as libc::c_double / fps
                     }),
                 ),
                 (if !frame.is_null() {
-                    (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                    if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                        if (*logo_block.offset(i as isize)).start >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*logo_block.offset(i as isize)).start as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if cblock[f as usize].f_start <= 0 as libc::c_int as libc::c_long {
+                    if cblock[f as usize].f_start <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[f as usize].f_start >= framenum_real as libc::c_long {
+                        if cblock[f as usize].f_start >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(cblock[f as usize].f_start as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[f as usize].f_start as libc::c_double / fps
                 }),
                 (if !frame.is_null() {
-                    (if cblock[t as usize].f_end <= 0 as libc::c_int as libc::c_long {
+                    if cblock[t as usize].f_end <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if cblock[t as usize].f_end >= framenum_real as libc::c_long {
+                        if cblock[t as usize].f_end >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(cblock[t as usize].f_end as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     cblock[t as usize].f_end as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                    if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                        if (*logo_block.offset(i as isize)).end >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*logo_block.offset(i as isize)).end as libc::c_double / fps
                 }),
@@ -16239,53 +16230,53 @@ pub unsafe extern "C" fn PrintLogoFrameGroups() {
         t = (*logo_block.offset((i + 1 as libc::c_int) as isize)).start;
         if (max_logo_gap as libc::c_double)
             < (if !frame.is_null() {
-                (if t <= 0 as libc::c_int {
+                if t <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if t >= framenum_real {
+                    if t >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(t as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 t as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if f <= 0 as libc::c_int {
+                if f <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if f >= framenum_real {
+                    if f >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(f as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 f as libc::c_double / fps
             })
         {
             max_logo_gap = ((if !frame.is_null() {
-                (if t <= 0 as libc::c_int {
+                if t <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if t >= framenum_real {
+                    if t >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(t as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 t as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if f <= 0 as libc::c_int {
+                if f <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if f >= framenum_real {
+                    if f >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(f as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 f as libc::c_double / fps
             })) as libc::c_int;
@@ -16306,53 +16297,53 @@ pub unsafe extern "C" fn PrintLogoFrameGroups() {
         f = FindBlock((*logo_block.offset(i as isize)).start as libc::c_long);
         t = FindBlock((*logo_block.offset(i as isize)).end as libc::c_long);
         if (if !frame.is_null() {
-            (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+            if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                if (*logo_block.offset(i as isize)).end >= framenum_real {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             (*logo_block.offset(i as isize)).end as libc::c_double / fps
         }) - (if !frame.is_null() {
-            (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+            if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                if (*logo_block.offset(i as isize)).start >= framenum_real {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             (*logo_block.offset(i as isize)).start as libc::c_double / fps
         }) > max_nonlogo_block_length as libc::c_double
         {
             cl = (if !frame.is_null() {
-                (if cblock[f as usize].f_end <= 0 as libc::c_int as libc::c_long {
+                if cblock[f as usize].f_end <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[f as usize].f_end >= framenum_real as libc::c_long {
+                    if cblock[f as usize].f_end >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[f as usize].f_end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[f as usize].f_end as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
+                if (*logo_block.offset(i as isize)).start <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*logo_block.offset(i as isize)).start >= framenum_real {
+                    if (*logo_block.offset(i as isize)).start >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*logo_block.offset(i as isize)).start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*logo_block.offset(i as isize)).start as libc::c_double / fps
             });
@@ -16362,27 +16353,27 @@ pub unsafe extern "C" fn PrintLogoFrameGroups() {
                 }
             }
             cl = (if !frame.is_null() {
-                (if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
+                if (*logo_block.offset(i as isize)).end <= 0 as libc::c_int {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*logo_block.offset(i as isize)).end >= framenum_real {
+                    if (*logo_block.offset(i as isize)).end >= framenum_real {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset((*logo_block.offset(i as isize)).end as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*logo_block.offset(i as isize)).end as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if cblock[t as usize].f_start <= 0 as libc::c_int as libc::c_long {
+                if cblock[t as usize].f_start <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if cblock[t as usize].f_start >= framenum_real as libc::c_long {
+                    if cblock[t as usize].f_start >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(cblock[t as usize].f_start as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 cblock[t as usize].f_start as libc::c_double / fps
             });
@@ -16411,27 +16402,27 @@ pub unsafe extern "C" fn PrintCCBlocks() {
     i = (cc_block_count - 1 as libc::c_int as libc::c_long) as libc::c_int;
     while i > 0 as libc::c_int {
         if (if !frame.is_null() {
-            (if (*cc_block.offset(i as isize)).end_frame <= 0 as libc::c_int as libc::c_long {
+            if (*cc_block.offset(i as isize)).end_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if (*cc_block.offset(i as isize)).end_frame >= framenum_real as libc::c_long {
+                if (*cc_block.offset(i as isize)).end_frame >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset((*cc_block.offset(i as isize)).end_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             (*cc_block.offset(i as isize)).end_frame as libc::c_double / fps
         }) - (if !frame.is_null() {
-            (if (*cc_block.offset(i as isize)).start_frame <= 0 as libc::c_int as libc::c_long {
+            if (*cc_block.offset(i as isize)).start_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if (*cc_block.offset(i as isize)).start_frame >= framenum_real as libc::c_long {
+                if (*cc_block.offset(i as isize)).start_frame >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset((*cc_block.offset(i as isize)).start_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             (*cc_block.offset(i as isize)).start_frame as libc::c_double / fps
         }) < 1.0f64
@@ -16442,34 +16433,33 @@ pub unsafe extern "C" fn PrintCCBlocks() {
                     as *const libc::c_char as *mut libc::c_char,
                 i,
                 (if !frame.is_null() {
-                    (if (*cc_block.offset(i as isize)).end_frame <= 0 as libc::c_int as libc::c_long
+                    if (*cc_block.offset(i as isize)).end_frame <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*cc_block.offset(i as isize)).end_frame
-                            >= framenum_real as libc::c_long
+                        if (*cc_block.offset(i as isize)).end_frame >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((*cc_block.offset(i as isize)).end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*cc_block.offset(i as isize)).end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if (*cc_block.offset(i as isize)).start_frame
+                    if (*cc_block.offset(i as isize)).start_frame
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*cc_block.offset(i as isize)).start_frame
+                        if (*cc_block.offset(i as isize)).start_frame
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((*cc_block.offset(i as isize)).start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*cc_block.offset(i as isize)).start_frame as libc::c_double / fps
                 }),
@@ -16507,12 +16497,12 @@ pub unsafe extern "C" fn PrintCCBlocks() {
         b"\tlength - %s\n\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         dblSecondsToStrMinutes(
             (if !frame.is_null() {
-                (if (*cc_block.offset(0 as libc::c_int as isize)).end_frame
+                if (*cc_block.offset(0 as libc::c_int as isize)).end_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*cc_block.offset(0 as libc::c_int as isize)).end_frame
+                    if (*cc_block.offset(0 as libc::c_int as isize)).end_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -16521,17 +16511,17 @@ pub unsafe extern "C" fn PrintCCBlocks() {
                             (*cc_block.offset(0 as libc::c_int as isize)).end_frame as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*cc_block.offset(0 as libc::c_int as isize)).end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if (*cc_block.offset(0 as libc::c_int as isize)).start_frame
+                if (*cc_block.offset(0 as libc::c_int as isize)).start_frame
                     <= 0 as libc::c_int as libc::c_long
                 {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if (*cc_block.offset(0 as libc::c_int as isize)).start_frame
+                    if (*cc_block.offset(0 as libc::c_int as isize)).start_frame
                         >= framenum_real as libc::c_long
                     {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -16540,8 +16530,8 @@ pub unsafe extern "C" fn PrintCCBlocks() {
                             (*cc_block.offset(0 as libc::c_int as isize)).start_frame as isize,
                         ))
                         .pts
-                    })
-                })
+                    }
+                }
             } else {
                 (*cc_block.offset(0 as libc::c_int as isize)).start_frame as libc::c_double / fps
             }),
@@ -16567,34 +16557,33 @@ pub unsafe extern "C" fn PrintCCBlocks() {
             b"\tlength - %s\n\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             dblSecondsToStrMinutes(
                 (if !frame.is_null() {
-                    (if (*cc_block.offset(i as isize)).end_frame <= 0 as libc::c_int as libc::c_long
+                    if (*cc_block.offset(i as isize)).end_frame <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*cc_block.offset(i as isize)).end_frame
-                            >= framenum_real as libc::c_long
+                        if (*cc_block.offset(i as isize)).end_frame >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((*cc_block.offset(i as isize)).end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*cc_block.offset(i as isize)).end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if (*cc_block.offset(i as isize)).start_frame
+                    if (*cc_block.offset(i as isize)).start_frame
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*cc_block.offset(i as isize)).start_frame
+                        if (*cc_block.offset(i as isize)).start_frame
                             >= framenum_real as libc::c_long
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset((*cc_block.offset(i as isize)).start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*cc_block.offset(i as isize)).start_frame as libc::c_double / fps
                 }),
@@ -17655,12 +17644,12 @@ pub unsafe extern "C" fn ProcessLogoTest(
                     (*logo_block.offset(logo_block_count as isize)).end,
                     dblSecondsToStrMinutes(
                         (if !frame.is_null() {
-                            (if (*logo_block.offset(logo_block_count as isize)).end
+                            if (*logo_block.offset(logo_block_count as isize)).end
                                 <= 0 as libc::c_int
                             {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if (*logo_block.offset(logo_block_count as isize)).end
+                                if (*logo_block.offset(logo_block_count as isize)).end
                                     >= framenum_real_0
                                 {
                                     (*frame.offset((framenum_real_0 - 1 as libc::c_int) as isize))
@@ -17671,18 +17660,18 @@ pub unsafe extern "C" fn ProcessLogoTest(
                                             as isize,
                                     ))
                                     .pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             (*logo_block.offset(logo_block_count as isize)).end as libc::c_double
                                 / fps
                         }) - (if !frame.is_null() {
-                            (if (*logo_block.offset(logo_block_count as isize)).start
+                            if (*logo_block.offset(logo_block_count as isize)).start
                                 <= 0 as libc::c_int
                             {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if (*logo_block.offset(logo_block_count as isize)).start
+                                if (*logo_block.offset(logo_block_count as isize)).start
                                     >= framenum_real_0
                                 {
                                     (*frame.offset((framenum_real_0 - 1 as libc::c_int) as isize))
@@ -17693,8 +17682,8 @@ pub unsafe extern "C" fn ProcessLogoTest(
                                             as isize,
                                     ))
                                     .pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             (*logo_block.offset(logo_block_count as isize)).start as libc::c_double
                                 / fps
@@ -17742,12 +17731,12 @@ pub unsafe extern "C" fn ProcessLogoTest(
                             as *mut libc::c_char,
                         dblSecondsToStrMinutes(
                             (if !frame.is_null() {
-                                (if (*logo_block.offset(logo_block_count as isize)).start
+                                if (*logo_block.offset(logo_block_count as isize)).start
                                     <= 0 as libc::c_int
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if (*logo_block.offset(logo_block_count as isize)).start
+                                    if (*logo_block.offset(logo_block_count as isize)).start
                                         >= framenum_real_0
                                     {
                                         (*frame
@@ -17759,21 +17748,21 @@ pub unsafe extern "C" fn ProcessLogoTest(
                                                 as isize,
                                         ))
                                         .pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 (*logo_block.offset(logo_block_count as isize)).start
                                     as libc::c_double
                                     / fps
                             }) - (if !frame.is_null() {
-                                (if (*logo_block.offset(
+                                if (*logo_block.offset(
                                     (logo_block_count - 1 as libc::c_int as libc::c_long) as isize,
                                 ))
                                 .end <= 0 as libc::c_int
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if (*logo_block.offset(
+                                    if (*logo_block.offset(
                                         (logo_block_count - 1 as libc::c_int as libc::c_long)
                                             as isize,
                                     ))
@@ -17793,8 +17782,8 @@ pub unsafe extern "C" fn ProcessLogoTest(
                                                 as isize,
                                         ))
                                         .pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 (*logo_block.offset(
                                     (logo_block_count - 1 as libc::c_int as libc::c_long) as isize,
@@ -20085,54 +20074,54 @@ pub unsafe extern "C" fn InputReffer(
                 0.0f64,
                 0.0f64,
                 (if !frame.is_null() {
-                    (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                    if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                        if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     reffer[i as usize].end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                    if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                        if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     reffer[i as usize].start_frame as libc::c_double / fps
                 }),
             );
         }
         total += (if !frame.is_null() {
-            (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+            if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             reffer[i as usize].end_frame as libc::c_double / fps
         }) - (if !frame.is_null() {
-            (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+            if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                 (*frame.offset(1 as libc::c_int as isize)).pts
             } else {
-                (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                 } else {
                     (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                })
-            })
+                }
+            }
         } else {
             reffer[i as usize].start_frame as libc::c_double / fps
         });
@@ -20194,12 +20183,12 @@ pub unsafe extern "C" fn InputReffer(
                                     0.0f64,
                                     0.0f64,
                                     (if !frame.is_null() {
-                                        (if reffer[i as usize].end_frame
+                                        if reffer[i as usize].end_frame
                                             <= 0 as libc::c_int as libc::c_long
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if reffer[i as usize].end_frame
+                                            if reffer[i as usize].end_frame
                                                 >= framenum_real as libc::c_long
                                             {
                                                 (*frame.offset(
@@ -20210,17 +20199,17 @@ pub unsafe extern "C" fn InputReffer(
                                                 (*frame
                                                     .offset(reffer[i as usize].end_frame as isize))
                                                 .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         reffer[i as usize].end_frame as libc::c_double / fps
                                     }) - (if !frame.is_null() {
-                                        (if reffer[i as usize].start_frame
+                                        if reffer[i as usize].start_frame
                                             <= 0 as libc::c_int as libc::c_long
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if reffer[i as usize].start_frame
+                                            if reffer[i as usize].start_frame
                                                 >= framenum_real as libc::c_long
                                             {
                                                 (*frame.offset(
@@ -20232,44 +20221,43 @@ pub unsafe extern "C" fn InputReffer(
                                                     reffer[i as usize].start_frame as isize,
                                                 ))
                                                 .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         reffer[i as usize].start_frame as libc::c_double / fps
                                     }),
                                 );
                             }
                             total += (if !frame.is_null() {
-                                (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long
+                                if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if reffer[i as usize].end_frame
-                                        >= framenum_real as libc::c_long
+                                    if reffer[i as usize].end_frame >= framenum_real as libc::c_long
                                     {
                                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                             .pts
                                     } else {
                                         (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 reffer[i as usize].end_frame as libc::c_double / fps
                             }) - (if !frame.is_null() {
-                                (if reffer[i as usize].start_frame
+                                if reffer[i as usize].start_frame
                                     <= 0 as libc::c_int as libc::c_long
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if reffer[i as usize].start_frame
+                                    if reffer[i as usize].start_frame
                                         >= framenum_real as libc::c_long
                                     {
                                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                             .pts
                                     } else {
                                         (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 reffer[i as usize].start_frame as libc::c_double / fps
                             });
@@ -20315,12 +20303,12 @@ pub unsafe extern "C" fn InputReffer(
                                     0.0f64,
                                     0.0f64,
                                     (if !frame.is_null() {
-                                        (if reffer[i as usize].end_frame
+                                        if reffer[i as usize].end_frame
                                             <= 0 as libc::c_int as libc::c_long
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if reffer[i as usize].end_frame
+                                            if reffer[i as usize].end_frame
                                                 >= framenum_real as libc::c_long
                                             {
                                                 (*frame.offset(
@@ -20331,17 +20319,17 @@ pub unsafe extern "C" fn InputReffer(
                                                 (*frame
                                                     .offset(reffer[i as usize].end_frame as isize))
                                                 .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         reffer[i as usize].end_frame as libc::c_double / fps
                                     }) - (if !frame.is_null() {
-                                        (if reffer[i as usize].start_frame
+                                        if reffer[i as usize].start_frame
                                             <= 0 as libc::c_int as libc::c_long
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if reffer[i as usize].start_frame
+                                            if reffer[i as usize].start_frame
                                                 >= framenum_real as libc::c_long
                                             {
                                                 (*frame.offset(
@@ -20353,44 +20341,43 @@ pub unsafe extern "C" fn InputReffer(
                                                     reffer[i as usize].start_frame as isize,
                                                 ))
                                                 .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         reffer[i as usize].start_frame as libc::c_double / fps
                                     }),
                                 );
                             }
                             total += (if !frame.is_null() {
-                                (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long
+                                if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if reffer[i as usize].end_frame
-                                        >= framenum_real as libc::c_long
+                                    if reffer[i as usize].end_frame >= framenum_real as libc::c_long
                                     {
                                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                             .pts
                                     } else {
                                         (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 reffer[i as usize].end_frame as libc::c_double / fps
                             }) - (if !frame.is_null() {
-                                (if reffer[i as usize].start_frame
+                                if reffer[i as usize].start_frame
                                     <= 0 as libc::c_int as libc::c_long
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if reffer[i as usize].start_frame
+                                    if reffer[i as usize].start_frame
                                         >= framenum_real as libc::c_long
                                     {
                                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                             .pts
                                     } else {
                                         (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 reffer[i as usize].start_frame as libc::c_double / fps
                             });
@@ -20433,12 +20420,12 @@ pub unsafe extern "C" fn InputReffer(
                                     0.0f64,
                                     0.0f64,
                                     (if !frame.is_null() {
-                                        (if reffer[i as usize].end_frame
+                                        if reffer[i as usize].end_frame
                                             <= 0 as libc::c_int as libc::c_long
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if reffer[i as usize].end_frame
+                                            if reffer[i as usize].end_frame
                                                 >= framenum_real as libc::c_long
                                             {
                                                 (*frame.offset(
@@ -20449,17 +20436,17 @@ pub unsafe extern "C" fn InputReffer(
                                                 (*frame
                                                     .offset(reffer[i as usize].end_frame as isize))
                                                 .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         reffer[i as usize].end_frame as libc::c_double / fps
                                     }) - (if !frame.is_null() {
-                                        (if reffer[i as usize].start_frame
+                                        if reffer[i as usize].start_frame
                                             <= 0 as libc::c_int as libc::c_long
                                         {
                                             (*frame.offset(1 as libc::c_int as isize)).pts
                                         } else {
-                                            (if reffer[i as usize].start_frame
+                                            if reffer[i as usize].start_frame
                                                 >= framenum_real as libc::c_long
                                             {
                                                 (*frame.offset(
@@ -20471,44 +20458,43 @@ pub unsafe extern "C" fn InputReffer(
                                                     reffer[i as usize].start_frame as isize,
                                                 ))
                                                 .pts
-                                            })
-                                        })
+                                            }
+                                        }
                                     } else {
                                         reffer[i as usize].start_frame as libc::c_double / fps
                                     }),
                                 );
                             }
                             total += (if !frame.is_null() {
-                                (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long
+                                if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if reffer[i as usize].end_frame
-                                        >= framenum_real as libc::c_long
+                                    if reffer[i as usize].end_frame >= framenum_real as libc::c_long
                                     {
                                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                             .pts
                                     } else {
                                         (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 reffer[i as usize].end_frame as libc::c_double / fps
                             }) - (if !frame.is_null() {
-                                (if reffer[i as usize].start_frame
+                                if reffer[i as usize].start_frame
                                     <= 0 as libc::c_int as libc::c_long
                                 {
                                     (*frame.offset(1 as libc::c_int as isize)).pts
                                 } else {
-                                    (if reffer[i as usize].start_frame
+                                    if reffer[i as usize].start_frame
                                         >= framenum_real as libc::c_long
                                     {
                                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize))
                                             .pts
                                     } else {
                                         (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                                    })
-                                })
+                                    }
+                                }
                             } else {
                                 reffer[i as usize].start_frame as libc::c_double / fps
                             });
@@ -20534,27 +20520,27 @@ pub unsafe extern "C" fn InputReffer(
                         inbasename.as_mut_ptr(),
                         pk,
                         (if !frame.is_null() {
-                            (if k <= 0 as libc::c_int {
+                            if k <= 0 as libc::c_int {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if k >= framenum_real {
+                                if k >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset(k as isize)).pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             k as libc::c_double / fps
                         }) - (if !frame.is_null() {
-                            (if pk <= 0 as libc::c_int {
+                            if pk <= 0 as libc::c_int {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if pk >= framenum_real {
+                                if pk >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset(pk as isize)).pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             pk as libc::c_double / fps
                         }),
@@ -20563,27 +20549,27 @@ pub unsafe extern "C" fn InputReffer(
                     );
                 }
                 fneg += (if !frame.is_null() {
-                    (if k <= 0 as libc::c_int {
+                    if k <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if k >= framenum_real {
+                        if k >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(k as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     k as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if pk <= 0 as libc::c_int {
+                    if pk <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if pk >= framenum_real {
+                        if pk >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(pk as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     pk as libc::c_double / fps
                 });
@@ -20619,27 +20605,27 @@ pub unsafe extern "C" fn InputReffer(
                         pk,
                         0.0f64,
                         (if !frame.is_null() {
-                            (if k <= 0 as libc::c_int {
+                            if k <= 0 as libc::c_int {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if k >= framenum_real {
+                                if k >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset(k as isize)).pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             k as libc::c_double / fps
                         }) - (if !frame.is_null() {
-                            (if pk <= 0 as libc::c_int {
+                            if pk <= 0 as libc::c_int {
                                 (*frame.offset(1 as libc::c_int as isize)).pts
                             } else {
-                                (if pk >= framenum_real {
+                                if pk >= framenum_real {
                                     (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                                 } else {
                                     (*frame.offset(pk as isize)).pts
-                                })
-                            })
+                                }
+                            }
                         } else {
                             pk as libc::c_double / fps
                         }),
@@ -20647,27 +20633,27 @@ pub unsafe extern "C" fn InputReffer(
                     );
                 }
                 fpos += (if !frame.is_null() {
-                    (if k <= 0 as libc::c_int {
+                    if k <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if k >= framenum_real {
+                        if k >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(k as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     k as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if pk <= 0 as libc::c_int {
+                    if pk <= 0 as libc::c_int {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if pk >= framenum_real {
+                        if pk >= framenum_real {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(pk as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     pk as libc::c_double / fps
                 });
@@ -20716,52 +20702,52 @@ pub unsafe extern "C" fn InputReffer(
                 0 as libc::c_long,
                 0 as libc::c_long,
                 (if !frame.is_null() {
-                    (if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                    if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
+                        if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(commercial[j as usize].end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[j as usize].end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                    if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
+                        if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(commercial[j as usize].start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[j as usize].start_frame as libc::c_double / fps
                 }),
                 (if !frame.is_null() {
-                    (if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                    if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
+                        if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(commercial[j as usize].end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[j as usize].end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                    if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
+                        if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(commercial[j as usize].start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     commercial[j as usize].start_frame as libc::c_double / fps
                 }),
@@ -20777,52 +20763,52 @@ pub unsafe extern "C" fn InputReffer(
                 reffer[i as usize].start_frame,
                 reffer[i as usize].end_frame,
                 -((if !frame.is_null() {
-                    (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                    if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                        if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     reffer[i as usize].end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                    if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                        if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     reffer[i as usize].start_frame as libc::c_double / fps
                 })),
                 -((if !frame.is_null() {
-                    (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                    if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                        if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     reffer[i as usize].end_frame as libc::c_double / fps
                 }) - (if !frame.is_null() {
-                    (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                    if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                        if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
                             (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     reffer[i as usize].start_frame as libc::c_double / fps
                 })),
@@ -20843,53 +20829,52 @@ pub unsafe extern "C" fn InputReffer(
                     reffer[i as usize].start_frame,
                     reffer[i as usize].end_frame,
                     (if !frame.is_null() {
-                        (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                        if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                            if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         reffer[i as usize].start_frame as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                        if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if commercial[j as usize].start_frame >= framenum_real as libc::c_long
-                            {
+                            if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(commercial[j as usize].start_frame as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         commercial[j as usize].start_frame as libc::c_double / fps
                     }),
                     (if !frame.is_null() {
-                        (if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                        if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
+                            if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(commercial[j as usize].end_frame as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         commercial[j as usize].end_frame as libc::c_double / fps
                     }) - (if !frame.is_null() {
-                        (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                        if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                            if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
                                 (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         reffer[i as usize].end_frame as libc::c_double / fps
                     }),
@@ -20909,52 +20894,52 @@ pub unsafe extern "C" fn InputReffer(
             0 as libc::c_long,
             0 as libc::c_long,
             (if !frame.is_null() {
-                (if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
+                    if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[j as usize].end_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[j as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
+                    if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[j as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[j as usize].start_frame as libc::c_double / fps
             }),
             (if !frame.is_null() {
-                (if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[j as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
+                    if commercial[j as usize].end_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[j as usize].end_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[j as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if commercial[j as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
+                    if commercial[j as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(commercial[j as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 commercial[j as usize].start_frame as libc::c_double / fps
             }),
@@ -20971,52 +20956,52 @@ pub unsafe extern "C" fn InputReffer(
             reffer[i as usize].start_frame,
             reffer[i as usize].end_frame,
             -((if !frame.is_null() {
-                (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                    if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 reffer[i as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                    if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 reffer[i as usize].start_frame as libc::c_double / fps
             })),
             -((if !frame.is_null() {
-                (if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
+                if reffer[i as usize].end_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
+                    if reffer[i as usize].end_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(reffer[i as usize].end_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 reffer[i as usize].end_frame as libc::c_double / fps
             }) - (if !frame.is_null() {
-                (if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
+                if reffer[i as usize].start_frame <= 0 as libc::c_int as libc::c_long {
                     (*frame.offset(1 as libc::c_int as isize)).pts
                 } else {
-                    (if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
+                    if reffer[i as usize].start_frame >= framenum_real as libc::c_long {
                         (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                     } else {
                         (*frame.offset(reffer[i as usize].start_frame as isize)).pts
-                    })
-                })
+                    }
+                }
             } else {
                 reffer[i as usize].start_frame as libc::c_double / fps
             })),
@@ -23508,14 +23493,14 @@ pub unsafe extern "C" fn AddNewCCBlock(
             (*cc_block.offset(cc_block_count as isize)).type_0 = type_0;
             if cc_block_count > 1 as libc::c_int as libc::c_long {
                 if (if !frame.is_null() {
-                    (if (*cc_block
+                    if (*cc_block
                         .offset((cc_block_count - 1 as libc::c_int as libc::c_long) as isize))
                     .end_frame
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*cc_block
+                        if (*cc_block
                             .offset((cc_block_count - 1 as libc::c_int as libc::c_long) as isize))
                         .end_frame
                             >= framenum_real as libc::c_long
@@ -23529,21 +23514,21 @@ pub unsafe extern "C" fn AddNewCCBlock(
                                 .end_frame as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*cc_block.offset((cc_block_count - 1 as libc::c_int as libc::c_long) as isize))
                         .end_frame as libc::c_double
                         / fps
                 }) - (if !frame.is_null() {
-                    (if (*cc_block
+                    if (*cc_block
                         .offset((cc_block_count - 1 as libc::c_int as libc::c_long) as isize))
                     .start_frame
                         <= 0 as libc::c_int as libc::c_long
                     {
                         (*frame.offset(1 as libc::c_int as isize)).pts
                     } else {
-                        (if (*cc_block
+                        if (*cc_block
                             .offset((cc_block_count - 1 as libc::c_int as libc::c_long) as isize))
                         .start_frame
                             >= framenum_real as libc::c_long
@@ -23557,8 +23542,8 @@ pub unsafe extern "C" fn AddNewCCBlock(
                                 .start_frame as isize,
                             ))
                             .pts
-                        })
-                    })
+                        }
+                    }
                 } else {
                     (*cc_block.offset((cc_block_count - 1 as libc::c_int as libc::c_long) as isize))
                         .start_frame as libc::c_double
@@ -23670,12 +23655,12 @@ pub unsafe extern "C" fn DetermineCCTypeForBlock(
                     && (*cc_block.offset((i - 1 as libc::c_int) as isize)).type_0
                         == 0 as libc::c_int
                     && (if !frame.is_null() {
-                        (if (*cc_block.offset((i - 1 as libc::c_int) as isize)).end_frame
+                        if (*cc_block.offset((i - 1 as libc::c_int) as isize)).end_frame
                             <= 0 as libc::c_int as libc::c_long
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*cc_block.offset((i - 1 as libc::c_int) as isize)).end_frame
+                            if (*cc_block.offset((i - 1 as libc::c_int) as isize)).end_frame
                                 >= framenum_real as libc::c_long
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -23685,19 +23670,19 @@ pub unsafe extern "C" fn DetermineCCTypeForBlock(
                                         as isize,
                                 ))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*cc_block.offset((i - 1 as libc::c_int) as isize)).end_frame
                             as libc::c_double
                             / fps
                     }) - (if !frame.is_null() {
-                        (if (*cc_block.offset((i - 1 as libc::c_int) as isize)).start_frame
+                        if (*cc_block.offset((i - 1 as libc::c_int) as isize)).start_frame
                             <= 0 as libc::c_int as libc::c_long
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            (if (*cc_block.offset((i - 1 as libc::c_int) as isize)).start_frame
+                            if (*cc_block.offset((i - 1 as libc::c_int) as isize)).start_frame
                                 >= framenum_real as libc::c_long
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
@@ -23707,8 +23692,8 @@ pub unsafe extern "C" fn DetermineCCTypeForBlock(
                                         as isize,
                                 ))
                                 .pts
-                            })
-                        })
+                            }
+                        }
                     } else {
                         (*cc_block.offset((i - 1 as libc::c_int) as isize)).start_frame
                             as libc::c_double
