@@ -1,20 +1,7 @@
 extern "C" {
-    pub type __sFILEX;
-    fn fwrite(
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-        _: libc::c_ulong,
-        _: *mut FILE,
-    ) -> libc::c_ulong;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
-        -> *mut libc::c_void;
-    fn memset(_: *mut libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn exit(_: libc::c_int) -> !;
-    fn read(_: libc::c_int, _: *mut libc::c_void, _: size_t) -> ssize_t;
     fn lseek(_: libc::c_int, _: off_t, _: libc::c_int) -> off_t;
     static mut gop_time: gop_time_code;
     static mut first_gop_time: gop_time_code;
@@ -35,7 +22,7 @@ extern "C" {
     static mut pts_big_change: libc::c_uint;
     static mut ptsdata: [libc::c_uchar; 5];
     static mut lastptsdata: [libc::c_uchar; 5];
-    static mut clean: *mut FILE;
+    static mut clean: *mut libc::FILE;
     #[link_name = "in"]
     static mut in_0: libc::c_int;
     static mut stat_dvdccheaders: libc::c_int;
@@ -70,44 +57,13 @@ pub type __darwin_ssize_t = libc::c_long;
 pub type __darwin_off_t = __int64_t;
 pub type size_t = __darwin_size_t;
 pub type int64_t = libc::c_longlong;
-pub type ssize_t = __darwin_ssize_t;
 pub type off_t = __darwin_off_t;
-pub type fpos_t = __darwin_off_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sbuf {
     pub _base: *mut libc::c_uchar,
     pub _size: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct __sFILE {
-    pub _p: *mut libc::c_uchar,
-    pub _r: libc::c_int,
-    pub _w: libc::c_int,
-    pub _flags: libc::c_short,
-    pub _file: libc::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: libc::c_int,
-    pub _cookie: *mut libc::c_void,
-    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
-    pub _write: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: libc::c_int,
-    pub _ubuf: [libc::c_uchar; 3],
-    pub _nbuf: [libc::c_uchar; 1],
-    pub _lb: __sbuf,
-    pub _blksize: libc::c_int,
-    pub _offset: fpos_t,
-}
-pub type FILE = __sFILE;
 pub type LONG = libc::c_long;
 pub type frame_type = libc::c_uint;
 pub const B_FRAME: frame_type = 3;
@@ -262,10 +218,10 @@ pub unsafe extern "C" fn update_clock() {
             pts_big_change = 1 as libc::c_int as libc::c_uint;
         }
         last_pts = current_pts;
-        memcpy(
+        libc::memcpy(
             lastptsdata.as_mut_ptr() as *mut libc::c_void,
             ptsdata.as_mut_ptr() as *const libc::c_void,
-            5 as libc::c_int as libc::c_ulong,
+            5,
         );
     }
 }
@@ -329,9 +285,7 @@ pub unsafe extern "C" fn init_file_buffer() -> libc::c_int {
     filebuffer_pos = 0 as libc::c_int;
     bytesinbuffer = 0 as libc::c_int;
     if filebuffer.is_null() {
-        filebuffer = malloc(
-            (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int) as libc::c_ulong,
-        ) as *mut libc::c_uchar;
+        filebuffer = libc::malloc((1024 * 1024 * 16) as usize) as *mut libc::c_uchar;
     }
     if filebuffer.is_null() {
         return -(1 as libc::c_int);
@@ -374,7 +328,7 @@ pub unsafe extern "C" fn buffered_read_opt(
                 if buffer_input == 0 {
                     let mut i_0: libc::c_int = 0;
                     loop {
-                        i_0 = read(in_0, fbuffer as *mut libc::c_void, bytes as size_t)
+                        i_0 = libc::read(in_0, fbuffer as *mut libc::c_void, bytes as usize)
                             as libc::c_int;
                         copied += i_0 as libc::c_long;
                         bytes = bytes.wrapping_sub(i_0 as libc::c_uint);
@@ -390,19 +344,18 @@ pub unsafe extern "C" fn buffered_read_opt(
                 } else {
                     bytesinbuffer
                 };
-                memmove(
+                libc::memmove(
                     filebuffer as *mut libc::c_void,
                     filebuffer.offset(
                         (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int - keep)
                             as isize,
                     ) as *const libc::c_void,
-                    keep as libc::c_ulong,
+                    keep as usize,
                 );
-                i = read(
+                i = libc::read(
                     in_0,
                     filebuffer.offset(keep as isize) as *mut libc::c_void,
-                    (1024 as libc::c_int * 1024 as libc::c_int * 16 as libc::c_int - keep)
-                        as size_t,
+                    (1024 * 1024 * 16 - keep) as usize,
                 ) as libc::c_int;
                 if i == 0 as libc::c_int {
                     eof = 1 as libc::c_int;
@@ -417,10 +370,10 @@ pub unsafe extern "C" fn buffered_read_opt(
                 ready
             }) as libc::c_int;
             if !fbuffer.is_null() {
-                memcpy(
+                libc::memcpy(
                     fbuffer as *mut libc::c_void,
                     filebuffer.offset(filebuffer_pos as isize) as *const libc::c_void,
-                    copy as libc::c_ulong,
+                    copy as usize,
                 );
                 buffer = buffer.offset(copy as isize);
             }
@@ -431,7 +384,7 @@ pub unsafe extern "C" fn buffered_read_opt(
         return copied;
     } else {
         if !fbuffer.is_null() {
-            return copied + read(in_0, fbuffer as *mut libc::c_void, bytes as size_t);
+            return copied + libc::read(in_0, fbuffer as *mut libc::c_void, bytes as usize) as i64;
         }
         return (copied as libc::c_longlong + lseek(in_0, bytes as off_t, 1 as libc::c_int))
             as LONG;
@@ -540,11 +493,11 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                             let mut adlength: libc::c_uchar = 0;
                             if 1 as libc::c_int <= bytesinbuffer - filebuffer_pos {
                                 if !(&mut adlength as *mut libc::c_uchar).is_null() {
-                                    memcpy(
+                                    libc::memcpy(
                                         &mut adlength as *mut libc::c_uchar as *mut libc::c_void,
                                         filebuffer.offset(filebuffer_pos as isize)
                                             as *const libc::c_void,
-                                        1 as libc::c_int as libc::c_ulong,
+                                        1,
                                     );
                                 }
                                 filebuffer_pos += 1 as libc::c_int;
@@ -573,11 +526,11 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                         pes_start_in_this_pass = 1 as libc::c_int;
                         if 6 as libc::c_int <= bytesinbuffer - filebuffer_pos {
                             if !pesheaderbuf.is_null() {
-                                memcpy(
+                                libc::memcpy(
                                     pesheaderbuf as *mut libc::c_void,
                                     filebuffer.offset(filebuffer_pos as isize)
                                         as *const libc::c_void,
-                                    6 as libc::c_int as libc::c_ulong,
+                                    6,
                                 );
                             }
                             filebuffer_pos += 6 as libc::c_int;
@@ -618,12 +571,12 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                 let mut need_to_skip: libc::c_int = 0;
                                 if 3 as libc::c_int <= bytesinbuffer - filebuffer_pos {
                                     if !pesheaderbuf.offset(6 as libc::c_int as isize).is_null() {
-                                        memcpy(
+                                        libc::memcpy(
                                             pesheaderbuf.offset(6 as libc::c_int as isize)
                                                 as *mut libc::c_void,
                                             filebuffer.offset(filebuffer_pos as isize)
                                                 as *const libc::c_void,
-                                            3 as libc::c_int as libc::c_ulong,
+                                            3,
                                         );
                                     }
                                     filebuffer_pos += 3 as libc::c_int;
@@ -649,11 +602,11 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                     let mut pts_raw: [libc::c_uchar; 5] = [0; 5];
                                     if 5 as libc::c_int <= bytesinbuffer - filebuffer_pos {
                                         if !pts_raw.as_mut_ptr().is_null() {
-                                            memcpy(
+                                            libc::memcpy(
                                                 pts_raw.as_mut_ptr() as *mut libc::c_void,
                                                 filebuffer.offset(filebuffer_pos as isize)
                                                     as *const libc::c_void,
-                                                5 as libc::c_int as libc::c_ulong,
+                                                5,
                                             );
                                         }
                                         filebuffer_pos += 5 as libc::c_int;
@@ -707,10 +660,10 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                             pts_set = 1 as libc::c_int;
                                         }
                                     }
-                                    memcpy(
+                                    libc::memcpy(
                                         ptsdata.as_mut_ptr() as *mut libc::c_void,
                                         pts_raw.as_mut_ptr() as *const libc::c_void,
-                                        5 as libc::c_int as libc::c_ulong,
+                                        5,
                                     );
                                 }
                                 if need_to_skip < 0 as libc::c_int {
@@ -754,11 +707,11 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                         }) as libc::c_int;
                         if want <= bytesinbuffer - filebuffer_pos {
                             if !fbuffer.offset(inbuf as isize).is_null() {
-                                memcpy(
+                                libc::memcpy(
                                     fbuffer.offset(inbuf as isize) as *mut libc::c_void,
                                     filebuffer.offset(filebuffer_pos as isize)
                                         as *const libc::c_void,
-                                    want as libc::c_ulong,
+                                    want as usize,
                                 );
                             }
                             filebuffer_pos += want;
@@ -811,10 +764,10 @@ pub unsafe extern "C" fn general_getmoredata() -> LONG {
             - inbuf) as libc::c_int;
         if want <= bytesinbuffer - filebuffer_pos {
             if !fbuffer.offset(inbuf as isize).is_null() {
-                memcpy(
+                libc::memcpy(
                     fbuffer.offset(inbuf as isize) as *mut libc::c_void,
                     filebuffer.offset(filebuffer_pos as isize) as *const libc::c_void,
-                    want as libc::c_ulong,
+                    want as usize,
                 );
             }
             filebuffer_pos += want;
@@ -1440,10 +1393,10 @@ pub unsafe extern "C" fn general_loop() {
         let mut i: LONG = 0;
         let mut got: LONG = 0;
         overlap = inbuf - pos;
-        memmove(
+        libc::memmove(
             fbuffer as *mut libc::c_void,
             fbuffer.offset(pos as isize) as *const libc::c_void,
-            (inbuf - pos) as size_t,
+            (inbuf - pos) as usize,
         );
         inbuf -= pos;
         pos = 0 as libc::c_int as LONG;
@@ -1453,20 +1406,20 @@ pub unsafe extern "C" fn general_loop() {
             i = general_getmoredata();
         }
         if !clean.is_null() {
-            fwrite(
+            libc::fwrite(
                 fbuffer.offset(overlap as isize) as *const libc::c_void,
-                1 as libc::c_int as libc::c_ulong,
-                (inbuf - overlap) as size_t,
+                1,
+                (inbuf - overlap) as usize,
                 clean,
             );
         }
         if i == 0 as libc::c_int as libc::c_long {
             end_of_file = 1 as libc::c_int;
-            memset(
+            libc::memset(
                 fbuffer.offset(inbuf as isize) as *mut libc::c_void,
                 0 as libc::c_int,
                 ((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_long
-                    - inbuf) as size_t,
+                    - inbuf) as usize,
             );
         }
         if inbuf == 0 as libc::c_int as libc::c_long {

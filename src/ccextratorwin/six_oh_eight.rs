@@ -1,11 +1,4 @@
 extern "C" {
-    pub type __sFILEX;
-    fn fwrite(
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-        _: libc::c_ulong,
-        _: *mut FILE,
-    ) -> libc::c_ulong;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn sprintf(_: *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn get_char_in_latin_1(buffer: *mut libc::c_uchar, c: libc::c_uchar);
@@ -31,8 +24,6 @@ extern "C" {
     static mut spell_words: libc::c_int;
     static mut write_format: libc::c_int;
     fn exit(_: libc::c_int) -> !;
-    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn memset(_: *mut libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn __maskrune(_: __darwin_ct_rune_t, _: libc::c_ulong) -> libc::c_int;
@@ -46,7 +37,6 @@ pub type __darwin_wchar_t = libc::c_int;
 pub type __darwin_rune_t = __darwin_wchar_t;
 pub type __darwin_off_t = __int64_t;
 pub type size_t = __darwin_size_t;
-pub type fpos_t = __darwin_off_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sbuf {
@@ -55,37 +45,8 @@ pub struct __sbuf {
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct __sFILE {
-    pub _p: *mut libc::c_uchar,
-    pub _r: libc::c_int,
-    pub _w: libc::c_int,
-    pub _flags: libc::c_short,
-    pub _file: libc::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: libc::c_int,
-    pub _cookie: *mut libc::c_void,
-    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
-    pub _write: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: libc::c_int,
-    pub _ubuf: [libc::c_uchar; 3],
-    pub _nbuf: [libc::c_uchar; 1],
-    pub _lb: __sbuf,
-    pub _blksize: libc::c_int,
-    pub _offset: fpos_t,
-}
-pub type FILE = __sFILE;
-#[derive(Copy, Clone)]
-#[repr(C)]
 pub struct s_write {
-    pub fh: *mut FILE,
+    pub fh: *mut libc::FILE,
     pub filename: *mut libc::c_char,
     pub buffer: *mut libc::c_uchar,
     pub used: libc::c_int,
@@ -558,10 +519,10 @@ pub unsafe extern "C" fn correct_case(line_num: libc::c_int, data: *mut eia608_s
                     || next as libc::c_int == 0x89 as libc::c_int
                     || ispunct(next as libc::c_int) != 0)
             {
-                memcpy(
+                libc::memcpy(
                     c as *mut libc::c_void,
                     *spell_correct.offset(i as isize) as *const libc::c_void,
-                    len,
+                    len as usize,
                 );
             }
             c = c.offset(1);
@@ -718,22 +679,22 @@ pub unsafe extern "C" fn clear_eia608_cc_buffer(mut data: *mut eia608_screen) {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while i < 15 as libc::c_int {
-        memset(
+        libc::memset(
             ((*data).characters[i as usize]).as_mut_ptr() as *mut libc::c_void,
             ' ' as i32,
-            32 as libc::c_int as libc::c_ulong,
+            32,
         );
         (*data).characters[i as usize][32 as libc::c_int as usize] =
             0 as libc::c_int as libc::c_uchar;
-        memset(
+        libc::memset(
             ((*data).colors[i as usize]).as_mut_ptr() as *mut libc::c_void,
             default_color,
-            33 as libc::c_int as libc::c_ulong,
+            33,
         );
-        memset(
+        libc::memset(
             ((*data).fonts[i as usize]).as_mut_ptr() as *mut libc::c_void,
             FONT_REGULAR as libc::c_int,
-            33 as libc::c_int as libc::c_ulong,
+            33,
         );
         (*data).row_used[i as usize] = 0 as libc::c_int;
         (*data).empty = 1 as libc::c_int;
@@ -870,10 +831,10 @@ pub unsafe extern "C" fn write_subtitle_file_footer(wb: *mut s_write) {
                 );
             }
             enc_buffer_used = encode_line(enc_buffer.as_mut_ptr(), str.as_mut_ptr());
-            fwrite(
+            libc::fwrite(
                 enc_buffer.as_mut_ptr() as *const libc::c_void,
-                enc_buffer_used as libc::c_ulong,
-                1 as libc::c_int as libc::c_ulong,
+                enc_buffer_used as usize,
+                1,
                 (*wb).fh,
             );
         }
@@ -881,12 +842,12 @@ pub unsafe extern "C" fn write_subtitle_file_footer(wb: *mut s_write) {
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn fprintf_encoded(fh: *mut FILE, string: *mut libc::c_char) {
+pub unsafe extern "C" fn fprintf_encoded(fh: *mut libc::FILE, string: *mut libc::c_char) {
     enc_buffer_used = encode_line(enc_buffer.as_mut_ptr(), string as *mut libc::c_uchar);
-    fwrite(
+    libc::fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
-        enc_buffer_used as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        enc_buffer_used as usize,
+        1,
         fh,
     );
 }
@@ -1000,10 +961,10 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
         enc_buffer.as_mut_ptr(),
         timeline.as_mut_ptr() as *mut libc::c_uchar,
     );
-    fwrite(
+    libc::fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
-        enc_buffer_used as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        enc_buffer_used as usize,
+        1,
         (*wb).fh,
     );
     sprintf(
@@ -1029,10 +990,10 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
             timeline.as_mut_ptr(),
         );
     }
-    fwrite(
+    libc::fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
-        enc_buffer_used as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        enc_buffer_used as usize,
+        1,
         (*wb).fh,
     );
     i = 0 as libc::c_int;
@@ -1048,16 +1009,11 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
                 printf(b"\r\0" as *const u8 as *const libc::c_char);
                 printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
             }
-            fwrite(
-                subline as *const libc::c_void,
-                1 as libc::c_int as libc::c_ulong,
-                length as libc::c_ulong,
-                (*wb).fh,
-            );
-            fwrite(
+            libc::fwrite(subline as *const libc::c_void, 1, length as usize, (*wb).fh);
+            libc::fwrite(
                 encoded_crlf.as_mut_ptr() as *const libc::c_void,
-                1 as libc::c_int as libc::c_ulong,
-                encoded_crlf_length as libc::c_ulong,
+                1,
+                encoded_crlf_length as usize,
                 (*wb).fh,
             );
             wrote_something = 1 as libc::c_int;
@@ -1067,10 +1023,10 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
     if debug_608 != 0 {
         printf(b"\r\n\0" as *const u8 as *const libc::c_char);
     }
-    fwrite(
+    libc::fwrite(
         encoded_crlf.as_mut_ptr() as *const libc::c_void,
-        1 as libc::c_int as libc::c_ulong,
-        encoded_crlf_length as libc::c_ulong,
+        1,
+        encoded_crlf_length as usize,
         (*wb).fh,
     );
     return wrote_something;
@@ -1114,10 +1070,10 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         );
     }
     enc_buffer_used = encode_line(enc_buffer.as_mut_ptr(), str.as_mut_ptr());
-    fwrite(
+    libc::fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
-        enc_buffer_used as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        enc_buffer_used as usize,
+        1,
         (*wb).fh,
     );
     i = 0 as libc::c_int;
@@ -1128,25 +1084,20 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
                 printf(b"\r\0" as *const u8 as *const libc::c_char);
                 printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
             }
-            fwrite(
-                subline as *const libc::c_void,
-                1 as libc::c_int as libc::c_ulong,
-                length as libc::c_ulong,
-                (*wb).fh,
-            );
+            libc::fwrite(subline as *const libc::c_void, 1, length as usize, (*wb).fh);
             wrote_something = 1 as libc::c_int;
             if i != 14 as libc::c_int {
-                fwrite(
+                libc::fwrite(
                     encoded_br.as_mut_ptr() as *const libc::c_void,
-                    1 as libc::c_int as libc::c_ulong,
-                    encoded_br_length as libc::c_ulong,
+                    1,
+                    encoded_br_length as usize,
                     (*wb).fh,
                 );
             }
-            fwrite(
+            libc::fwrite(
                 encoded_crlf.as_mut_ptr() as *const libc::c_void,
-                1 as libc::c_int as libc::c_ulong,
-                encoded_crlf_length as libc::c_ulong,
+                1,
+                encoded_crlf_length as usize,
                 (*wb).fh,
             );
         }
@@ -1163,10 +1114,10 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         );
     }
     enc_buffer_used = encode_line(enc_buffer.as_mut_ptr(), str.as_mut_ptr());
-    fwrite(
+    libc::fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
-        enc_buffer_used as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        enc_buffer_used as usize,
+        1,
         (*wb).fh,
     );
     sprintf(
@@ -1182,10 +1133,10 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         );
     }
     enc_buffer_used = encode_line(enc_buffer.as_mut_ptr(), str.as_mut_ptr());
-    fwrite(
+    libc::fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
-        enc_buffer_used as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        enc_buffer_used as usize,
+        1,
         (*wb).fh,
     );
     return wrote_something;
@@ -1265,23 +1216,23 @@ pub unsafe extern "C" fn roll_up(wb: *mut s_write) {
         j = lastrow - keep_lines + 1 as libc::c_int;
         while j < lastrow {
             if j >= 0 as libc::c_int {
-                memcpy(
+                libc::memcpy(
                     ((*use_buffer).characters[j as usize]).as_mut_ptr() as *mut libc::c_void,
                     ((*use_buffer).characters[(j + 1 as libc::c_int) as usize]).as_mut_ptr()
                         as *const libc::c_void,
-                    33 as libc::c_int as libc::c_ulong,
+                    33,
                 );
-                memcpy(
+                libc::memcpy(
                     ((*use_buffer).colors[j as usize]).as_mut_ptr() as *mut libc::c_void,
                     ((*use_buffer).colors[(j + 1 as libc::c_int) as usize]).as_mut_ptr()
                         as *const libc::c_void,
-                    33 as libc::c_int as libc::c_ulong,
+                    33,
                 );
-                memcpy(
+                libc::memcpy(
                     ((*use_buffer).fonts[j as usize]).as_mut_ptr() as *mut libc::c_void,
                     ((*use_buffer).fonts[(j + 1 as libc::c_int) as usize]).as_mut_ptr()
                         as *const libc::c_void,
-                    33 as libc::c_int as libc::c_ulong,
+                    33,
                 );
                 (*use_buffer).row_used[j as usize] =
                     (*use_buffer).row_used[(j + 1 as libc::c_int) as usize];
@@ -1290,40 +1241,40 @@ pub unsafe extern "C" fn roll_up(wb: *mut s_write) {
         }
         j = 0 as libc::c_int;
         while j < 1 as libc::c_int + (*(*wb).data608).cursor_row - keep_lines {
-            memset(
+            libc::memset(
                 ((*use_buffer).characters[j as usize]).as_mut_ptr() as *mut libc::c_void,
                 ' ' as i32,
-                32 as libc::c_int as libc::c_ulong,
+                32,
             );
-            memset(
+            libc::memset(
                 ((*use_buffer).colors[j as usize]).as_mut_ptr() as *mut libc::c_void,
                 COL_WHITE as libc::c_int,
-                32 as libc::c_int as libc::c_ulong,
+                32,
             );
-            memset(
+            libc::memset(
                 ((*use_buffer).fonts[j as usize]).as_mut_ptr() as *mut libc::c_void,
                 FONT_REGULAR as libc::c_int,
-                32 as libc::c_int as libc::c_ulong,
+                32,
             );
             (*use_buffer).characters[j as usize][32 as libc::c_int as usize] =
                 0 as libc::c_int as libc::c_uchar;
             (*use_buffer).row_used[j as usize] = 0 as libc::c_int;
             j += 1;
         }
-        memset(
+        libc::memset(
             ((*use_buffer).characters[lastrow as usize]).as_mut_ptr() as *mut libc::c_void,
             ' ' as i32,
-            32 as libc::c_int as libc::c_ulong,
+            32,
         );
-        memset(
+        libc::memset(
             ((*use_buffer).colors[lastrow as usize]).as_mut_ptr() as *mut libc::c_void,
             COL_WHITE as libc::c_int,
-            32 as libc::c_int as libc::c_ulong,
+            32,
         );
-        memset(
+        libc::memset(
             ((*use_buffer).fonts[lastrow as usize]).as_mut_ptr() as *mut libc::c_void,
             FONT_REGULAR as libc::c_int,
-            32 as libc::c_int as libc::c_ulong,
+            32,
         );
         (*use_buffer).characters[lastrow as usize][32 as libc::c_int as usize] =
             0 as libc::c_int as libc::c_uchar;

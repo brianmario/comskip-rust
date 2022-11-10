@@ -1,24 +1,12 @@
 extern "C" {
-    pub type __sFILEX;
     static mut _DefaultRuneLocale: _RuneLocale;
     fn __tolower(_: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
-    fn fclose(_: *mut FILE) -> libc::c_int;
-    fn fgets(_: *mut libc::c_char, _: libc::c_int, _: *mut FILE) -> *mut libc::c_char;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fwrite(
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-        _: libc::c_ulong,
-        _: *mut FILE,
-    ) -> libc::c_ulong;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn strcat(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strcpy(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn atoi(_: *const libc::c_char) -> libc::c_int;
     fn exit(_: libc::c_int) -> !;
@@ -102,7 +90,6 @@ pub struct _RuneLocale {
     pub __ncharclasses: libc::c_int,
     pub __charclasses: *mut _RuneCharClass,
 }
-pub type fpos_t = __darwin_off_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sbuf {
@@ -111,37 +98,8 @@ pub struct __sbuf {
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
-pub struct __sFILE {
-    pub _p: *mut libc::c_uchar,
-    pub _r: libc::c_int,
-    pub _w: libc::c_int,
-    pub _flags: libc::c_short,
-    pub _file: libc::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: libc::c_int,
-    pub _cookie: *mut libc::c_void,
-    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
-    pub _write: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: libc::c_int,
-    pub _ubuf: [libc::c_uchar; 3],
-    pub _nbuf: [libc::c_uchar; 1],
-    pub _lb: __sbuf,
-    pub _blksize: libc::c_int,
-    pub _offset: fpos_t,
-}
-pub type FILE = __sFILE;
-#[derive(Copy, Clone)]
-#[repr(C)]
 pub struct s_write {
-    pub fh: *mut FILE,
+    pub fh: *mut libc::FILE,
     pub filename: *mut libc::c_char,
     pub buffer: *mut libc::c_uchar,
     pub used: libc::c_int,
@@ -427,7 +385,7 @@ pub static mut spell_capacity: libc::c_int = 0 as libc::c_int;
 pub static mut spell_builtin_added: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub static mut wbout1: s_write = s_write {
-    fh: 0 as *const FILE as *mut FILE,
+    fh: 0 as *const libc::FILE as *mut libc::FILE,
     filename: 0 as *const libc::c_char as *mut libc::c_char,
     buffer: 0 as *const libc::c_uchar as *mut libc::c_uchar,
     used: 0,
@@ -435,7 +393,7 @@ pub static mut wbout1: s_write = s_write {
 };
 #[no_mangle]
 pub static mut wbout2: s_write = s_write {
-    fh: 0 as *const FILE as *mut FILE,
+    fh: 0 as *const libc::FILE as *mut libc::FILE,
     filename: 0 as *const libc::c_char as *mut libc::c_char,
     buffer: 0 as *const libc::c_uchar as *mut libc::c_uchar,
     used: 0,
@@ -487,7 +445,7 @@ pub static mut lc5: [libc::c_uchar; 1] = [0xff as libc::c_int as libc::c_uchar];
 #[no_mangle]
 pub static mut lc6: [libc::c_uchar; 1] = [0xfe as libc::c_int as libc::c_uchar];
 #[no_mangle]
-pub static mut clean: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut clean: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[export_name = "in"]
 pub static mut in_0: libc::c_int = 0;
 #[no_mangle]
@@ -1023,16 +981,14 @@ pub unsafe extern "C" fn totalblockswritten_thisfile() -> libc::c_uint {
 #[no_mangle]
 pub unsafe extern "C" fn init_write(mut wb: *mut s_write) {
     let ref mut fresh0 = (*wb).fh;
-    *fresh0 = 0 as *mut FILE;
+    *fresh0 = 0 as *mut libc::FILE;
     let ref mut fresh1 = (*wb).filename;
     *fresh1 = 0 as *mut libc::c_char;
     let ref mut fresh2 = (*wb).buffer;
-    *fresh2 =
-        malloc((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_ulong)
-            as *mut libc::c_uchar;
+    *fresh2 = libc::malloc(256 * 1024 + 120) as *mut libc::c_uchar;
     (*wb).used = 0 as libc::c_int;
     let ref mut fresh3 = (*wb).data608;
-    *fresh3 = malloc(::std::mem::size_of::<eia608>() as libc::c_ulong) as *mut eia608;
+    *fresh3 = libc::malloc(::std::mem::size_of::<eia608>() as usize) as *mut eia608;
     init_eia608((*wb).data608);
 }
 #[no_mangle]
@@ -1045,36 +1001,26 @@ pub unsafe extern "C" fn writeraw(
         if data.is_null()
             || (*wb).used + length > 256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int
         {
-            fwrite(
+            libc::fwrite(
                 (*wb).buffer as *const libc::c_void,
-                (*wb).used as libc::c_ulong,
-                1 as libc::c_int as libc::c_ulong,
+                (*wb).used as usize,
+                1,
                 (*wb).fh,
             );
             if !data.is_null() {
-                fwrite(
-                    data as *const libc::c_void,
-                    length as libc::c_ulong,
-                    1 as libc::c_int as libc::c_ulong,
-                    (*wb).fh,
-                );
+                libc::fwrite(data as *const libc::c_void, length as usize, 1, (*wb).fh);
             }
             (*wb).used = 0 as libc::c_int;
         } else {
-            memcpy(
+            libc::memcpy(
                 ((*wb).buffer).offset((*wb).used as isize) as *mut libc::c_void,
                 data as *const libc::c_void,
-                length as libc::c_ulong,
+                length as usize,
             );
             (*wb).used += length;
         }
     } else {
-        fwrite(
-            data as *const libc::c_void,
-            length as libc::c_ulong,
-            1 as libc::c_int as libc::c_ulong,
-            (*wb).fh,
-        );
+        libc::fwrite(data as *const libc::c_void, length as usize, 1, (*wb).fh);
     };
 }
 #[no_mangle]
@@ -1104,7 +1050,7 @@ pub unsafe extern "C" fn flushbuffer(wb: *mut s_write, closefile: libc::c_int) {
         writedata(0 as *const libc::c_uchar, 0 as libc::c_int, wb);
     }
     if closefile != 0 && !wb.is_null() && !((*wb).fh).is_null() {
-        fclose((*wb).fh);
+        libc::fclose((*wb).fh);
     }
 }
 #[no_mangle]
@@ -1389,8 +1335,8 @@ pub unsafe extern "C" fn add_word(word: *const libc::c_char) -> libc::c_int {
         ) as *mut *mut libc::c_char;
     }
     len = strlen(word);
-    new_lower = malloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
-    new_correct = malloc(len.wrapping_add(1 as libc::c_int as libc::c_ulong)) as *mut libc::c_char;
+    new_lower = libc::malloc(len.wrapping_add(1) as usize) as *mut libc::c_char;
+    new_correct = libc::malloc(len.wrapping_add(1) as usize) as *mut libc::c_char;
     if spell_lower.is_null()
         || spell_correct.is_null()
         || new_lower.is_null()
@@ -1432,7 +1378,7 @@ pub unsafe extern "C" fn add_built_in_words() -> libc::c_int {
 }
 #[no_mangle]
 pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::c_int {
-    let fi: *mut FILE = fopen(filename, b"rt\0" as *const u8 as *const libc::c_char);
+    let fi = libc::fopen(filename, b"rt\0" as *const u8 as *const libc::c_char);
     let mut num: libc::c_int = 0 as libc::c_int;
     let mut line: [libc::c_char; 35] = [0; 35];
     if fi.is_null() {
@@ -1442,7 +1388,7 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
         );
         return -(1 as libc::c_int);
     }
-    while !(fgets(line.as_mut_ptr(), 35 as libc::c_int, fi)).is_null() {
+    while !(libc::fgets(line.as_mut_ptr(), 35 as libc::c_int, fi)).is_null() {
         let mut c: *mut libc::c_char = 0 as *mut libc::c_char;
         num += 1;
         if line[0 as libc::c_int as usize] as libc::c_int == '#' as i32 {
@@ -1464,7 +1410,7 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
                     as *const libc::c_char,
                 num,
             );
-            fclose(fi);
+            libc::fclose(fi);
             return -(1 as libc::c_int);
         }
         if strlen(line.as_mut_ptr()) > 0 as libc::c_int as libc::c_ulong {
@@ -1473,16 +1419,16 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
             }
         }
     }
-    fclose(fi);
+    libc::fclose(fi);
     return 0 as libc::c_int;
 }
 #[no_mangle]
 pub unsafe extern "C" fn CEW_reinit() {
     if !(wbout1.fh).is_null() {
-        fclose(wbout1.fh);
+        libc::fclose(wbout1.fh);
     }
     if !(wbout1.filename).is_null() && strlen(wbout1.filename) > 0 as libc::c_int as libc::c_ulong {
-        wbout1.fh = fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
+        wbout1.fh = libc::fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
     }
     init_boundary_time(&mut extraction_start);
     init_boundary_time(&mut extraction_end);
@@ -1968,28 +1914,24 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         );
         exit(-(5 as libc::c_int));
     }
-    fbuffer =
-        malloc((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int) as libc::c_ulong)
-            as *mut libc::c_uchar;
-    subline = malloc(2048 as libc::c_int as libc::c_ulong) as *mut libc::c_uchar;
-    pesheaderbuf = malloc(188 as libc::c_int as libc::c_ulong) as *mut libc::c_uchar;
-    basefilename = malloc(
-        (strlen(*inputfile.offset(0 as libc::c_int as isize)))
-            .wrapping_add(1 as libc::c_int as libc::c_ulong),
-    ) as *mut libc::c_char;
+    fbuffer = libc::malloc(256 * 1024 + 120) as *mut libc::c_uchar;
+    subline = libc::malloc(2048) as *mut libc::c_uchar;
+    pesheaderbuf = libc::malloc(188) as *mut libc::c_uchar;
+    basefilename =
+        libc::malloc((strlen(*inputfile.offset(0))).wrapping_add(1) as usize) as *mut libc::c_char;
     if (wbout1.filename).is_null() {
-        wbout1.filename = malloc(
-            (strlen(*inputfile.offset(0 as libc::c_int as isize)))
-                .wrapping_add(3 as libc::c_int as libc::c_ulong)
-                .wrapping_add(strlen(extension)),
+        wbout1.filename = libc::malloc(
+            (strlen(*inputfile.offset(0)))
+                .wrapping_add(3)
+                .wrapping_add(strlen(extension)) as usize,
         ) as *mut libc::c_char;
         *(wbout1.filename).offset(0 as libc::c_int as isize) = 0 as libc::c_int as libc::c_char;
     }
     if (wbout2.filename).is_null() {
-        wbout2.filename = malloc(
-            (strlen(*inputfile.offset(0 as libc::c_int as isize)))
-                .wrapping_add(3 as libc::c_int as libc::c_ulong)
-                .wrapping_add(strlen(extension)),
+        wbout2.filename = libc::malloc(
+            (strlen(*inputfile.offset(0)))
+                .wrapping_add(3)
+                .wrapping_add(strlen(extension)) as usize,
         ) as *mut libc::c_char;
         *(wbout2.filename).offset(0 as libc::c_int as isize) = 0 as libc::c_int as libc::c_char;
     }
@@ -2026,7 +1968,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             b"Creating %s\n\0" as *const u8 as *const libc::c_char,
             wbout1.filename,
         );
-        wbout1.fh = fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
+        wbout1.fh = libc::fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
         if (wbout1.fh).is_null() {
             printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
             exit(3 as libc::c_int);
@@ -2043,7 +1985,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
                 b"Creating %s\n\0" as *const u8 as *const libc::c_char,
                 wbout1.filename,
             );
-            wbout1.fh = fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
+            wbout1.fh = libc::fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
             if (wbout1.fh).is_null() {
                 printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
                 exit(3 as libc::c_int);
@@ -2080,7 +2022,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
                 b"Creating %s\n\0" as *const u8 as *const libc::c_char,
                 wbout2.filename,
             );
-            wbout2.fh = fopen(wbout2.filename, b"wb\0" as *const u8 as *const libc::c_char);
+            wbout2.fh = libc::fopen(wbout2.filename, b"wb\0" as *const u8 as *const libc::c_char);
             if (wbout2.fh).is_null() {
                 printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
                 exit(3 as libc::c_int);
@@ -2103,9 +2045,9 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             }
         }
     }
-    clean = 0 as *mut FILE;
+    clean = 0 as *mut libc::FILE;
     if !clean_filename.is_null() {
-        clean = fopen(clean_filename, b"wb\0" as *const u8 as *const libc::c_char);
+        clean = libc::fopen(clean_filename, b"wb\0" as *const u8 as *const libc::c_char);
         if clean.is_null() {
             printf(
                 b"Unable to open clean file: %s\n\0" as *const u8 as *const libc::c_char,

@@ -910,11 +910,10 @@ pub unsafe extern "C" fn cctolower(c: libc::c_uchar) -> libc::c_uchar {
     }
     return c;
 }
-use crate::platform;
 #[no_mangle]
 pub unsafe extern "C" fn cctoupper(c: libc::c_uchar) -> libc::c_uchar {
     if c as libc::c_int >= 'a' as i32 && c as libc::c_int <= 'z' as i32 {
-        return platform::toupper(c as libc::c_int) as libc::c_uchar;
+        return libc::toupper(c as libc::c_int) as libc::c_uchar;
     }
     match c as libc::c_int {
         126 => return 0x7d as libc::c_int as libc::c_uchar,

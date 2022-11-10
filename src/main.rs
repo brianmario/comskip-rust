@@ -11,14 +11,12 @@
 #![feature(extern_types, register_tool, c_variadic, linkage)]
 use std::arch::asm;
 extern crate c2rust_bitfields;
+extern crate libm;
 
 mod ccextratorwin;
 mod comskip;
-mod platform;
-mod video_out_dx;
 
 extern "C" {
-    pub type __sFILEX;
     pub type AVOptionRanges;
     pub type AVOption;
     pub type AVBuffer;
@@ -33,15 +31,9 @@ extern "C" {
     pub type AVDeviceInfoList;
     pub type AVCodecTag;
     pub type SwsContext;
-    static mut __stderrp: *mut FILE;
-    fn fclose(_: *mut FILE) -> libc::c_int;
-    fn fflush(_: *mut FILE) -> libc::c_int;
-    fn fopen(_: *const libc::c_char, _: *const libc::c_char) -> *mut FILE;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
+    static mut __stderrp: *mut libc::FILE;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn sprintf(_: *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn memset(_: *mut libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
     fn strcpy(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
@@ -56,12 +48,8 @@ extern "C" {
     ) -> Option<unsafe extern "C" fn(libc::c_int) -> ()>;
     fn abs(_: libc::c_int) -> libc::c_int;
     fn exit(_: libc::c_int) -> !;
-    fn min(i: libc::c_int, j: libc::c_int) -> libc::c_int;
-    fn myfopen(f: *const libc::c_char, m: *mut libc::c_char) -> fileh;
     fn gettimeofday(_: *mut timeval, _: *mut libc::c_void) -> libc::c_int;
     fn fabs(_: libc::c_double) -> libc::c_double;
-    fn fmax(_: libc::c_double, _: libc::c_double) -> libc::c_double;
-    fn fmin(_: libc::c_double, _: libc::c_double) -> libc::c_double;
     fn av_mallocz(size: size_t) -> *mut libc::c_void;
     fn av_log_get_level() -> libc::c_int;
     fn av_log_set_level(level: libc::c_int);
@@ -230,7 +218,7 @@ extern "C" {
     fn dump_audio_start();
     fn DetectCommercials(_: libc::c_int, _: libc::c_double) -> libc::c_int;
     fn BuildMasterCommList() -> libc::c_int;
-    fn LoadSettings(argc: libc::c_int, argv: *mut *mut libc::c_char) -> *mut FILE;
+    fn LoadSettings(argc: libc::c_int, argv: *mut *mut libc::c_char) -> *mut libc::FILE;
     fn ProcessCCData();
     fn dump_data(start: *mut libc::c_char, length: libc::c_int);
     fn close_data();
@@ -271,45 +259,15 @@ pub struct timeval {
     pub tv_usec: __darwin_suseconds_t,
 }
 pub type va_list = __builtin_va_list;
-pub type fpos_t = __darwin_off_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sbuf {
     pub _base: *mut libc::c_uchar,
     pub _size: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct __sFILE {
-    pub _p: *mut libc::c_uchar,
-    pub _r: libc::c_int,
-    pub _w: libc::c_int,
-    pub _flags: libc::c_short,
-    pub _file: libc::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: libc::c_int,
-    pub _cookie: *mut libc::c_void,
-    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
-    pub _write: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: libc::c_int,
-    pub _ubuf: [libc::c_uchar; 3],
-    pub _nbuf: [libc::c_uchar; 1],
-    pub _lb: __sbuf,
-    pub _blksize: libc::c_int,
-    pub _offset: fpos_t,
-}
-pub type FILE = __sFILE;
 pub type uint8_t = libc::c_uchar;
 pub type uint16_t = libc::c_ushort;
-pub type fileh = *mut FILE;
+pub type fileh = *mut libc::FILE;
 pub type AVMediaType = libc::c_int;
 pub const AVMEDIA_TYPE_NB: AVMediaType = 5;
 pub const AVMEDIA_TYPE_ATTACHMENT: AVMediaType = 4;
@@ -2327,9 +2285,9 @@ pub static mut have_frame_rate: libc::c_int = 0;
 pub static mut stream_index: libc::c_int = 0;
 #[no_mangle]
 pub static mut best_effort_timestamp: int64_t = 0;
-static mut in_file: *mut FILE = 0 as *const FILE as *mut FILE;
-static mut sample_file: *mut FILE = 0 as *const FILE as *mut FILE;
-static mut timing_file: *mut FILE = 0 as *const FILE as *mut FILE;
+static mut in_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
+static mut sample_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
+static mut timing_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
 pub static mut is_AC3: libc::c_int = 0;
 #[no_mangle]
@@ -2404,8 +2362,6 @@ static mut verbose: libc::c_int = 0 as libc::c_int;
 pub static mut selftest_target: libc::c_double = 0.0f64;
 #[no_mangle]
 pub static mut framenum: libc::c_int = 0;
-#[no_mangle]
-pub static mut filepos: fpos_t = 0;
 #[no_mangle]
 pub static mut goppos: int64_t = 0;
 #[no_mangle]
@@ -2494,7 +2450,7 @@ pub unsafe extern "C" fn retreive_frame_volume(
         ) as *mut libc::c_short;
         volume = 0 as libc::c_int;
         if !sample_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 sample_file,
                 b"Frame %i\n\0" as *const u8 as *const libc::c_char,
                 sound_frame_counter,
@@ -2503,7 +2459,7 @@ pub unsafe extern "C" fn retreive_frame_volume(
         i = 0 as libc::c_int;
         while i < s_per_frame {
             if !sample_file.is_null() {
-                fprintf(
+                libc::fprintf(
                     sample_file,
                     b"%i\n\0" as *const u8 as *const libc::c_char,
                     *buffer as libc::c_int,
@@ -2519,7 +2475,7 @@ pub unsafe extern "C" fn retreive_frame_volume(
         }
         volume = volume / s_per_frame;
         if !timing_file.is_null() && csStepping == 0 && csJumping == 0 && csStartJump == 0 {
-            fprintf(
+            libc::fprintf(
                 timing_file,
                 b"%7s, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %d\n\0" as *const u8
                     as *const libc::c_char,
@@ -2587,7 +2543,7 @@ pub unsafe extern "C" fn backfill_frame_volumes() {
         && top_apts - base_apts > 0.2f64
     {
         volume = retreive_frame_volume(
-            fmax(get_frame_pts(f) + initial_pts, base_apts),
+            libm::fmax(get_frame_pts(f) + initial_pts, base_apts),
             get_frame_pts(f + 1 as libc::c_int) + initial_pts,
         );
         if volume > -(1 as libc::c_int) {
@@ -2799,7 +2755,7 @@ pub unsafe extern "C" fn sound_to_frames(
             / (*(*(*is_0).audio_st).codec).sample_rate as libc::c_double;
     calculated_delay = (*is_0).audio_clock - old_audio_clock;
     if !timing_file.is_null() && csStepping == 0 && csJumping == 0 && csStartJump == 0 {
-        fprintf(
+        libc::fprintf(
             timing_file,
             b"%7s, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %d\n\0" as *const u8
                 as *const libc::c_char,
@@ -2874,11 +2830,11 @@ pub unsafe extern "C" fn audio_packet_process(mut is_0: *mut VideoState, pkt: *m
             );
             return;
         }
-        memcpy(
+        libc::memcpy(
             &mut *ac3_packet.as_mut_ptr().offset(ac3_packet_index as isize) as *mut uint8_t
                 as *mut libc::c_void,
             (*pkt_temp).data as *const libc::c_void,
-            (*pkt_temp).size as libc::c_ulong,
+            (*pkt_temp).size as usize,
         );
         let ref mut fresh9 = (*pkt_temp).data;
         *fresh9 = ac3_packet.as_mut_ptr();
@@ -3132,7 +3088,7 @@ unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
         } else {
             tfps = 0 as libc::c_int as libc::c_double;
         }
-        fprintf(
+        libc::fprintf(
             __stderrp,
             b"\n%d frames decoded in %.2f seconds (%.2f fps)\n\0" as *const u8
                 as *const libc::c_char,
@@ -3140,7 +3096,7 @@ unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
             total_elapsed as libc::c_double / 100.0f64,
             tfps,
         );
-        fflush(__stderrp);
+        libc::fflush(__stderrp);
         return tfps;
     }
     frame_counter = frame_counter.wrapping_add(1);
@@ -3163,7 +3119,7 @@ unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
     );
     fps = frames as libc::c_double * 100.0f64 / elapsed as libc::c_double;
     tfps = frame_counter as libc::c_double * 100.0f64 / total_elapsed as libc::c_double;
-    fprintf(
+    libc::fprintf(
         __stderrp,
         b"%s - %d frames in %.2f sec(%.2f fps), %.2f sec(%.2f fps), %d%%\r\0" as *const u8
             as *const libc::c_char,
@@ -3176,7 +3132,7 @@ unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
         (100.0f64 * framenum as libc::c_double / get_fps() / (*global_video_state).duration)
             as libc::c_int,
     );
-    fflush(__stderrp);
+    libc::fflush(__stderrp);
     last_count = frame_counter as libc::c_int;
     return tfps;
 }
@@ -3272,11 +3228,11 @@ pub unsafe extern "C" fn SubmitFrame(
     }
     if selftest == 2 as libc::c_int && pass > 0 as libc::c_int {
         if test_pts != pts_0 {
-            sample_file = fopen(
+            sample_file = libc::fopen(
                 b"seektest.log\0" as *const u8 as *const libc::c_char,
                 b"a+\0" as *const u8 as *const libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 sample_file,
                 b"Reset file Failed, initial pts = %6.3f, seek pts = %6.3f, pass = %d, \"%s\"\n\0"
                     as *const u8 as *const libc::c_char,
@@ -3285,7 +3241,7 @@ pub unsafe extern "C" fn SubmitFrame(
                 pass + 1 as libc::c_int,
                 ((*is).filename).as_mut_ptr(),
             );
-            fclose(sample_file);
+            libc::fclose(sample_file);
             Debug(
                 1 as libc::c_int,
                 b"\nSelftest %d FAILED: Reset\n\0" as *const u8 as *const libc::c_char
@@ -3328,21 +3284,22 @@ pub unsafe extern "C" fn Set_seek(mut is_0: *mut VideoState, mut pts_0: libc::c_
     (*is_0).seek_flags = 1 as libc::c_int;
     (*is_0).seek_req = 1 as libc::c_int;
     (*is_0).seek_pts = pts_0;
-    pts_0 = fmax(0.0f64, pts_0 - 2.0f64);
+    pts_0 = libm::fmax(0.0f64, pts_0 - 2.0f64);
     if (*is_0).seek_by_bytes != 0 {
         let size: uint64_t = avio_size((*ic).pb) as uint64_t;
         if length < 0 as libc::c_int as libc::c_double {
-            (*is_0).seek_pos =
-                (size as libc::c_double * fmax(0 as libc::c_int as libc::c_double, pts_0 - 4.0f64)
-                    / (frame_count as libc::c_double * get_fps())) as int64_t;
+            (*is_0).seek_pos = (size as libc::c_double
+                * libm::fmax(0 as libc::c_int as libc::c_double, pts_0 - 4.0f64)
+                / (frame_count as libc::c_double * get_fps()))
+                as int64_t;
         } else {
             (*is_0).seek_pos = (size as libc::c_double
-                * fmax(0 as libc::c_int as libc::c_double, pts_0 - 4.0f64)
+                * libm::fmax(0 as libc::c_int as libc::c_double, pts_0 - 4.0f64)
                 / length) as int64_t;
         }
         (*is_0).seek_flags |= 2 as libc::c_int;
     } else {
-        pts_0 = fmax(0 as libc::c_int as libc::c_double, pts_0 + initial_pts);
+        pts_0 = libm::fmax(0 as libc::c_int as libc::c_double, pts_0 + initial_pts);
         (*is_0).seek_pos = (pts_0 / av_q2d((*(*is_0).video_st).time_base)) as int64_t;
         if (*(*is_0).video_st).start_time != 0x8000000000000000 as libc::c_ulonglong as int64_t {
             let ref mut fresh15 = (*is_0).seek_pos;
@@ -3376,7 +3333,7 @@ pub unsafe extern "C" fn DoSeekRequest(mut is_0: *mut VideoState) {
         } else {
             error_text = b"Generic\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
         }
-        fprintf(
+        libc::fprintf(
             __stderrp,
             b"%s error while seeking. target=%6.3f, \"%s\"\n\0" as *const u8 as *const libc::c_char,
             error_text,
@@ -3384,11 +3341,11 @@ pub unsafe extern "C" fn DoSeekRequest(mut is_0: *mut VideoState) {
             ((*(*is_0).pFormatCtx).filename).as_mut_ptr(),
         );
         if selftest != 0 {
-            sample_file = fopen(
+            sample_file = libc::fopen(
                 b"seektest.log\0" as *const u8 as *const libc::c_char,
                 b"a+\0" as *const u8 as *const libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 sample_file,
                 b"%s error while seeking, target=%6.3f, \"%s\"\n\0" as *const u8
                     as *const libc::c_char,
@@ -3396,7 +3353,7 @@ pub unsafe extern "C" fn DoSeekRequest(mut is_0: *mut VideoState) {
                 (*is_0).seek_pts,
                 ((*(*is_0).pFormatCtx).filename).as_mut_ptr(),
             );
-            fclose(sample_file);
+            libc::fclose(sample_file);
         }
         if !((*is_0).seek_by_bytes == 0) {
             break;
@@ -3415,7 +3372,7 @@ pub unsafe extern "C" fn DoSeekRequest(mut is_0: *mut VideoState) {
     (*is_0).seek_no_flush = 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn DecodeOnePicture(f: *mut FILE, pts_0: libc::c_double) {
+pub unsafe extern "C" fn DecodeOnePicture(f: *mut libc::FILE, pts_0: libc::c_double) {
     let mut is_0: *mut VideoState = global_video_state;
     let mut packet: *mut AVPacket = 0 as *mut AVPacket;
     file_open();
@@ -3798,7 +3755,7 @@ pub unsafe extern "C" fn video_packet_process(
         if pts_0 != 0 as libc::c_int as libc::c_double {
             (*is_0).video_clock = pts_0;
             if !timing_file.is_null() && csStepping == 0 && csJumping == 0 && csStartJump == 0 {
-                fprintf(
+                libc::fprintf(
                     timing_file,
                     b"%7s, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %d\n\0" as *const u8
                         as *const libc::c_char,
@@ -3814,7 +3771,7 @@ pub unsafe extern "C" fn video_packet_process(
             }
         } else {
             if !timing_file.is_null() && csStepping == 0 && csJumping == 0 && csStartJump == 0 {
-                fprintf(
+                libc::fprintf(
                     timing_file,
                     b"%7s, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %12.3f, %d\n\0" as *const u8
                         as *const libc::c_char,
@@ -3837,11 +3794,11 @@ pub unsafe extern "C" fn video_packet_process(
                     if (*is_0).video_clock < selftest_target - 0.05f64
                         || (*is_0).video_clock > selftest_target + 0.05f64
                     {
-                        sample_file = fopen(
+                        sample_file = libc::fopen(
                             b"seektest.log\0" as *const u8 as *const libc::c_char,
                             b"a+\0" as *const u8 as *const libc::c_char,
                         );
-                        fprintf(
+                        libc::fprintf(
                             sample_file,
                             b"Seek error: target=%8.1f, result=%8.1f, error=%6.3f, size=%8.1f, mode=%s, \"%s\"\n\0"
                                 as *const u8 as *const libc::c_char,
@@ -3856,7 +3813,7 @@ pub unsafe extern "C" fn video_packet_process(
                             },
                             ((*is_0).filename).as_mut_ptr(),
                         );
-                        fclose(sample_file);
+                        libc::fclose(sample_file);
                         Debug(
                             1 as libc::c_int,
                             b"\nSelftest 1 FAILED: Seektest\n:Starting test 3\n\0" as *const u8
@@ -3888,11 +3845,11 @@ pub unsafe extern "C" fn video_packet_process(
                 if (*is_0).video_clock < selftest_target - 0.05f64
                     || (*is_0).video_clock > selftest_target + 0.05f64
                 {
-                    sample_file = fopen(
+                    sample_file = libc::fopen(
                         b"seektest.log\0" as *const u8 as *const libc::c_char,
                         b"a+\0" as *const u8 as *const libc::c_char,
                     );
-                    fprintf(
+                    libc::fprintf(
                         sample_file,
                         b"Reopen error: target=%8.1f, result=%8.1f, error=%6.3f, size=%8.1f, mode=%s, \"%s\"\n\0"
                             as *const u8 as *const libc::c_char,
@@ -3907,7 +3864,7 @@ pub unsafe extern "C" fn video_packet_process(
                         },
                         ((*is_0).filename).as_mut_ptr(),
                     );
-                    fclose(sample_file);
+                    libc::fclose(sample_file);
                     Debug(
                         1 as libc::c_int,
                         b"\nSelftest 3 FAILED: Reopen\n\0" as *const u8 as *const libc::c_char
@@ -3937,11 +3894,11 @@ pub unsafe extern "C" fn video_packet_process(
                 (*is_0).video_clock,
             );
             if selftest == 1 as libc::c_int || selftest == 3 as libc::c_int {
-                sample_file = fopen(
+                sample_file = libc::fopen(
                     b"seektest.log\0" as *const u8 as *const libc::c_char,
                     b"a+\0" as *const u8 as *const libc::c_char,
                 );
-                fprintf(
+                libc::fprintf(
                     sample_file,
                     b"Seek error : target=%8.1f, result=%8.1f, error=%6.3f, size=%8.1f, mode=%s, \"%s\"\n\0"
                         as *const u8 as *const libc::c_char,
@@ -3956,7 +3913,7 @@ pub unsafe extern "C" fn video_packet_process(
                     },
                     ((*is_0).filename).as_mut_ptr(),
                 );
-                fclose(sample_file);
+                libc::fclose(sample_file);
                 Debug(
                     1 as libc::c_int,
                     b"\nSelftest %d FAILED\n\0" as *const u8 as *const libc::c_char
@@ -4107,7 +4064,7 @@ pub unsafe extern "C" fn stream_component_open(
         );
     }
     if codec.is_null() || avcodec_open2(codecCtx, codec, &mut myoptions) < 0 as libc::c_int {
-        fprintf(
+        libc::fprintf(
             __stderrp,
             b"Unsupported codec!\n\0" as *const u8 as *const libc::c_char,
         );
@@ -4139,7 +4096,7 @@ pub unsafe extern "C" fn stream_component_open(
             if hardware_decode == 0 {
                 (*codecCtx).flags |= (1 as libc::c_int) << 13 as libc::c_int;
             }
-            (*codecCtx).lowres = min(av_codec_get_max_lowres((*codecCtx).codec), lowres);
+            (*codecCtx).lowres = std::cmp::min(av_codec_get_max_lowres((*codecCtx).codec), lowres);
             if (*codecCtx).codec_id as libc::c_uint
                 == AV_CODEC_ID_H264 as libc::c_int as libc::c_uint
             {
@@ -4203,10 +4160,10 @@ pub unsafe extern "C" fn file_open() {
     let mut openretries: libc::c_int = 0 as libc::c_int;
     if global_video_state.is_null() {
         is_0 = av_mallocz(::std::mem::size_of::<VideoState>() as libc::c_ulong) as *mut VideoState;
-        memset(
+        libc::memset(
             &mut (*is_0).audio_pkt as *mut AVPacket as *mut libc::c_void,
             0 as libc::c_int,
-            ::std::mem::size_of::<AVPacket>() as libc::c_ulong,
+            ::std::mem::size_of::<AVPacket>() as usize,
         );
         strcpy(((*is_0).filename).as_mut_ptr(), mpegfilename.as_mut_ptr());
         av_log_level = 32 as libc::c_int;
@@ -4266,7 +4223,7 @@ pub unsafe extern "C" fn file_open() {
                     &mut myoptions,
                 ) != 0 as libc::c_int
                 {
-                    fprintf(
+                    libc::fprintf(
                         __stderrp,
                         b"%s: Can not open file\n\0" as *const u8 as *const libc::c_char,
                         ((*is_0).filename).as_mut_ptr(),
@@ -4291,7 +4248,7 @@ pub unsafe extern "C" fn file_open() {
         if avformat_find_stream_info((*is_0).pFormatCtx, 0 as *mut *mut AVDictionary)
             < 0 as libc::c_int
         {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s: Can not find stream info\n\0" as *const u8 as *const libc::c_char,
                 ((*is_0).filename).as_mut_ptr(),
@@ -4325,7 +4282,7 @@ pub unsafe extern "C" fn file_open() {
                 b"Could not open video codec\n\0" as *const u8 as *const libc::c_char
                     as *mut libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s: could not open video codec\n\0" as *const u8 as *const libc::c_char,
                 ((*is_0).filename).as_mut_ptr(),
@@ -4483,12 +4440,12 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
     } else {
         *ptr = '\0' as i32 as libc::c_char;
     }
-    fprintf(
+    libc::fprintf(
         __stderrp,
         b"%s, made using ffmpeg\n\0" as *const u8 as *const libc::c_char,
         b"Comskip 0.82.005\0" as *const u8 as *const libc::c_char,
     );
-    fprintf(
+    libc::fprintf(
         __stderrp,
         b"Donator build\n\0" as *const u8 as *const libc::c_char,
     );
@@ -4502,12 +4459,12 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
             b"%s.timing.csv\0" as *const u8 as *const libc::c_char,
             inbasename.as_mut_ptr(),
         );
-        timing_file = myfopen(
+        timing_file = libc::fopen(
             tempstring.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !timing_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 timing_file,
                 b"sep=,\ntype   ,real_pts, step        ,pts         ,clock       ,delta       ,offset, repeat\n\0"
                     as *const u8 as *const libc::c_char,
@@ -4526,8 +4483,8 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                 file_close();
                 file_open();
                 if !timing_file.is_null() {
-                    fclose(timing_file);
-                    timing_file = 0 as *mut FILE;
+                    libc::fclose(timing_file);
+                    timing_file = 0 as *mut libc::FILE;
                 }
                 if output_timing != 0 {
                     sprintf(
@@ -4535,12 +4492,12 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                         b"%s.timing.csv\0" as *const u8 as *const libc::c_char,
                         inbasename.as_mut_ptr(),
                     );
-                    timing_file = myfopen(
+                    timing_file = libc::fopen(
                         tempstring.as_mut_ptr(),
                         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
                     if !timing_file.is_null() {
-                        fprintf(
+                        libc::fprintf(
                             timing_file,
                             b"sep=,\ntype   ,real_pts, step        ,pts         ,clock       ,delta       ,offset, repeat\n\0"
                                 as *const u8 as *const libc::c_char,
@@ -4548,7 +4505,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                     }
                 }
                 if !timing_file.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         timing_file,
                         b"sep=,\ntype   ,real_pts, step        ,pts         ,clock       ,delta       ,offset, repeat\n\0"
                             as *const u8 as *const libc::c_char,
@@ -4659,11 +4616,11 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                         if (*is).video_clock < selftest_target - 0.05f64
                             || (*is).video_clock > selftest_target + 0.05f64
                         {
-                            sample_file = fopen(
+                            sample_file = libc::fopen(
                                 b"seektest.log\0" as *const u8 as *const libc::c_char,
                                 b"a+\0" as *const u8 as *const libc::c_char,
                             );
-                            fprintf(
+                            libc::fprintf(
                                 sample_file,
                                 b"\"%s\": reopen file failed, size=%8.1f, pts=%6.2f\n\0"
                                     as *const u8
@@ -4672,7 +4629,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                                 (*is).duration,
                                 (*is).video_clock,
                             );
-                            fclose(sample_file);
+                            libc::fclose(sample_file);
                             Debug(
                                 1 as libc::c_int,
                                 b"\nSelftest %d FAILED\n\0" as *const u8 as *const libc::c_char
@@ -4694,7 +4651,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                                 as *mut libc::c_char,
                             selftest,
                         );
-                        selftest_target = fmax(selftest_target, 0.5f64);
+                        selftest_target = libm::fmax(selftest_target, 0.5f64);
                         live_tv = 1 as libc::c_int;
                         live_tv_retries = 2 as libc::c_int;
                     }
@@ -4775,7 +4732,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
             && framenum == 50 as libc::c_int
         {
             if (*is).duration > 2 as libc::c_int as libc::c_double {
-                selftest_target = fmin(
+                selftest_target = libm::fmin(
                     450.0f64,
                     (*is).duration - 2 as libc::c_int as libc::c_double,
                 );
@@ -4791,11 +4748,11 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
         if (*is).video_clock < selftest_target - 0.08f64
             || (*is).video_clock > selftest_target + 0.08f64
         {
-            sample_file = fopen(
+            sample_file = libc::fopen(
                 b"seektest.log\0" as *const u8 as *const libc::c_char,
                 b"a+\0" as *const u8 as *const libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 sample_file,
                 b"Seek error: target=%8.1f, result=%8.1f, error=%6.3f, size=%8.1f, mode=%s\"%s\"\n\0"
                     as *const u8 as *const libc::c_char,
@@ -4810,7 +4767,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                 },
                 ((*is).filename).as_mut_ptr(),
             );
-            fclose(sample_file);
+            libc::fclose(sample_file);
         } else {
             Debug(
                 1 as libc::c_int,
@@ -4840,7 +4797,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
             as *mut libc::c_char,
         max_volume_found,
     );
-    in_file = 0 as *mut FILE;
+    in_file = 0 as *mut libc::FILE;
     if framenum > 0 as libc::c_int {
         if BuildMasterCommList() != 0 {
             result = 1 as libc::c_int;
@@ -4853,8 +4810,8 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
             processCC = 0 as libc::c_int;
             printf(b"Close window when done\n\0" as *const u8 as *const libc::c_char);
             if !timing_file.is_null() {
-                fclose(timing_file);
-                timing_file = 0 as *mut FILE;
+                libc::fclose(timing_file);
+                timing_file = 0 as *mut libc::FILE;
             }
             if output_timing != 0 {
                 output_timing = 0 as libc::c_int;

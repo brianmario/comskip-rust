@@ -1,43 +1,43 @@
+extern crate libc;
+
+unsafe fn _strupr(string: *mut libc::c_char) -> *mut libc::c_char {
+    let mut s: *mut libc::c_char = 0 as *mut libc::c_char;
+    if !string.is_null() {
+        s = string;
+        while *s != 0 {
+            *s = libc::toupper(*s as libc::c_int) as libc::c_char;
+            s = s.offset(1);
+        }
+    }
+    return string;
+}
+
+#[no_mangle]
+pub static mut xPos: libc::c_int = 0;
+#[no_mangle]
+pub static mut yPos: libc::c_int = 0;
+#[no_mangle]
+pub static mut lMouseDown: libc::c_int = 0;
+#[no_mangle]
+pub static mut key: libc::c_int = 0;
+#[no_mangle]
+pub static mut osname: [libc::c_char; 1024] = [0; 1024];
+
 extern "C" {
-    pub type __sFILEX;
     pub type dispatch_semaphore_s;
-    fn close(_: libc::c_int) -> libc::c_int;
-    fn getcwd(_: *mut libc::c_char, _: size_t) -> *mut libc::c_char;
-    fn read(_: libc::c_int, _: *mut libc::c_void, _: size_t) -> ssize_t;
     fn write(__fd: libc::c_int, __buf: *const libc::c_void, __nbyte: size_t) -> ssize_t;
     fn usleep(_: useconds_t) -> libc::c_int;
     static mut _DefaultRuneLocale: _RuneLocale;
     fn __maskrune(_: __darwin_ct_rune_t, _: libc::c_ulong) -> libc::c_int;
-    static mut __stdoutp: *mut FILE;
-    static mut __stderrp: *mut FILE;
-    fn fclose(_: *mut FILE) -> libc::c_int;
-    fn feof(_: *mut FILE) -> libc::c_int;
-    fn fflush(_: *mut FILE) -> libc::c_int;
-    fn fgets(_: *mut libc::c_char, _: libc::c_int, _: *mut FILE) -> *mut libc::c_char;
-    fn fprintf(_: *mut FILE, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn fread(
-        _: *mut libc::c_void,
-        _: libc::c_ulong,
-        _: libc::c_ulong,
-        _: *mut FILE,
-    ) -> libc::c_ulong;
-    fn fseek(_: *mut FILE, _: libc::c_long, _: libc::c_int) -> libc::c_int;
-    fn fwrite(
-        _: *const libc::c_void,
-        _: libc::c_ulong,
-        _: libc::c_ulong,
-        _: *mut FILE,
-    ) -> libc::c_ulong;
-    fn getc(_: *mut FILE) -> libc::c_int;
+    static mut __stdoutp: *mut libc::FILE;
+    static mut __stderrp: *mut libc::FILE;
+    fn getc(_: *mut libc::FILE) -> libc::c_int;
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn sprintf(_: *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn sscanf(_: *const libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn vsprintf(_: *mut libc::c_char, _: *const libc::c_char, _: ::std::ffi::VaList)
         -> libc::c_int;
-    fn fileno(_: *mut FILE) -> libc::c_int;
-    fn fseeko(__stream: *mut FILE, __offset: off_t, __whence: libc::c_int) -> libc::c_int;
-    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn memset(_: *mut libc::c_void, _: libc::c_int, _: libc::c_ulong) -> *mut libc::c_void;
+    fn fileno(_: *mut libc::FILE) -> libc::c_int;
     fn strcat(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
@@ -48,9 +48,7 @@ extern "C" {
     fn strncpy(_: *mut libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
         -> *mut libc::c_char;
     fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     fn calloc(_: libc::c_ulong, _: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn abs(_: libc::c_int) -> libc::c_int;
     fn atof(_: *const libc::c_char) -> libc::c_double;
@@ -61,11 +59,6 @@ extern "C" {
     fn ctime(_: *const time_t) -> *mut libc::c_char;
     fn localtime(_: *const time_t) -> *mut tm;
     fn time(_: *mut time_t) -> time_t;
-    fn _strupr(string: *mut libc::c_char) -> *mut libc::c_char;
-    fn max(i: libc::c_int, j: libc::c_int) -> libc::c_int;
-    fn min(i: libc::c_int, j: libc::c_int) -> libc::c_int;
-    fn myremove(f: *mut libc::c_char) -> libc::c_int;
-    fn myfopen(f: *const libc::c_char, m: *mut libc::c_char) -> fileh;
     fn dispatch_semaphore_signal(dsema: dispatch_semaphore_t) -> intptr_t;
     fn dispatch_semaphore_wait(dsema: dispatch_semaphore_t, timeout: dispatch_time_t) -> intptr_t;
     fn dispatch_semaphore_create(value: intptr_t) -> dispatch_semaphore_t;
@@ -122,27 +115,23 @@ extern "C" {
         argtable: *mut *mut libc::c_void,
     ) -> libc::c_int;
     fn arg_print_syntaxv(
-        fp: *mut FILE,
+        fp: *mut libc::FILE,
         argtable: *mut *mut libc::c_void,
         suffix: *const libc::c_char,
     );
     fn arg_print_glossary(
-        fp: *mut FILE,
+        fp: *mut libc::FILE,
         argtable: *mut *mut libc::c_void,
         format: *const libc::c_char,
     );
-    fn arg_print_errors(fp: *mut FILE, end: *mut arg_end, progname_0: *const libc::c_char);
+    fn arg_print_errors(fp: *mut libc::FILE, end: *mut arg_end, progname_0: *const libc::c_char);
     fn arg_freetable(argtable: *mut *mut libc::c_void, n: size_t);
     static mut demux_pid: libc::c_int;
     static mut selected_audio_pid: libc::c_int;
     static mut selected_subtitle_pid: libc::c_int;
     static mut selected_video_pid: libc::c_int;
     static mut demux_asf: libc::c_int;
-    static mut key: libc::c_int;
-    static mut osname: [libc::c_char; 0];
-    static mut xPos: libc::c_int;
-    static mut yPos: libc::c_int;
-    static mut lMouseDown: libc::c_int;
+
     static mut headerpos: int64_t;
     static mut reorderCC: libc::c_int;
     static mut framenum: libc::c_int;
@@ -150,7 +139,7 @@ extern "C" {
     static mut ms_audio_delay: libc::c_int;
     static mut is_h264: libc::c_int;
     fn backfill_frame_volumes();
-    fn DecodeOnePicture(f: *mut FILE, pts: libc::c_double);
+    fn DecodeOnePicture(f: *mut libc::FILE, pts: libc::c_double);
     fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int;
     fn process_block(data: *mut libc::c_uchar, length: libc::c_long) -> libc::c_long;
 }
@@ -202,7 +191,6 @@ pub type intptr_t = __darwin_intptr_t;
 pub type ssize_t = __darwin_ssize_t;
 pub type uint64_t = libc::c_ulonglong;
 pub type uint32_t = libc::c_uint;
-pub type off_t = __darwin_off_t;
 pub type useconds_t = __darwin_useconds_t;
 pub type time_t = __darwin_time_t;
 #[derive(Copy, Clone)]
@@ -257,42 +245,12 @@ pub struct _RuneLocale {
     pub __ncharclasses: libc::c_int,
     pub __charclasses: *mut _RuneCharClass,
 }
-pub type fpos_t = __darwin_off_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sbuf {
     pub _base: *mut libc::c_uchar,
     pub _size: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct __sFILE {
-    pub _p: *mut libc::c_uchar,
-    pub _r: libc::c_int,
-    pub _w: libc::c_int,
-    pub _flags: libc::c_short,
-    pub _file: libc::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: libc::c_int,
-    pub _cookie: *mut libc::c_void,
-    pub _close: Option<unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int>,
-    pub _read: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *mut libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _seek: Option<unsafe extern "C" fn(*mut libc::c_void, fpos_t, libc::c_int) -> fpos_t>,
-    pub _write: Option<
-        unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char, libc::c_int) -> libc::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: libc::c_int,
-    pub _ubuf: [libc::c_uchar; 3],
-    pub _nbuf: [libc::c_uchar; 1],
-    pub _lb: __sbuf,
-    pub _blksize: libc::c_int,
-    pub _offset: fpos_t,
-}
-pub type FILE = __sFILE;
 pub type pthread_attr_t = __darwin_pthread_attr_t;
 pub type uint8_t = libc::c_uchar;
 #[derive(Copy, Clone)]
@@ -314,13 +272,12 @@ pub type pthread_t = __darwin_pthread_t;
 pub type dispatch_time_t = uint64_t;
 pub type dispatch_semaphore_t = *mut dispatch_semaphore_s;
 pub type sema_t = dispatch_semaphore_t;
-pub type fileh = *mut FILE;
 pub type arg_resetfn = unsafe extern "C" fn(*mut libc::c_void) -> ();
 pub type arg_scanfn = unsafe extern "C" fn(*mut libc::c_void, *const libc::c_char) -> libc::c_int;
 pub type arg_checkfn = unsafe extern "C" fn(*mut libc::c_void) -> libc::c_int;
 pub type arg_errorfn = unsafe extern "C" fn(
     *mut libc::c_void,
-    *mut FILE,
+    *mut libc::FILE,
     libc::c_int,
     *const libc::c_char,
     *const libc::c_char,
@@ -587,84 +544,85 @@ pub static mut initialized: bool = 0 as libc::c_int != 0;
 #[no_mangle]
 pub static mut progname: *const libc::c_char = b"ComSkip\0" as *const u8 as *const libc::c_char;
 #[no_mangle]
-pub static mut out_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut out_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut incommercial_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut incommercial_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut ini_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut ini_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut plist_cutlist_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut plist_cutlist_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut zoomplayer_cutlist_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut zoomplayer_cutlist_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut zoomplayer_chapter_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut zoomplayer_chapter_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut scf_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut scf_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut vcf_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut vcf_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut vdr_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut vdr_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut projectx_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut projectx_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut avisynth_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut avisynth_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut videoredo_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut videoredo_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut videoredo3_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut videoredo3_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut btv_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut btv_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut edl_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut edl_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut ffmeta_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut ffmeta_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut ffsplit_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut ffsplit_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut live_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut live_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut ipodchap_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut ipodchap_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut edlp_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut edlp_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut bcf_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut bcf_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut edlx_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut edlx_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut cuttermaran_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut cuttermaran_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut chapters_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut chapters_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut log_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut log_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut womble_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut womble_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut mls_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut mls_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut mpgtx_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut mpgtx_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut dvrcut_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut dvrcut_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut dvrmstb_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut dvrmstb_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut mpeg2schnitt_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut mpeg2schnitt_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut tuning_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut tuning_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut training_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut training_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut aspect_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut aspect_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut cutscene_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut cutscene_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut mkvtoolnix_chapters_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut mkvtoolnix_chapters_file: *mut libc::FILE =
+    0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
-pub static mut mkvtoolnix_tags_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut mkvtoolnix_tags_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
 pub static mut audio_channels: libc::c_int = 0;
 #[no_mangle]
 pub static mut vo_init_done: libc::c_int = 0 as libc::c_int;
-static mut in_file: *mut FILE = 0 as *const FILE as *mut FILE;
+static mut in_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
 pub static mut debug_cur_segment: libc::c_int = 0;
 #[no_mangle]
@@ -1451,8 +1409,8 @@ pub static mut play_nice_end: libc::c_int = -(1 as libc::c_int);
 #[no_mangle]
 pub static mut play_nice_sleep: libc::c_long = 2 as libc::c_long;
 #[no_mangle]
-pub static mut dump_data_file: *mut FILE =
-    0 as *const libc::c_void as *mut libc::c_void as *mut FILE;
+pub static mut dump_data_file: *mut libc::FILE =
+    0 as *const libc::c_void as *mut libc::c_void as *mut libc::FILE;
 #[no_mangle]
 pub static mut ccData: [uint8_t; 500] = [0; 500];
 #[no_mangle]
@@ -3067,11 +3025,10 @@ pub unsafe extern "C" fn InitScanLines() {
 pub unsafe extern "C" fn InitHasLogo() {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
-    memset(
+    libc::memset(
         haslogo.as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        ((3840 as libc::c_int * 1200 as libc::c_int) as libc::c_ulong)
-            .wrapping_mul(::std::mem::size_of::<libc::c_char>() as libc::c_ulong),
+        ((3840 * 1200) as usize).wrapping_mul(::std::mem::size_of::<libc::c_char>()),
     );
     y = if 0 as libc::c_int > clogoMinY - 5 as libc::c_int {
         0 as libc::c_int
@@ -3133,7 +3090,7 @@ pub unsafe extern "C" fn Recalc() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn ReviewResult() -> bool {
-    let mut review_file: *mut FILE = 0 as *mut FILE;
+    let mut review_file: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut curframe: libc::c_int = 1 as libc::c_int;
     let mut lastcurframe: libc::c_int = -(1 as libc::c_int);
     let bartop: libc::c_int = 0 as libc::c_int;
@@ -3150,7 +3107,7 @@ pub unsafe extern "C" fn ReviewResult() -> bool {
     output_srt = 0 as libc::c_int != 0;
     output_smi = 0 as libc::c_int != 0;
     if review_file.is_null() && mpegfilename[0 as libc::c_int as usize] as libc::c_int != 0 {
-        review_file = myfopen(
+        review_file = libc::fopen(
             mpegfilename.as_mut_ptr(),
             b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -3166,7 +3123,7 @@ pub unsafe extern "C" fn ReviewResult() -> bool {
         tsfilename[i as usize] = 't' as i32 as libc::c_char;
         tsfilename[(i + 1 as libc::c_int) as usize] = 's' as i32 as libc::c_char;
         tsfilename[(i + 2 as libc::c_int) as usize] = 0 as libc::c_int as libc::c_char;
-        review_file = myfopen(
+        review_file = libc::fopen(
             tsfilename.as_mut_ptr(),
             b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -3187,7 +3144,7 @@ pub unsafe extern "C" fn ReviewResult() -> bool {
             &mut *tsfilename.as_mut_ptr().offset(i as isize),
             b"dvr-ms\0" as *const u8 as *const libc::c_char,
         );
-        review_file = myfopen(
+        review_file = libc::fopen(
             tsfilename.as_mut_ptr(),
             b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -3433,10 +3390,13 @@ pub unsafe extern "C" fn ReviewResult() -> bool {
                             j -= 1;
                         }
                         reffer[(i + 1 as libc::c_int) as usize].start_frame =
-                            max(curframe - 1000 as libc::c_int, 1 as libc::c_int) as libc::c_long;
-                        reffer[(i + 1 as libc::c_int) as usize].end_frame =
-                            min(curframe + 1000 as libc::c_int, frame_count as libc::c_int)
+                            std::cmp::max(curframe - 1000 as libc::c_int, 1 as libc::c_int)
                                 as libc::c_long;
+                        reffer[(i + 1 as libc::c_int) as usize].end_frame = std::cmp::min(
+                            curframe + 1000 as libc::c_int,
+                            frame_count as libc::c_int,
+                        )
+                            as libc::c_long;
                         reffer_count += 1;
                         oldfrm = -(1 as libc::c_int);
                     }
@@ -3688,11 +3648,11 @@ pub unsafe extern "C" fn DetectCommercials(f: libc::c_int, mut pts: libc::c_doub
         ticker_tape = ticker_tape_percentage * height / 100 as libc::c_int;
     }
     if ticker_tape != 0 {
-        memset(
+        libc::memset(
             &mut *frame_ptr.offset((width * (height - ticker_tape)) as isize) as *mut libc::c_uchar
                 as *mut libc::c_void,
             0 as libc::c_int,
-            (width * ticker_tape) as libc::c_ulong,
+            (width * ticker_tape) as usize,
         );
     }
     if ignore_side != 0 {
@@ -3906,8 +3866,8 @@ pub unsafe extern "C" fn AverageARForBlock(start: libc::c_int, end: libc::c_int)
     Ar = 0.0f64;
     i = 0 as libc::c_int;
     while (i as libc::c_long) < ar_block_count {
-        f = max((*ar_block.offset(i as isize)).start, start);
-        t = min((*ar_block.offset(i as isize)).end, end);
+        f = std::cmp::max((*ar_block.offset(i as isize)).start, start);
+        t = std::cmp::min((*ar_block.offset(i as isize)).end, end);
         if maxSize < t - f + 1 as libc::c_int {
             Ar = (*ar_block.offset(i as isize)).ar_ratio;
             maxSize = t - f + 1 as libc::c_int;
@@ -3930,8 +3890,8 @@ pub unsafe extern "C" fn AverageACForBlock(start: libc::c_int, end: libc::c_int)
     Ac = 0 as libc::c_int;
     i = 0 as libc::c_int;
     while (i as libc::c_long) < ac_block_count {
-        f = max((*ac_block.offset(i as isize)).start, start);
-        t = min((*ac_block.offset(i as isize)).end, end);
+        f = std::cmp::max((*ac_block.offset(i as isize)).start, start);
+        t = std::cmp::min((*ac_block.offset(i as isize)).end, end);
         if maxSize < t - f + 1 as libc::c_int {
             Ac = (*ac_block.offset(i as isize)).audio_channels;
             maxSize = t - f + 1 as libc::c_int;
@@ -4220,7 +4180,7 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
     let mut platauHistogram: [libc::c_int; 256] = [0; 256];
     let mut length: libc::c_double = 0.;
     let mut new_ar_ratio: libc::c_double = 0.;
-    let mut logo_file: *mut FILE = 0 as *mut FILE;
+    let mut logo_file: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut foundCommercials: bool = 0 as libc::c_int != 0;
     let mut ltime: time_t = 0;
     if frame_count == 0 as libc::c_int as libc::c_long {
@@ -5199,7 +5159,7 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                             || (*frame.offset(i as isize)).schange_percent < schange_threshold
                         {
                             summed_volume1 = 0 as libc::c_int;
-                            j = max(
+                            j = std::cmp::max(
                                 silence_start - (2.5f64 * fps) as libc::c_int,
                                 1 as libc::c_int,
                             );
@@ -5207,20 +5167,20 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                                 summed_volume1 += (*frame.offset(j as isize)).volume;
                                 j += 1;
                             }
-                            summed_volume1 /= min(
+                            summed_volume1 /= std::cmp::min(
                                 (2.5f64 * fps) as libc::c_int,
                                 silence_start + 1 as libc::c_int,
                             );
                             summed_volume2 = 0 as libc::c_int;
                             j = i;
-                            while j < min(
+                            while j < std::cmp::min(
                                 i + (2.5f64 * fps) as libc::c_int,
                                 frame_count as libc::c_int,
                             ) {
                                 summed_volume2 += (*frame.offset(j as isize)).volume;
                                 j += 1;
                             }
-                            summed_volume2 /= min(
+                            summed_volume2 /= std::cmp::min(
                                 (2.5f64 * fps) as libc::c_int,
                                 (frame_count - i as libc::c_long + 1 as libc::c_int as libc::c_long)
                                     as libc::c_int,
@@ -5698,32 +5658,32 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
             b"\n%i Frames Processed\n\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             framesprocessed,
         );
-        log_file = myfopen(
+        log_file = libc::fopen(
             logfilename.as_mut_ptr(),
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
-        fprintf(
+        libc::fprintf(
             log_file,
             b"################################################################\n\0" as *const u8
                 as *const libc::c_char,
         );
         time(&mut ltime);
-        fprintf(
+        libc::fprintf(
             log_file,
             b"Time at end of run:\n%s\0" as *const u8 as *const libc::c_char,
             ctime(&mut ltime),
         );
-        fprintf(
+        libc::fprintf(
             log_file,
             b"################################################################\n\0" as *const u8
                 as *const libc::c_char,
         );
-        fclose(log_file);
-        log_file = 0 as *mut FILE;
+        libc::fclose(log_file);
+        log_file = 0 as *mut libc::FILE;
     }
     if ccCheck as libc::c_int != 0 && processCC as libc::c_int != 0 {
         let mut temp: [libc::c_char; 1024] = [0; 1024];
-        let mut tempFile: *mut FILE = 0 as *mut FILE;
+        let mut tempFile: *mut libc::FILE = 0 as *mut libc::FILE;
         if most_cc_type == 3 as libc::c_int
             || most_cc_type == 1 as libc::c_int
             || most_cc_type == 2 as libc::c_int
@@ -5733,44 +5693,44 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
                 b"%s.ccyes\0" as *const u8 as *const libc::c_char,
                 workbasename.as_mut_ptr(),
             );
-            tempFile = myfopen(
+            tempFile = libc::fopen(
                 temp.as_mut_ptr(),
                 b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
-            fclose(tempFile);
+            libc::fclose(tempFile);
             sprintf(
                 temp.as_mut_ptr(),
                 b"%s.ccno\0" as *const u8 as *const libc::c_char,
                 workbasename.as_mut_ptr(),
             );
-            myremove(temp.as_mut_ptr());
+            libc::unlink(temp.as_mut_ptr());
         } else {
             sprintf(
                 temp.as_mut_ptr(),
                 b"%s.ccno\0" as *const u8 as *const libc::c_char,
                 workbasename.as_mut_ptr(),
             );
-            tempFile = myfopen(
+            tempFile = libc::fopen(
                 temp.as_mut_ptr(),
                 b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
-            fclose(tempFile);
+            libc::fclose(tempFile);
             sprintf(
                 temp.as_mut_ptr(),
                 b"%s.ccyes\0" as *const u8 as *const libc::c_char,
                 workbasename.as_mut_ptr(),
             );
-            myremove(temp.as_mut_ptr());
+            libc::unlink(temp.as_mut_ptr());
         }
     }
     if deleteLogoFile {
-        logo_file = myfopen(
+        logo_file = libc::fopen(
             logofilename.as_mut_ptr(),
             b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !logo_file.is_null() {
-            fclose(logo_file);
-            myremove(logofilename.as_mut_ptr());
+            libc::fclose(logo_file);
+            libc::unlink(logofilename.as_mut_ptr());
         }
     }
     return foundCommercials;
@@ -7669,13 +7629,13 @@ pub unsafe extern "C" fn OpenOutputFiles() {
     let mut tempstr: [libc::c_char; 1024] = [0; 1024];
     let mut cwd: [libc::c_char; 1024] = [0; 1024];
     if output_default {
-        out_file = myfopen(
+        out_file = libc::fopen(
             out_filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if out_file.is_null() {
             usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-            out_file = myfopen(
+            out_file = libc::fopen(
                 out_filename.as_mut_ptr(),
                 b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -7689,10 +7649,10 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 exit(103 as libc::c_int);
             }
         }
-        fprintf(
+        libc::fprintf(
             out_file,
-            b"FILE PROCESSING COMPLETE %6li FRAMES AT %5i\n-------------------\n\0" as *const u8
-                as *const libc::c_char,
+            b"libc::FILE PROCESSING COMPLETE %6li FRAMES AT %5i\n-------------------\n\0"
+                as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
                 if frame_count - 1 as libc::c_int as libc::c_long
                     <= 0 as libc::c_int as libc::c_long
@@ -7714,7 +7674,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 + 1.5f64) as libc::c_long,
             (fps * 100 as libc::c_int as libc::c_double) as libc::c_int,
         );
-        fclose(out_file);
+        libc::fclose(out_file);
     }
     if output_chapters {
         sprintf(
@@ -7722,13 +7682,13 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.chap\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        chapters_file = myfopen(
+        chapters_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if chapters_file.is_null() {
             usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-            out_file = myfopen(
+            out_file = libc::fopen(
                 chapters_file as *const libc::c_char,
                 b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -7742,10 +7702,10 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 exit(103 as libc::c_int);
             }
         }
-        fprintf(
+        libc::fprintf(
             chapters_file,
-            b"FILE PROCESSING COMPLETE %6li FRAMES AT %5i\n-------------------\n\0" as *const u8
-                as *const libc::c_char,
+            b"libc::FILE PROCESSING COMPLETE %6li FRAMES AT %5i\n-------------------\n\0"
+                as *const u8 as *const libc::c_char,
             frame_count - 1 as libc::c_int as libc::c_long,
             (fps * 100 as libc::c_int as libc::c_double) as libc::c_int,
         );
@@ -7756,12 +7716,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.cut\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        zoomplayer_cutlist_file = myfopen(
+        zoomplayer_cutlist_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if zoomplayer_cutlist_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7778,12 +7738,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.plist\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        plist_cutlist_file = myfopen(
+        plist_cutlist_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if plist_cutlist_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7792,7 +7752,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             exit(6 as libc::c_int);
         } else {
             output_plist_cutlist = 1 as libc::c_int != 0;
-            fprintf(
+            libc::fprintf(
                 plist_cutlist_file,
                 b"<array>\n\0" as *const u8 as *const libc::c_char,
             );
@@ -7804,12 +7764,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.incommercial\0" as *const u8 as *const libc::c_char,
             workbasename.as_mut_ptr(),
         );
-        incommercial_file = myfopen(
+        incommercial_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if incommercial_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7817,11 +7777,11 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             );
             exit(6 as libc::c_int);
         }
-        fprintf(
+        libc::fprintf(
             incommercial_file,
             b"0\n\0" as *const u8 as *const libc::c_char,
         );
-        fclose(incommercial_file);
+        libc::fclose(incommercial_file);
     }
     if output_zoomplayer_chapter {
         sprintf(
@@ -7829,12 +7789,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.chp\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        zoomplayer_chapter_file = myfopen(
+        zoomplayer_chapter_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if zoomplayer_chapter_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7851,12 +7811,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.scf\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        scf_file = myfopen(
+        scf_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if scf_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7873,12 +7833,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.edl\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        edl_file = myfopen(
+        edl_file = libc::fopen(
             filename.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if edl_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7895,12 +7855,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.ffmeta\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        ffmeta_file = myfopen(
+        ffmeta_file = libc::fopen(
             filename.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if ffmeta_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7917,12 +7877,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.ffsplit\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        ffsplit_file = myfopen(
+        ffsplit_file = libc::fopen(
             filename.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if ffsplit_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7939,12 +7899,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.chap\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        ipodchap_file = myfopen(
+        ipodchap_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if ipodchap_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7954,7 +7914,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
         } else {
             output_ipodchap = 1 as libc::c_int != 0;
         }
-        fprintf(
+        libc::fprintf(
             ipodchap_file,
             b"CHAPTER01=00:00:00.000\nCHAPTER01NAME=1\n\0" as *const u8 as *const libc::c_char,
         );
@@ -7965,12 +7925,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.edlp\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        edlp_file = myfopen(
+        edlp_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if edlp_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -7987,12 +7947,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.bcf\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        bcf_file = myfopen(
+        bcf_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if bcf_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8009,12 +7969,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.edlx\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        edlx_file = myfopen(
+        edlx_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if edlx_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8023,7 +7983,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             exit(6 as libc::c_int);
         } else {
             output_edlx = 1 as libc::c_int != 0;
-            fprintf(
+            libc::fprintf(
                 edlx_file,
                 b"<regionlist units=\"bytes\" mode=\"exclude\"> \n\0" as *const u8
                     as *const libc::c_char,
@@ -8036,7 +7996,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.VPrj\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        videoredo_file = myfopen(
+        videoredo_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -8044,14 +8004,14 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             if mpegfilename[1 as libc::c_int as usize] as libc::c_int == ':' as i32
                 || mpegfilename[0 as libc::c_int as usize] as libc::c_int == '/' as i32
             {
-                fprintf(
+                libc::fprintf(
                     videoredo_file,
                     b"<Version>2\n<Filename>%s\n\0" as *const u8 as *const libc::c_char,
                     mpegfilename.as_mut_ptr(),
                 );
             } else {
-                getcwd(cwd.as_mut_ptr(), 256 as libc::c_int as size_t);
-                fprintf(
+                libc::getcwd(cwd.as_mut_ptr(), 256);
+                libc::fprintf(
                     videoredo_file,
                     b"<Version>2\n<Filename>%s%c%s\n\0" as *const u8 as *const libc::c_char,
                     cwd.as_mut_ptr(),
@@ -8060,14 +8020,14 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 );
             }
             if is_h264 != 0 {
-                fprintf(
+                libc::fprintf(
                     videoredo_file,
                     b"<MPEG Stream Type>4\n\0" as *const u8 as *const libc::c_char,
                 );
             }
             output_videoredo = 1 as libc::c_int != 0;
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8082,7 +8042,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.VPrj\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        videoredo3_file = myfopen(
+        videoredo3_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -8090,15 +8050,15 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             if mpegfilename[1 as libc::c_int as usize] as libc::c_int == ':' as i32
                 || mpegfilename[0 as libc::c_int as usize] as libc::c_int == '/' as i32
             {
-                fprintf(
+                libc::fprintf(
                     videoredo3_file,
                     b"<VideoReDoProject Version=\"3\">\n<Filename>%s</Filename><CutList>\n\0"
                         as *const u8 as *const libc::c_char,
                     EscapeXmlFilename(mpegfilename.as_mut_ptr()),
                 );
             } else {
-                getcwd(cwd.as_mut_ptr(), 256 as libc::c_int as size_t);
-                fprintf(
+                libc::getcwd(cwd.as_mut_ptr(), 256);
+                libc::fprintf(
                     videoredo3_file,
                     b"<VideoReDoProject Version=\"3\">\n<Filename>%s%c%s</Filename><CutList>\n\0"
                         as *const u8 as *const libc::c_char,
@@ -8109,7 +8069,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             }
             output_videoredo3 = 1 as libc::c_int != 0;
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8124,18 +8084,18 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.chapters.xml\0" as *const u8 as *const libc::c_char,
             mpegfilename.as_mut_ptr(),
         );
-        btv_file = myfopen(
+        btv_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !btv_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 btv_file,
                 b"<cutlist>\n\0" as *const u8 as *const libc::c_char,
             );
             output_btv = 1 as libc::c_int != 0;
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8150,7 +8110,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.cpf\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        cuttermaran_file = myfopen(
+        cuttermaran_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -8160,7 +8120,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             {
                 strcpy(tempstr.as_mut_ptr(), inbasename.as_mut_ptr());
             } else {
-                getcwd(cwd.as_mut_ptr(), 256 as libc::c_int as size_t);
+                libc::getcwd(cwd.as_mut_ptr(), 256);
                 sprintf(
                     tempstr.as_mut_ptr(),
                     b"%s%c%s\0" as *const u8 as *const libc::c_char,
@@ -8169,30 +8129,30 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                     inbasename.as_mut_ptr(),
                 );
             }
-            fprintf(
+            libc::fprintf(
                 cuttermaran_file,
                 b"<?xml version=\"1.0\" standalone=\"yes\"?>\n\0" as *const u8
                     as *const libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 cuttermaran_file,
                 b"<StateData xmlns=\"http://cuttermaran.kickme.to/StateData.xsd\">\n\0" as *const u8
                     as *const libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 cuttermaran_file,
                 b"<usedVideoFiles FileID=\"0\" FileName=\"%s.M2V\" />\n\0" as *const u8
                     as *const libc::c_char,
                 inbasename.as_mut_ptr(),
             );
-            fprintf(
+            libc::fprintf(
                 cuttermaran_file,
                 b"<usedAudioFiles FileID=\"1\" FileName=\"%s.mp2\" StartDelay=\"0\" />\n\0"
                     as *const u8 as *const libc::c_char,
                 inbasename.as_mut_ptr(),
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8207,7 +8167,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.vcf\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        vcf_file = myfopen(
+        vcf_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -8217,7 +8177,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             {
                 strcpy(tempstr.as_mut_ptr(), inbasename.as_mut_ptr());
             } else {
-                getcwd(cwd.as_mut_ptr(), 256 as libc::c_int as size_t);
+                libc::getcwd(cwd.as_mut_ptr(), 256);
                 sprintf(
                     tempstr.as_mut_ptr(),
                     b"%s%c%s\0" as *const u8 as *const libc::c_char,
@@ -8226,13 +8186,13 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                     inbasename.as_mut_ptr(),
                 );
             }
-            fprintf(
+            libc::fprintf(
                 vcf_file,
                 b"VirtualDub.video.SetMode(0);\nVirtualDub.subset.Clear();\n\0" as *const u8
                     as *const libc::c_char,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8247,7 +8207,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.vdr\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        vdr_file = myfopen(
+        vdr_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -8257,7 +8217,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             {
                 strcpy(tempstr.as_mut_ptr(), inbasename.as_mut_ptr());
             } else {
-                getcwd(cwd.as_mut_ptr(), 256 as libc::c_int as size_t);
+                libc::getcwd(cwd.as_mut_ptr(), 256);
                 sprintf(
                     tempstr.as_mut_ptr(),
                     b"%s%c%s\0" as *const u8 as *const libc::c_char,
@@ -8267,7 +8227,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 );
             }
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8282,17 +8242,17 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.Xcl\0" as *const u8 as *const libc::c_char,
             mpegfilename.as_mut_ptr(),
         );
-        projectx_file = myfopen(
+        projectx_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !projectx_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 projectx_file,
                 b"CollectionPanel.CutMode=2\n\0" as *const u8 as *const libc::c_char,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8307,27 +8267,27 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.avs\0" as *const u8 as *const libc::c_char,
             mpegfilename.as_mut_ptr(),
         );
-        avisynth_file = myfopen(
+        avisynth_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !avisynth_file.is_null() {
             if avisynth_options[0 as libc::c_int as usize] as libc::c_int == 0 as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     avisynth_file,
                     b"LoadPlugin(\"MPEG2Dec3.dll\") \nMPEG2Source(\"%s\")\n\0" as *const u8
                         as *const libc::c_char,
                     mpegfilename.as_mut_ptr(),
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     avisynth_file,
                     avisynth_options.as_mut_ptr(),
                     mpegfilename.as_mut_ptr(),
                 );
             }
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8342,14 +8302,14 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.wme\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        womble_file = myfopen(
+        womble_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !womble_file.is_null() {
             output_womble = 1 as libc::c_int != 0;
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8364,14 +8324,14 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.mls\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        mls_file = myfopen(
+        mls_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !mls_file.is_null() {
             output_mls = 1 as libc::c_int != 0;
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8386,13 +8346,13 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s_mpgtx.bat\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        mpgtx_file = myfopen(
+        mpgtx_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !mpgtx_file.is_null() {
             output_mpgtx = 1 as libc::c_int != 0;
-            fprintf(
+            libc::fprintf(
                 mpgtx_file,
                 b"mpgtx.exe -j -f -o \"%s%s\" \"%s\" \0" as *const u8 as *const libc::c_char,
                 mpegfilename.as_mut_ptr(),
@@ -8400,7 +8360,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 mpegfilename.as_mut_ptr(),
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8415,18 +8375,18 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s_dvrcut.bat\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        dvrcut_file = myfopen(
+        dvrcut_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !dvrcut_file.is_null() {
             if dvrcut_options[0 as libc::c_int as usize] as libc::c_int == 0 as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     dvrcut_file,
                     b"dvrcut \"%%1\" \"%%2\" \0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     dvrcut_file,
                     dvrcut_options.as_mut_ptr(),
                     inbasename.as_mut_ptr(),
@@ -8435,7 +8395,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                 );
             }
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8450,18 +8410,18 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.xml\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        dvrmstb_file = myfopen(
+        dvrmstb_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !dvrmstb_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 dvrmstb_file,
                 b"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<root>\n\0" as *const u8
                     as *const libc::c_char,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8476,14 +8436,14 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s_mpeg2schnitt.bat\0" as *const u8 as *const libc::c_char,
             inbasename.as_mut_ptr(),
         );
-        mpeg2schnitt_file = myfopen(
+        mpeg2schnitt_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !mpeg2schnitt_file.is_null() {
             output_mpgtx = 1 as libc::c_int != 0;
             if mpeg2schnitt_options[0 as libc::c_int as usize] as libc::c_int == 0 as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     mpeg2schnitt_file,
                     b"mpeg2schnitt.exe /S /E /R%5.2f  /Z \"%s\" \"%s\" \0" as *const u8
                         as *const libc::c_char,
@@ -8492,14 +8452,14 @@ pub unsafe extern "C" fn OpenOutputFiles() {
                     b"%1\0" as *const u8 as *const libc::c_char,
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     mpeg2schnitt_file,
                     b"%s \0" as *const u8 as *const libc::c_char,
                     mpeg2schnitt_options.as_mut_ptr(),
                 );
             }
         } else {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8514,12 +8474,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.mkvtoolnix.chapters\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        mkvtoolnix_chapters_file = myfopen(
+        mkvtoolnix_chapters_file = libc::fopen(
             filename.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if mkvtoolnix_chapters_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8527,7 +8487,7 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             );
             exit(6 as libc::c_int);
         } else {
-            fprintf(
+            libc::fprintf(
                 mkvtoolnix_chapters_file,
                 b"<?xml version=\"1.0\" encoding=\"ISO - 8859 - 1\"?>\n<Chapters>\n\0" as *const u8
                     as *const libc::c_char,
@@ -8540,12 +8500,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             b"%s.mkvtoolnix.tags\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        mkvtoolnix_tags_file = myfopen(
+        mkvtoolnix_tags_file = libc::fopen(
             filename.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if mkvtoolnix_tags_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 __stderrp,
                 b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                 strerror(*__error()),
@@ -8553,12 +8513,12 @@ pub unsafe extern "C" fn OpenOutputFiles() {
             );
             exit(6 as libc::c_int);
         } else {
-            fprintf(
+            libc::fprintf(
                 mkvtoolnix_tags_file,
                 b"<?xml version=\"1.0\" encoding=\"ISO - 8859 - 1\"?>\n<Tags>\n\t<Tag>\n\t\t<Targets>\n\t\t\t<TargetTypeValue>50</TargetTypeValue>\n\t\t\t<EditionUID>1</EditionUID>\n\t\t</Targets>\n\t\t<Simple>\n\t\t\t<TagLanguage>eng</TagLanguage>\n\t\t\t<Name>TITLE</Name>\n\t\t\t<DefaultLanguage>1</DefaultLanguage>\n\t\t\t<String>With Commercials</String>\n\t\t</Simple>\n\t</Tag>\n\t<Tag>\n\t\t<Targets>\n\t\t\t<TargetTypeValue>50</TargetTypeValue>\n\t\t\t<EditionUID>2</EditionUID>\n\t\t</Targets>\n\t\t<Simple>\n\t\t\t<TagLanguage>eng</TagLanguage>\n\t\t\t<Name>TITLE</Name>\n\t\t\t<DefaultLanguage>1</DefaultLanguage>\n\t\t\t<String>Without Commercials</String>\n\t\t</Simple>\n\t</Tag>\n</Tags>\0"
                     as *const u8 as *const libc::c_char,
             );
-            fclose(mkvtoolnix_tags_file);
+            libc::fclose(mkvtoolnix_tags_file);
         }
     }
 }
@@ -8599,12 +8559,12 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             as libc::c_int;
     }
     if output_default as libc::c_int != 0 && prev < start {
-        out_file = myfopen(
+        out_file = libc::fopen(
             out_filename.as_mut_ptr(),
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !out_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 out_file,
                 b"%li\t%li\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -8680,15 +8640,15 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 }) * fps
                     + 1.5f64) as libc::c_long,
             );
-            fclose(out_file);
+            libc::fclose(out_file);
         } else {
             usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-            out_file = myfopen(
+            out_file = libc::fopen(
                 out_filename.as_mut_ptr(),
                 b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
             if !out_file.is_null() {
-                fprintf(
+                libc::fprintf(
                     out_file,
                     b"%li\t%li\n\0" as *const u8 as *const libc::c_char,
                     ((if !frame.is_null() {
@@ -8764,7 +8724,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     }) * fps
                         + 1.5f64) as libc::c_long,
                 );
-                fclose(out_file);
+                libc::fclose(out_file);
             } else {
                 Debug(
                     0 as libc::c_int,
@@ -8780,7 +8740,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         && prev < start
         && end - start > 2 as libc::c_int as libc::c_long
     {
-        fprintf(
+        libc::fprintf(
             zoomplayer_cutlist_file,
             b"JumpSegment(\"From=%.4f\",\"To=%.4f\")\n\0" as *const u8 as *const libc::c_char,
             get_frame_pts(start as libc::c_int),
@@ -8788,11 +8748,11 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !zoomplayer_cutlist_file.is_null() && last as libc::c_int != 0 {
-        fclose(zoomplayer_cutlist_file);
+        libc::fclose(zoomplayer_cutlist_file);
     }
     if !plist_cutlist_file.is_null() {
         if prev < start {
-            fprintf(
+            libc::fprintf(
                 plist_cutlist_file,
                 b"<integer>%ld</integer> <integer>%ld</integer>\n\0" as *const u8
                     as *const libc::c_char,
@@ -8803,17 +8763,17 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             );
         }
         if last {
-            fprintf(
+            libc::fprintf(
                 plist_cutlist_file,
                 b"</array>\n\0" as *const u8 as *const libc::c_char,
             );
         }
     }
     if !plist_cutlist_file.is_null() && last as libc::c_int != 0 {
-        fclose(plist_cutlist_file);
+        libc::fclose(plist_cutlist_file);
     }
     if !zoomplayer_chapter_file.is_null() && prev < start && (end - start) as libc::c_double > fps {
-        fprintf(
+        libc::fprintf(
             zoomplayer_chapter_file,
             b"AddChapterBySecond(%i,Commercial Segment)\nAddChapterBySecond(%i,Show Segment)\n\0"
                 as *const u8 as *const libc::c_char,
@@ -8822,11 +8782,11 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !zoomplayer_chapter_file.is_null() && last as libc::c_int != 0 {
-        fclose(zoomplayer_chapter_file);
+        libc::fclose(zoomplayer_chapter_file);
     }
     if !scf_file.is_null() && prev < start && (end - start) as libc::c_double > fps {
         let rounded_fps: libc::c_int = (fps + 0.5f64) as libc::c_int;
-        fprintf(
+        libc::fprintf(
             scf_file,
             b"CHAPTER%02i=%02li:%02li:%02li.%03li\n\0" as *const u8 as *const libc::c_char,
             i * 2 as libc::c_int + 1 as libc::c_int,
@@ -8837,13 +8797,13 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             start / rounded_fps as libc::c_long % 60 as libc::c_int as libc::c_long,
             start % rounded_fps as libc::c_long,
         );
-        fprintf(
+        libc::fprintf(
             scf_file,
             b"CHAPTER%02iNAME=%s\n\0" as *const u8 as *const libc::c_char,
             i * 2 as libc::c_int + 1 as libc::c_int,
             b"Commercial starts\0" as *const u8 as *const libc::c_char,
         );
-        fprintf(
+        libc::fprintf(
             scf_file,
             b"CHAPTER%02i=%02li:%02li:%02li.%03li\n\0" as *const u8 as *const libc::c_char,
             i * 2 as libc::c_int + 2 as libc::c_int,
@@ -8854,7 +8814,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             end / rounded_fps as libc::c_long % 60 as libc::c_int as libc::c_long,
             end % rounded_fps as libc::c_long,
         );
-        fprintf(
+        libc::fprintf(
             scf_file,
             b"CHAPTER%02iNAME=%s\n\0" as *const u8 as *const libc::c_char,
             i * 2 as libc::c_int + 2 as libc::c_int,
@@ -8862,11 +8822,11 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !scf_file.is_null() && last as libc::c_int != 0 {
-        fclose(scf_file);
+        libc::fclose(scf_file);
     }
     if !ffmeta_file.is_null() {
         if prev != -(1 as libc::c_int) as libc::c_long && prev < start {
-            fprintf(
+            libc::fprintf(
                 ffmeta_file,
                 b"[CHAPTER]\nTIMEBASE=1/100\nSTART=%llu\nEND=%llu\ntitle=Show Segment\n\0"
                     as *const u8 as *const libc::c_char,
@@ -8878,7 +8838,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         } else if prev == -(1 as libc::c_int) as libc::c_long
             && start > 5 as libc::c_int as libc::c_long
         {
-            fprintf(
+            libc::fprintf(
                 ffmeta_file,
                 b"[CHAPTER]\nTIMEBASE=1/100\nSTART=%llu\nEND=%llu\ntitle=Show Segment\n\0"
                     as *const u8 as *const libc::c_char,
@@ -8891,7 +8851,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             start = 0 as libc::c_int as libc::c_long;
         }
         if end - start > 2 as libc::c_int as libc::c_long {
-            fprintf(
+            libc::fprintf(
                 ffmeta_file,
                 b"[CHAPTER]\nTIMEBASE=1/100\nSTART=%llu\nEND=%llu\ntitle=Commercial Segment\n\0"
                     as *const u8 as *const libc::c_char,
@@ -8903,11 +8863,11 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !ffmeta_file.is_null() && last as libc::c_int != 0 {
-        fclose(ffmeta_file);
+        libc::fclose(ffmeta_file);
     }
     if !ffsplit_file.is_null() {
         if prev != -(1 as libc::c_int) as libc::c_long && prev < start {
-            fprintf(
+            libc::fprintf(
                 ffsplit_file,
                 b"-c copy -ss %.3f -t %.3f segment%03d.ts \n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts((prev + 1 as libc::c_int as libc::c_long) as libc::c_int),
@@ -8918,7 +8878,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         } else if prev == -(1 as libc::c_int) as libc::c_long
             && start > 5 as libc::c_int as libc::c_long
         {
-            fprintf(
+            libc::fprintf(
                 ffsplit_file,
                 b"-c copy -ss %.3f -t %.3f segment%03d.ts \n\0" as *const u8 as *const libc::c_char,
                 0.0f64,
@@ -8928,14 +8888,14 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !ffsplit_file.is_null() && last as libc::c_int != 0 {
-        fclose(ffsplit_file);
+        libc::fclose(ffsplit_file);
     }
     if !vcf_file.is_null()
         && prev < start
         && start - prev > 5 as libc::c_int as libc::c_long
         && prev > 0 as libc::c_int as libc::c_long
     {
-        fprintf(
+        libc::fprintf(
             vcf_file,
             b"VirtualDub.subset.AddRange(%li,%li);\n\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
@@ -8983,28 +8943,28 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !vcf_file.is_null() && last as libc::c_int != 0 {
-        fclose(vcf_file);
+        libc::fclose(vcf_file);
     }
     if !vdr_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
         if start < 5 as libc::c_int as libc::c_long {
             start = 0 as libc::c_int as libc::c_long;
         }
-        fprintf(
+        libc::fprintf(
             vdr_file,
             b"%s start\n\0" as *const u8 as *const libc::c_char,
             dblSecondsToStrMinutesFrames(get_frame_pts(start as libc::c_int)),
         );
-        fprintf(
+        libc::fprintf(
             vdr_file,
             b"%s end\n\0" as *const u8 as *const libc::c_char,
             dblSecondsToStrMinutesFrames(get_frame_pts(end as libc::c_int)),
         );
     }
     if !vdr_file.is_null() && last as libc::c_int != 0 {
-        fclose(vdr_file);
+        libc::fclose(vdr_file);
     }
     if !projectx_file.is_null() && prev < start {
-        fprintf(
+        libc::fprintf(
             projectx_file,
             b"%ld\n\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
@@ -9022,7 +8982,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             }) * fps
                 + 1.5f64) as libc::c_long,
         );
-        fprintf(
+        libc::fprintf(
             projectx_file,
             b"%ld\n\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
@@ -9042,10 +9002,10 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !projectx_file.is_null() && last as libc::c_int != 0 {
-        fclose(projectx_file);
+        libc::fclose(projectx_file);
     }
     if !avisynth_file.is_null() && prev < start {
-        fprintf(
+        libc::fprintf(
             avisynth_file,
             b"%strim(%ld,\0" as *const u8 as *const libc::c_char,
             if prev < 10 as libc::c_int as libc::c_long {
@@ -9068,7 +9028,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             }) * fps
                 + 1.5f64) as libc::c_long,
         );
-        fprintf(
+        libc::fprintf(
             avisynth_file,
             b"%ld)\0" as *const u8 as *const libc::c_char,
             ((if !frame.is_null() {
@@ -9088,14 +9048,14 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !avisynth_file.is_null() && last as libc::c_int != 0 {
-        fprintf(avisynth_file, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(avisynth_file, b"\n\0" as *const u8 as *const libc::c_char);
     }
     if !avisynth_file.is_null() && last as libc::c_int != 0 {
-        fclose(avisynth_file);
+        libc::fclose(avisynth_file);
     }
     if !videoredo_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
         if i == 0 as libc::c_int && demux_pid != 0 {
-            fprintf(
+            libc::fprintf(
                 videoredo_file,
                 b"<VideoStreamPID>%d\n<AudioStreamPID>%d\n<SubtitlePID1>%d\n\0" as *const u8
                     as *const libc::c_char,
@@ -9104,17 +9064,17 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 selected_subtitle_pid,
             );
         }
-        s_start = max(
+        s_start = std::cmp::max(
             (start - videoredo_offset as libc::c_long - 1 as libc::c_int as libc::c_long)
                 as libc::c_int,
             0 as libc::c_int,
         );
-        s_end = max(
+        s_end = std::cmp::max(
             (end - videoredo_offset as libc::c_long - 1 as libc::c_int as libc::c_long)
                 as libc::c_int,
             0 as libc::c_int,
         );
-        fprintf(
+        libc::fprintf(
             videoredo_file,
             b"<Cut>%.0f:%.0f\n\0" as *const u8 as *const libc::c_char,
             get_frame_pts(s_start) * 10000000 as libc::c_int as libc::c_double,
@@ -9122,12 +9082,12 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !videoredo_file.is_null() && last as libc::c_int != 0 {
-        fclose(videoredo_file);
+        libc::fclose(videoredo_file);
     }
     if !videoredo3_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long
     {
         if i == 0 as libc::c_int && demux_pid != 0 {
-            fprintf(
+            libc::fprintf(
                 videoredo3_file,
                 b"<InputPIDList><VideoStreamPID>%d</VideoStreamPID>\n<AudioStreamPID>%d</AudioStreamPID><SubtitlePID1>%d</SubtitlePID1></InputPIDList>\n\0"
                     as *const u8 as *const libc::c_char,
@@ -9136,17 +9096,17 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 selected_subtitle_pid,
             );
         }
-        s_start = max(
+        s_start = std::cmp::max(
             (start - videoredo_offset as libc::c_long - 1 as libc::c_int as libc::c_long)
                 as libc::c_int,
             0 as libc::c_int,
         );
-        s_end = max(
+        s_end = std::cmp::max(
             (end - videoredo_offset as libc::c_long - 1 as libc::c_int as libc::c_long)
                 as libc::c_int,
             0 as libc::c_int,
         );
-        fprintf(
+        libc::fprintf(
             videoredo3_file,
             b"<Cut><CutTimeStart>%.0f</CutTimeStart> <CutTimeEnd>%.0f</CutTimeEnd> </Cut>\n\0"
                 as *const u8 as *const libc::c_char,
@@ -9156,14 +9116,14 @@ pub unsafe extern "C" fn OutputCommercialBlock(
     }
     if !videoredo3_file.is_null() {
         if last {
-            fprintf(
+            libc::fprintf(
                 videoredo3_file,
                 b"</CutList>\n\0" as *const u8 as *const libc::c_char,
             );
         }
     }
     if !videoredo3_file.is_null() && last as libc::c_int != 0 {
-        fclose(videoredo3_file);
+        libc::fclose(videoredo3_file);
     }
     if !btv_file.is_null() && prev < start {
         strcpy(
@@ -9174,7 +9134,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             ecomment.as_mut_ptr(),
             dblSecondsToStrMinutes(get_frame_pts(end as libc::c_int)),
         );
-        fprintf(
+        libc::fprintf(
             btv_file,
             b"<Region><start comment=\"%s\">%.0f</start><end comment=\"%s\">%.0f</end></Region>\n\0"
                 as *const u8 as *const libc::c_char,
@@ -9184,29 +9144,29 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             get_frame_pts(end as libc::c_int) * 10000000 as libc::c_int as libc::c_double,
         );
         if last {
-            fprintf(
+            libc::fprintf(
                 btv_file,
                 b"</cutlist>\n\0" as *const u8 as *const libc::c_char,
             );
         }
     }
     if !btv_file.is_null() && last as libc::c_int != 0 {
-        fclose(btv_file);
+        libc::fclose(btv_file);
     }
     if !edl_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
         if start < 5 as libc::c_int as libc::c_long {
             start = 0 as libc::c_int as libc::c_long;
         }
-        s_start = max(
+        s_start = std::cmp::max(
             (start - edl_offset as libc::c_long) as libc::c_int,
             0 as libc::c_int,
         );
-        s_end = max(
+        s_end = std::cmp::max(
             (end - edl_offset as libc::c_long) as libc::c_int,
             0 as libc::c_int,
         );
         if demux_pid != 0 && enable_mencoder_pts as libc::c_int != 0 {
-            fprintf(
+            libc::fprintf(
                 edl_file,
                 b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(s_start)
@@ -9240,7 +9200,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 edl_skip_field,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 edl_file,
                 b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(s_start),
@@ -9250,22 +9210,22 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !edl_file.is_null() && last as libc::c_int != 0 {
-        fclose(edl_file);
+        libc::fclose(edl_file);
     }
     if !live_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
         if start < 5 as libc::c_int as libc::c_long {
             start = 0 as libc::c_int as libc::c_long;
         }
-        s_start = max(
+        s_start = std::cmp::max(
             (start - edl_offset as libc::c_long) as libc::c_int,
             0 as libc::c_int,
         );
-        s_end = max(
+        s_end = std::cmp::max(
             (end - edl_offset as libc::c_long) as libc::c_int,
             0 as libc::c_int,
         );
         if demux_pid != 0 && enable_mencoder_pts as libc::c_int != 0 {
-            fprintf(
+            libc::fprintf(
                 live_file,
                 b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(s_start)
@@ -9299,7 +9259,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 edl_skip_field,
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 live_file,
                 b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(s_start),
@@ -9309,10 +9269,10 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !live_file.is_null() && last as libc::c_int != 0 {
-        fclose(live_file);
+        libc::fclose(live_file);
     }
     if !ipodchap_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
-        fprintf(
+        libc::fprintf(
             ipodchap_file,
             b"CHAPTER%.2i=%s\nCHAPTER%.2iNAME=%d\n\0" as *const u8 as *const libc::c_char,
             i + 2 as libc::c_int,
@@ -9322,13 +9282,13 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !ipodchap_file.is_null() && last as libc::c_int != 0 {
-        fclose(ipodchap_file);
+        libc::fclose(ipodchap_file);
     }
     if !edlp_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
         if start < 5 as libc::c_int as libc::c_long {
             start = 0 as libc::c_int as libc::c_long;
         }
-        fprintf(
+        libc::fprintf(
             edlp_file,
             b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
             get_frame_pts(start as libc::c_int)
@@ -9363,10 +9323,10 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !edlp_file.is_null() && last as libc::c_int != 0 {
-        fclose(edlp_file);
+        libc::fclose(edlp_file);
     }
     if !bcf_file.is_null() && prev < start && end - start > 2 as libc::c_int as libc::c_long {
-        fprintf(
+        libc::fprintf(
             bcf_file,
             b"1,%.0f,%.0f\n\0" as *const u8 as *const libc::c_char,
             get_frame_pts(start as libc::c_int) * 1000.0f64,
@@ -9374,11 +9334,11 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         );
     }
     if !bcf_file.is_null() && last as libc::c_int != 0 {
-        fclose(bcf_file);
+        libc::fclose(bcf_file);
     }
     if !edlx_file.is_null() && !frame.is_null() {
         if prev < start && end - start > 2 as libc::c_int as libc::c_long {
-            fprintf(
+            libc::fprintf(
                 edlx_file,
                 b"<region start=\"%lld\" end=\"%lld\"/> \n\0" as *const u8 as *const libc::c_char,
                 (*frame.offset(start as isize)).goppos,
@@ -9386,19 +9346,19 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             );
         }
         if last {
-            fprintf(
+            libc::fprintf(
                 edlx_file,
                 b"</regionlist>\n\0" as *const u8 as *const libc::c_char,
             );
         }
     }
     if !edlx_file.is_null() && last as libc::c_int != 0 {
-        fclose(edlx_file);
+        libc::fclose(edlx_file);
     }
     if !womble_file.is_null() {
         if !last {
             if (start - prev) as libc::c_double > fps {
-                fprintf(
+                libc::fprintf(
                     womble_file,
                     b"CLIPLIST: #%i show\nCLIP: %s\n6 %li %li\n\0" as *const u8
                         as *const libc::c_char,
@@ -9453,7 +9413,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                             + 1.5f64) as libc::c_long,
                 );
             }
-            fprintf(
+            libc::fprintf(
                 womble_file,
                 b"CLIPLIST: #%i commercial\nCLIP: %s\n6 %li %li\n\0" as *const u8
                     as *const libc::c_char,
@@ -9503,7 +9463,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                         + 1.5f64) as libc::c_long,
             );
         } else if end - prev > 0 as libc::c_int as libc::c_long {
-            fprintf(
+            libc::fprintf(
                 womble_file,
                 b"CLIPLIST: #%i show\nCLIP: %s\n6 %li %li\n\0" as *const u8 as *const libc::c_char,
                 i + 1 as libc::c_int,
@@ -9555,7 +9515,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !womble_file.is_null() && last as libc::c_int != 0 {
-        fclose(womble_file);
+        libc::fclose(womble_file);
     }
     if !mls_file.is_null() {
         if i == 0 as libc::c_int {
@@ -9563,7 +9523,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             if (start as libc::c_double) < fps {
                 count -= 1 as libc::c_int;
             }
-            fprintf(
+            libc::fprintf(
                 mls_file,
                 b"[BookmarkList]\nPathName= %s\nVideoStreamID= 0\nFormat= frame\nCount= %d\n\0"
                     as *const u8 as *const libc::c_char,
@@ -9571,14 +9531,14 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 count,
             );
             if start as libc::c_double >= fps {
-                fprintf(
+                libc::fprintf(
                     mls_file,
                     b"%11i 1\n\0" as *const u8 as *const libc::c_char,
                     0 as libc::c_int,
                 );
             }
         } else {
-            fprintf(
+            libc::fprintf(
                 mls_file,
                 b"%11li 1\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -9598,7 +9558,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             );
         }
         if !last {
-            fprintf(
+            libc::fprintf(
                 mls_file,
                 b"%11li 0\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -9617,7 +9577,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     + 1.5f64) as libc::c_long,
             );
         } else if start < end - 5 as libc::c_int as libc::c_long {
-            fprintf(
+            libc::fprintf(
                 mls_file,
                 b"%11li 0\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -9635,7 +9595,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 }) * fps
                     + 1.5f64) as libc::c_long,
             );
-            fprintf(
+            libc::fprintf(
                 mls_file,
                 b"%11li 1\n\0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -9656,12 +9616,12 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !mls_file.is_null() && last as libc::c_int != 0 {
-        fclose(mls_file);
+        libc::fclose(mls_file);
     }
     if !mpgtx_file.is_null() {
         if !last {
             if start - prev > 0 as libc::c_int as libc::c_long {
-                fprintf(
+                libc::fprintf(
                     mpgtx_file,
                     b"[%s-\0" as *const u8 as *const libc::c_char,
                     if (prev as libc::c_double) < fps {
@@ -9671,7 +9631,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                             as *const libc::c_char
                     },
                 );
-                fprintf(
+                libc::fprintf(
                     mpgtx_file,
                     b"%s] \0" as *const u8 as *const libc::c_char,
                     intSecondsToStrMinutes(get_frame_pts(start as libc::c_int) as libc::c_int),
@@ -9679,7 +9639,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             }
         } else {
             if end - prev > 0 as libc::c_int as libc::c_long {
-                fprintf(
+                libc::fprintf(
                     mpgtx_file,
                     b"[%s-]\0" as *const u8 as *const libc::c_char,
                     intSecondsToStrMinutes(get_frame_pts(
@@ -9687,38 +9647,38 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                     ) as libc::c_int),
                 );
             }
-            fprintf(mpgtx_file, b"\n\0" as *const u8 as *const libc::c_char);
+            libc::fprintf(mpgtx_file, b"\n\0" as *const u8 as *const libc::c_char);
         }
     }
     if !mpgtx_file.is_null() && last as libc::c_int != 0 {
-        fclose(mpgtx_file);
+        libc::fclose(mpgtx_file);
     }
     if !dvrcut_file.is_null() {
         if start - prev > fps as libc::c_int as libc::c_long {
-            fprintf(
+            libc::fprintf(
                 dvrcut_file,
                 b"%s \0" as *const u8 as *const libc::c_char,
                 intSecondsToStrMinutes(get_frame_pts(prev as libc::c_int) as libc::c_int),
             );
-            fprintf(
+            libc::fprintf(
                 dvrcut_file,
                 b"%s \0" as *const u8 as *const libc::c_char,
                 intSecondsToStrMinutes(get_frame_pts(start as libc::c_int) as libc::c_int),
             );
         }
         if last {
-            fprintf(dvrcut_file, b"\n\0" as *const u8 as *const libc::c_char);
+            libc::fprintf(dvrcut_file, b"\n\0" as *const u8 as *const libc::c_char);
         }
     }
     if !dvrcut_file.is_null() && last as libc::c_int != 0 {
-        fclose(dvrcut_file);
+        libc::fclose(dvrcut_file);
     }
     if !dvrmstb_file.is_null() {
         if end - start > 1 as libc::c_int as libc::c_long {
             if start == 1 as libc::c_int as libc::c_long {
                 start = 0 as libc::c_int as libc::c_long;
             }
-            fprintf(
+            libc::fprintf(
                 dvrmstb_file,
                 b"  <commercial start=\"%f\" end=\"%f\" />\n\0" as *const u8 as *const libc::c_char,
                 get_frame_pts(start as libc::c_int),
@@ -9726,18 +9686,18 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             );
         }
         if last {
-            fprintf(
+            libc::fprintf(
                 dvrmstb_file,
                 b" </root>\n\0" as *const u8 as *const libc::c_char,
             );
         }
     }
     if !dvrmstb_file.is_null() && last as libc::c_int != 0 {
-        fclose(dvrmstb_file);
+        libc::fclose(dvrmstb_file);
     }
     if !mpeg2schnitt_file.is_null() {
         if end - start > 1 as libc::c_int as libc::c_long {
-            fprintf(
+            libc::fprintf(
                 mpeg2schnitt_file,
                 b"/o%ld \0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -9755,7 +9715,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 }) * fps
                     + 1.5f64) as libc::c_long,
             );
-            fprintf(
+            libc::fprintf(
                 mpeg2schnitt_file,
                 b"/i%ld \0" as *const u8 as *const libc::c_char,
                 ((if !frame.is_null() {
@@ -9775,18 +9735,18 @@ pub unsafe extern "C" fn OutputCommercialBlock(
             );
         }
         if last {
-            fprintf(
+            libc::fprintf(
                 mpeg2schnitt_file,
                 b"\n\0" as *const u8 as *const libc::c_char,
             );
         }
     }
     if !mpeg2schnitt_file.is_null() && last as libc::c_int != 0 {
-        fclose(mpeg2schnitt_file);
+        libc::fclose(mpeg2schnitt_file);
     }
     if !cuttermaran_file.is_null() {
         if (prev + 1 as libc::c_int as libc::c_long) < start {
-            fprintf(
+            libc::fprintf(
                 cuttermaran_file,
                 b"<CutElements refVideoFile=\"0\" StartPosition=\"%li\" EndPosition=\"%li\">\n\0"
                     as *const u8 as *const libc::c_char,
@@ -9822,7 +9782,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
                 }) * fps
                     + 1.5f64) as libc::c_long,
             );
-            fprintf(
+            libc::fprintf(
                 cuttermaran_file,
                 b"<CurrentFiles refVideoFiles=\"0\" /> <cutAudioFiles refAudioFile=\"1\" /></CutElements>\n\0"
                     as *const u8 as *const libc::c_char,
@@ -9830,14 +9790,14 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
         if last {
             if cuttermaran_options[0 as libc::c_int as usize] as libc::c_int == 0 as libc::c_int {
-                fprintf(
+                libc::fprintf(
                     cuttermaran_file,
                     b"<CmdArgs OutFile=\"%s_clean.m2v\" cut=\"true\" unattended=\"true\" snapToCutPoints=\"true\" closeApp=\"true\" />\n</StateData>\n\0"
                         as *const u8 as *const libc::c_char,
                     inbasename.as_mut_ptr(),
                 );
             } else {
-                fprintf(
+                libc::fprintf(
                     cuttermaran_file,
                     b"<CmdArgs OutFile=\"%s_clean.m2v\" %s />\n</StateData>\n\0" as *const u8
                         as *const libc::c_char,
@@ -9848,7 +9808,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         }
     }
     if !cuttermaran_file.is_null() && last as libc::c_int != 0 {
-        fclose(cuttermaran_file);
+        libc::fclose(cuttermaran_file);
     }
 }
 #[no_mangle]
@@ -10789,13 +10749,13 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
     if !zoomplayer_chapter_file.is_null()
         && commercial[0 as libc::c_int as usize].start_frame > 5 as libc::c_int as libc::c_long
     {
-        fprintf(
+        libc::fprintf(
             zoomplayer_chapter_file,
             b"AddChapter(1,Show Segment)\n\0" as *const u8 as *const libc::c_char,
         );
     }
     if !ffmeta_file.is_null() {
-        fprintf(
+        libc::fprintf(
             ffmeta_file,
             b";FFMETADATA1\n\0" as *const u8 as *const libc::c_char,
         );
@@ -10848,19 +10808,19 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             b"%s.VPrj\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        videoredo_file = myfopen(
+        videoredo_file = libc::fopen(
             filename.as_mut_ptr(),
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !videoredo_file.is_null() {
             i = 0 as libc::c_int;
             while (i as libc::c_long) < block_count {
-                fprintf(
+                libc::fprintf(
                     videoredo_file,
                     b"<SceneMarker %d>%.0f\n\0" as *const u8 as *const libc::c_char,
                     i,
                     (if !frame.is_null() {
-                        if max(
+                        if std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10870,7 +10830,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            if max(
+                            if std::cmp::max(
                                 (cblock[i as usize].f_end
                                     - videoredo_offset as libc::c_long
                                     - 1 as libc::c_int as libc::c_long)
@@ -10880,7 +10840,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
-                                (*frame.offset(max(
+                                (*frame.offset(std::cmp::max(
                                     (cblock[i as usize].f_end
                                         - videoredo_offset as libc::c_long
                                         - 1 as libc::c_int as libc::c_long)
@@ -10891,7 +10851,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             }
                         }
                     } else {
-                        max(
+                        std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10903,7 +10863,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 );
                 i += 1;
             }
-            fclose(videoredo_file);
+            libc::fclose(videoredo_file);
         }
     }
     if output_videoredo3 {
@@ -10912,24 +10872,24 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             b"%s.VPrj\0" as *const u8 as *const libc::c_char,
             outbasename.as_mut_ptr(),
         );
-        videoredo3_file = myfopen(
+        videoredo3_file = libc::fopen(
             filename.as_mut_ptr(),
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if !videoredo3_file.is_null() {
-            fprintf(
+            libc::fprintf(
                 videoredo3_file,
                 b"<SceneList>\n\0" as *const u8 as *const libc::c_char,
             );
             i = 0 as libc::c_int;
             while (i as libc::c_long) < block_count {
-                fprintf(
+                libc::fprintf(
                     videoredo3_file,
                     b"<SceneMarker Sequence=\"%d\" Timecode=\"%s\">%.0f</SceneMarker>\n\0"
                         as *const u8 as *const libc::c_char,
                     i,
                     dblSecondsToStrMinutes(if !frame.is_null() {
-                        if max(
+                        if std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10938,7 +10898,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         ) <= 0 as libc::c_int
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
-                        } else if max(
+                        } else if std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10948,7 +10908,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         {
                             (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                         } else {
-                            (*frame.offset(max(
+                            (*frame.offset(std::cmp::max(
                                 (cblock[i as usize].f_end
                                     - videoredo_offset as libc::c_long
                                     - 1 as libc::c_int as libc::c_long)
@@ -10958,7 +10918,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             .pts
                         }
                     } else {
-                        max(
+                        std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10968,7 +10928,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             / fps
                     }),
                     (if !frame.is_null() {
-                        if max(
+                        if std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -10978,7 +10938,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         {
                             (*frame.offset(1 as libc::c_int as isize)).pts
                         } else {
-                            if max(
+                            if std::cmp::max(
                                 (cblock[i as usize].f_end
                                     - videoredo_offset as libc::c_long
                                     - 1 as libc::c_int as libc::c_long)
@@ -10988,7 +10948,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             {
                                 (*frame.offset((framenum_real - 1 as libc::c_int) as isize)).pts
                             } else {
-                                (*frame.offset(max(
+                                (*frame.offset(std::cmp::max(
                                     (cblock[i as usize].f_end
                                         - videoredo_offset as libc::c_long
                                         - 1 as libc::c_int as libc::c_long)
@@ -10999,7 +10959,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                             }
                         }
                     } else {
-                        max(
+                        std::cmp::max(
                             (cblock[i as usize].f_end
                                 - videoredo_offset as libc::c_long
                                 - 1 as libc::c_int as libc::c_long)
@@ -11011,29 +10971,29 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 );
                 i += 1;
             }
-            fprintf(
+            libc::fprintf(
                 videoredo3_file,
                 b"</SceneList>\n\0" as *const u8 as *const libc::c_char,
             );
-            fprintf(
+            libc::fprintf(
                 videoredo3_file,
                 b"</VideoReDoProject>\n\0" as *const u8 as *const libc::c_char,
             );
-            fclose(videoredo3_file);
+            libc::fclose(videoredo3_file);
         }
     }
     if output_chapters {
         if !chapters_file.is_null() {
             i = 0 as libc::c_int;
             while (i as libc::c_long) < block_count {
-                fprintf(
+                libc::fprintf(
                     chapters_file,
                     b"%ld\n\0" as *const u8 as *const libc::c_char,
                     cblock[i as usize].f_end,
                 );
                 i += 1;
             }
-            fclose(chapters_file);
+            libc::fclose(chapters_file);
         }
     }
     if !mkvtoolnix_chapters_file.is_null() {
@@ -11041,7 +11001,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
         let mut startTimespan: [libc::c_char; 15] = [0; 15];
         let mut endTimespan: [libc::c_char; 15] = [0; 15];
         if output_mkvtoolnix > 0 as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 mkvtoolnix_chapters_file,
                 b"\t<EditionEntry>\n\t\t<EditionUID>1</EditionUID>\n\0" as *const u8
                     as *const libc::c_char,
@@ -11062,7 +11022,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                         startTimespan.as_mut_ptr(),
                         dblSecondsToStrMinutes(get_frame_pts(currentStart as libc::c_int)),
                     );
-                    fprintf(
+                    libc::fprintf(
                         mkvtoolnix_chapters_file,
                         b"\t\t<ChapterAtom>\n\t\t\t<ChapterDisplay>\n\t\t\t\t<ChapterString>%s</ChapterString>\n\t\t\t</ChapterDisplay>\n\t\t\t<ChapterTimeStart>%s</ChapterTimeStart>\n\t\t</ChapterAtom>\n\0"
                             as *const u8 as *const libc::c_char,
@@ -11076,13 +11036,13 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 }
                 i += 1;
             }
-            fprintf(
+            libc::fprintf(
                 mkvtoolnix_chapters_file,
                 b"\t</EditionEntry>\n\0" as *const u8 as *const libc::c_char,
             );
         }
         if output_mkvtoolnix == 2 as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 mkvtoolnix_chapters_file,
                 b"\t<EditionEntry>\n\t\t<EditionUID>2</EditionUID>\n\t\t<EditionFlagOrdered>1</EditionFlagOrdered>\n\0"
                     as *const u8 as *const libc::c_char,
@@ -11108,7 +11068,7 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                                 cblock[i as usize].f_end as libc::c_int,
                             )),
                         );
-                        fprintf(
+                        libc::fprintf(
                             mkvtoolnix_chapters_file,
                             b"\t\t<ChapterAtom>\n\t\t\t<ChapterDisplay>\n\t\t\t\t<ChapterString>Show</ChapterString>\n\t\t\t</ChapterDisplay>\n\t\t\t<ChapterFlagEnabled>1</ChapterFlagEnabled>\n\t\t\t<ChapterTimeStart>%s</ChapterTimeStart>\n\t\t\t<ChapterTimeEnd>%s</ChapterTimeEnd>\n\t\t</ChapterAtom>\n\0"
                                 as *const u8 as *const libc::c_char,
@@ -11119,16 +11079,16 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
                 }
                 i += 1;
             }
-            fprintf(
+            libc::fprintf(
                 mkvtoolnix_chapters_file,
                 b"\t</EditionEntry>\n\0" as *const u8 as *const libc::c_char,
             );
         }
-        fprintf(
+        libc::fprintf(
             mkvtoolnix_chapters_file,
             b"</Chapters>\0" as *const u8 as *const libc::c_char,
         );
-        fclose(mkvtoolnix_chapters_file);
+        libc::fclose(mkvtoolnix_chapters_file);
     }
     if reffer_count == -(1 as libc::c_int) {
         reffer_count = commercial_count;
@@ -11149,36 +11109,36 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
             b"%s.tun\0" as *const u8 as *const libc::c_char,
             workbasename.as_mut_ptr(),
         );
-        tuning_file = myfopen(
+        tuning_file = libc::fopen(
             filename.as_mut_ptr(),
             b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
-        fprintf(
+        libc::fprintf(
             tuning_file,
             b"max_volume=%6i\n\0" as *const u8 as *const libc::c_char,
             min_volume + 200 as libc::c_int,
         );
-        fprintf(
+        libc::fprintf(
             tuning_file,
             b"max_avg_brightness=%6i\n\0" as *const u8 as *const libc::c_char,
             min_brightness_found + 5 as libc::c_int,
         );
-        fprintf(
+        libc::fprintf(
             tuning_file,
             b"max_commercialbreak=%6i\n\0" as *const u8 as *const libc::c_char,
             max_logo_gap + 10 as libc::c_int,
         );
-        fprintf(
+        libc::fprintf(
             tuning_file,
             b"shrink_logo=%.2f\n\0" as *const u8 as *const libc::c_char,
             logo_overshoot,
         );
-        fprintf(
+        libc::fprintf(
             tuning_file,
             b"min_show_segment_length=%6i\n\0" as *const u8 as *const libc::c_char,
             max_nonlogo_block_length + 10 as libc::c_int,
         );
-        fprintf(
+        libc::fprintf(
             tuning_file,
             b"logo_threshold=%.3f\n\0" as *const u8 as *const libc::c_char,
             logo_quality,
@@ -11431,13 +11391,13 @@ pub unsafe extern "C" fn OutputStrict(
     tol: libc::c_double,
 ) {
     if output_training != 0 && training_file.is_null() {
-        training_file = myfopen(
+        training_file = libc::fopen(
             b"strict.csv\0" as *const u8 as *const libc::c_char,
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
     }
     if !training_file.is_null() {
-        fprintf(
+        libc::fprintf(
             training_file,
             b"%+f,%+f,%+f, %s\n\0" as *const u8 as *const libc::c_char,
             len,
@@ -11453,11 +11413,11 @@ pub unsafe extern "C" fn OutputTraining() {
     if output_training == 0 {
         return;
     }
-    training_file = myfopen(
+    training_file = libc::fopen(
         b"comskip.csv\0" as *const u8 as *const libc::c_char,
         b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    fprintf(
+    libc::fprintf(
         training_file,
         b"block, cm,rf, score, length, start, end, fromend ar, logo, cause, less, more\n\0"
             as *const u8 as *const libc::c_char,
@@ -11465,7 +11425,7 @@ pub unsafe extern "C" fn OutputTraining() {
     i = 0 as libc::c_int;
     while (i as libc::c_long) < block_count {
         if output_training != 0 {
-            fprintf(
+            libc::fprintf(
                 training_file,
                 b"%3d,%c,%c,%7.2f,%7.2f,%7.2f,%7.2f,%7.2f,%5.2f,%5.2f,\"%10s\",\"%10s\",\"%10s\",\"%s\"\n\0"
                     as *const u8 as *const libc::c_char,
@@ -11600,12 +11560,12 @@ pub unsafe extern "C" fn OutputCleanMpg() -> bool {
     let mut prevperc: libc::c_int = 0;
     let mut curperc: libc::c_int = 0;
     let mut Buf: *mut libc::c_char = 0 as *mut libc::c_char;
-    let mut infile: *mut FILE = 0 as *mut FILE;
+    let mut infile: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut firstbl: bool = 1 as libc::c_int != 0;
     if outputdirname[0 as libc::c_int as usize] as libc::c_int == 0 as libc::c_int {
         return 1 as libc::c_int != 0;
     }
-    Buf = malloc(((1 as libc::c_int) << 22 as libc::c_int) as libc::c_ulong) as *mut libc::c_char;
+    Buf = libc::malloc((1 << 22) as usize) as *mut libc::c_char;
     if Buf.is_null() {
         return 0 as libc::c_int != 0;
     }
@@ -11617,7 +11577,7 @@ pub unsafe extern "C" fn OutputCleanMpg() -> bool {
     if outf < 0 as libc::c_int {
         return 0 as libc::c_int != 0;
     }
-    infile = myfopen(
+    infile = libc::fopen(
         mpegfilename.as_mut_ptr(),
         b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -11626,7 +11586,7 @@ pub unsafe extern "C" fn OutputCleanMpg() -> bool {
     c = 0 as libc::c_int;
     while c <= commercial_count {
         endpos = (*frame.offset(commercial[c as usize].start_frame as isize)).goppos;
-        fseeko(infile, startpos, 0 as libc::c_int);
+        libc::fseek(infile, startpos, 0 as libc::c_int);
         begin = startpos;
         prevperc = 0 as libc::c_int;
         while startpos < endpos {
@@ -11634,7 +11594,7 @@ pub unsafe extern "C" fn OutputCleanMpg() -> bool {
             if len > (1 as libc::c_int) << 22 as libc::c_int {
                 len = (1 as libc::c_int) << 22 as libc::c_int;
             }
-            i = read(inf, Buf as *mut libc::c_void, len as libc::c_uint as size_t) as libc::c_int;
+            i = libc::read(inf, Buf as *mut libc::c_void, len as usize) as libc::c_int;
             if i <= 0 as libc::c_int {
                 return 0 as libc::c_int != 0;
             }
@@ -11675,8 +11635,8 @@ pub unsafe extern "C" fn OutputCleanMpg() -> bool {
         startpos = (*frame.offset(commercial[c as usize].end_frame as isize)).goppos;
         c += 1;
     }
-    close(outf);
-    free(Buf as *mut libc::c_void);
+    libc::close(outf);
+    libc::free(Buf as *mut libc::c_void);
     return 1 as libc::c_int != 0;
 }
 #[no_mangle]
@@ -12019,7 +11979,7 @@ pub unsafe extern "C" fn LoadIniFile() {
                 b"INI file found at %s\n\0" as *const u8 as *const libc::c_char,
                 inifilename.as_mut_ptr(),
             );
-            ini_file = myfopen(
+            ini_file = libc::fopen(
                 inifilename.as_mut_ptr(),
                 b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -12032,13 +11992,8 @@ pub unsafe extern "C" fn LoadIniFile() {
             b"Using %s for initiation values.\n\0" as *const u8 as *const libc::c_char,
             inifilename.as_mut_ptr(),
         );
-        len = fread(
-            data.as_mut_ptr() as *mut libc::c_void,
-            1 as libc::c_int as libc::c_ulong,
-            59999 as libc::c_int as libc::c_ulong,
-            ini_file,
-        );
-        fclose(ini_file);
+        len = libc::fread(data.as_mut_ptr() as *mut libc::c_void, 1, 59999, ini_file) as u64;
+        libc::fclose(ini_file);
         data[len as usize] = '\0' as i32 as libc::c_char;
         ini_text[0 as libc::c_int as usize] = 0 as libc::c_int as libc::c_char;
         AddIniString(
@@ -13575,11 +13530,11 @@ pub unsafe extern "C" fn LoadIniFile() {
 pub unsafe extern "C" fn LoadSettings(
     argc: libc::c_int,
     argv: *mut *mut libc::c_char,
-) -> *mut FILE {
+) -> *mut libc::FILE {
     let mut tempstr: [libc::c_char; 4096] = [0; 4096];
-    let mut logo_file: *mut FILE = 0 as *mut FILE;
-    let mut log_file_0: *mut FILE = 0 as *mut FILE;
-    let mut test_file: *mut FILE = 0 as *mut FILE;
+    let mut logo_file: *mut libc::FILE = 0 as *mut libc::FILE;
+    let mut log_file_0: *mut libc::FILE = 0 as *mut libc::FILE;
+    let mut test_file: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut i: libc::c_int = 0 as libc::c_int;
     let mut ltime: time_t = 0;
     let mut now: *mut tm = 0 as *mut tm;
@@ -13849,18 +13804,15 @@ pub unsafe extern "C" fn LoadSettings(
         b"The commandline used was:\n%s\n\n\0" as *const u8 as *const libc::c_char,
         incomingCommandLine.as_mut_ptr(),
     );
-    argument = malloc(
-        (::std::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
-            .wrapping_mul(argc as libc::c_ulong),
-    ) as *mut *mut libc::c_char;
+    argument = libc::malloc(::std::mem::size_of::<*mut libc::c_char>().wrapping_mul(argc as usize))
+        as *mut *mut libc::c_char;
     argument_count = argc;
     i = 0 as libc::c_int;
     while i < argc {
         let ref mut fresh77 = *argument.offset(i as isize);
-        *fresh77 = malloc(
-            (::std::mem::size_of::<libc::c_char>() as libc::c_ulong).wrapping_mul(
-                (strlen(*argv.offset(i as isize))).wrapping_add(1 as libc::c_int as libc::c_ulong),
-            ),
+        *fresh77 = libc::malloc(
+            (::std::mem::size_of::<libc::c_char>())
+                .wrapping_mul((strlen(*argv.offset(i as isize))).wrapping_add(1) as usize),
         ) as *mut libc::c_char;
         strcpy(*argument.offset(i as isize), *argv.offset(i as isize));
         i += 1;
@@ -14028,7 +13980,7 @@ pub unsafe extern "C" fn LoadSettings(
         ) == 0 as libc::c_int
         {
             loadingCSV = 1 as libc::c_int != 0;
-            in_file = myfopen(
+            in_file = libc::fopen(
                 *((*in_0).filename).offset(0 as libc::c_int as isize),
                 b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -14037,7 +13989,7 @@ pub unsafe extern "C" fn LoadSettings(
                 *((*in_0).filename).offset(0 as libc::c_int as isize),
             );
             if in_file.is_null() {
-                fprintf(
+                libc::fprintf(
                     __stderrp,
                     b"%s - could not open file %s\n\0" as *const u8 as *const libc::c_char,
                     strerror(*__error()),
@@ -14058,7 +14010,7 @@ pub unsafe extern "C" fn LoadSettings(
                 strlen(inbasename.as_mut_ptr()) as libc::c_int,
                 inbasename.as_mut_ptr(),
             );
-            test_file = myfopen(
+            test_file = libc::fopen(
                 mpegfilename.as_mut_ptr(),
                 b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -14069,7 +14021,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14081,7 +14033,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14093,7 +14045,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14105,7 +14057,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14117,7 +14069,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14129,7 +14081,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14137,7 +14089,7 @@ pub unsafe extern "C" fn LoadSettings(
             if test_file.is_null() {
                 mpegfilename[0 as libc::c_int as usize] = 0 as libc::c_int as libc::c_char;
             } else {
-                fclose(test_file);
+                libc::fclose(test_file);
             }
             i = strlen(inbasename.as_mut_ptr()) as libc::c_int;
             while i > 0 as libc::c_int
@@ -14169,7 +14121,7 @@ pub unsafe extern "C" fn LoadSettings(
         {
             loadingTXT = 1 as libc::c_int != 0;
             output_default = 0 as libc::c_int != 0;
-            in_file = myfopen(
+            in_file = libc::fopen(
                 *((*in_0).filename).offset(0 as libc::c_int as isize),
                 b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -14178,7 +14130,7 @@ pub unsafe extern "C" fn LoadSettings(
                 *((*in_0).filename).offset(0 as libc::c_int as isize),
             );
             if in_file.is_null() {
-                fprintf(
+                libc::fprintf(
                     __stderrp,
                     b"%s - could not open file %s\n\0" as *const u8 as *const libc::c_char,
                     strerror(*__error()),
@@ -14186,8 +14138,8 @@ pub unsafe extern "C" fn LoadSettings(
                 );
                 exit(4 as libc::c_int);
             }
-            fclose(in_file);
-            in_file = 0 as *mut FILE;
+            libc::fclose(in_file);
+            in_file = 0 as *mut libc::FILE;
             sprintf(
                 inbasename.as_mut_ptr(),
                 b"%.*s\0" as *const u8 as *const libc::c_char,
@@ -14201,7 +14153,7 @@ pub unsafe extern "C" fn LoadSettings(
                 strlen(inbasename.as_mut_ptr()) as libc::c_int,
                 inbasename.as_mut_ptr(),
             );
-            test_file = myfopen(
+            test_file = libc::fopen(
                 mpegfilename.as_mut_ptr(),
                 b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -14212,7 +14164,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14224,7 +14176,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14236,7 +14188,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14248,7 +14200,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14260,7 +14212,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14272,7 +14224,7 @@ pub unsafe extern "C" fn LoadSettings(
                     strlen(inbasename.as_mut_ptr()) as libc::c_int,
                     inbasename.as_mut_ptr(),
                 );
-                test_file = myfopen(
+                test_file = libc::fopen(
                     mpegfilename.as_mut_ptr(),
                     b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14280,7 +14232,7 @@ pub unsafe extern "C" fn LoadSettings(
             if test_file.is_null() {
                 mpegfilename[0 as libc::c_int as usize] = 0 as libc::c_int as libc::c_char;
             } else {
-                fclose(test_file);
+                libc::fclose(test_file);
             }
             i = strlen(inbasename.as_mut_ptr()) as libc::c_int;
             while i > 0 as libc::c_int
@@ -14318,7 +14270,7 @@ pub unsafe extern "C" fn LoadSettings(
                 inifilename.as_mut_ptr(),
             );
         }
-        ini_file = myfopen(
+        ini_file = libc::fopen(
             inifilename.as_mut_ptr(),
             b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -14400,7 +14352,7 @@ pub unsafe extern "C" fn LoadSettings(
                     inifilename.as_mut_ptr(),
                     b"comskip.ini\0" as *const u8 as *const libc::c_char,
                 );
-                ini_file = myfopen(
+                ini_file = libc::fopen(
                     inifilename.as_mut_ptr(),
                     b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14421,7 +14373,7 @@ pub unsafe extern "C" fn LoadSettings(
                     HomeDir.as_mut_ptr(),
                     '/' as i32,
                 );
-                ini_file = myfopen(
+                ini_file = libc::fopen(
                     inifilename.as_mut_ptr(),
                     b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
@@ -14523,13 +14475,13 @@ pub unsafe extern "C" fn LoadSettings(
             thread_count = *((*cl_threads).ival).offset(0 as libc::c_int as isize);
         }
         if !loadingTXT && !useExistingLogoFile && (*cl_logo).count == 0 as libc::c_int {
-            logo_file = myfopen(
+            logo_file = libc::fopen(
                 logofilename.as_mut_ptr(),
                 b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
             if !logo_file.is_null() {
-                fclose(logo_file);
-                myremove(logofilename.as_mut_ptr());
+                libc::fclose(logo_file);
+                libc::unlink(logofilename.as_mut_ptr());
             }
         }
         if (*cl_output_csv).count != 0 {
@@ -14539,107 +14491,107 @@ pub unsafe extern "C" fn LoadSettings(
             output_training = 1 as libc::c_int;
         }
         if verbose != 0 {
-            logo_file = myfopen(
+            logo_file = libc::fopen(
                 logofilename.as_mut_ptr(),
                 b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
             if loadingTXT {
                 verbose = 0 as libc::c_int;
             } else if loadingCSV {
-                log_file_0 = myfopen(
+                log_file_0 = libc::fopen(
                     logfilename.as_mut_ptr(),
                     b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if !log_file_0.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"################################################################\n\0"
                             as *const u8 as *const libc::c_char,
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Generated using %s %s\n\0" as *const u8 as *const libc::c_char,
                         b"donator\0" as *const u8 as *const libc::c_char,
                         b"Comskip 0.82.005\0" as *const u8 as *const libc::c_char,
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Loading comskip csv file - %s\n\0" as *const u8 as *const libc::c_char,
                         *((*in_0).filename).offset(0 as libc::c_int as isize),
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Time at start of run:\n%s\0" as *const u8 as *const libc::c_char,
                         ctime(&mut ltime),
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"################################################################\n\0"
                             as *const u8 as *const libc::c_char,
                     );
-                    fclose(log_file_0);
+                    libc::fclose(log_file_0);
                 }
-                log_file_0 = 0 as *mut FILE;
+                log_file_0 = 0 as *mut libc::FILE;
             } else if !logo_file.is_null() {
-                fclose(logo_file);
-                log_file_0 = myfopen(
+                libc::fclose(logo_file);
+                log_file_0 = libc::fopen(
                     logfilename.as_mut_ptr(),
                     b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if !log_file_0.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"################################################################\n\0"
                             as *const u8 as *const libc::c_char,
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Starting second pass using %s\n\0" as *const u8 as *const libc::c_char,
                         logofilename.as_mut_ptr(),
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Time at start of second run:\n%s\0" as *const u8 as *const libc::c_char,
                         ctime(&mut ltime),
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"################################################################\n\0"
                             as *const u8 as *const libc::c_char,
                     );
-                    fclose(log_file_0);
+                    libc::fclose(log_file_0);
                 }
-                log_file_0 = 0 as *mut FILE;
+                log_file_0 = 0 as *mut libc::FILE;
             } else {
-                log_file_0 = myfopen(
+                log_file_0 = libc::fopen(
                     logfilename.as_mut_ptr(),
                     b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if !log_file_0.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"################################################################\n\0"
                             as *const u8 as *const libc::c_char,
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Generated using %s %s\n\0" as *const u8 as *const libc::c_char,
                         b"donator\0" as *const u8 as *const libc::c_char,
                         b"Comskip 0.82.005\0" as *const u8 as *const libc::c_char,
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"Time at start of run:\n%s\0" as *const u8 as *const libc::c_char,
                         ctime(&mut ltime),
                     );
-                    fprintf(
+                    libc::fprintf(
                         log_file_0,
                         b"################################################################\n\0"
                             as *const u8 as *const libc::c_char,
                     );
-                    fclose(log_file_0);
+                    libc::fclose(log_file_0);
                 }
-                log_file_0 = 0 as *mut FILE;
+                log_file_0 = 0 as *mut libc::FILE;
             }
         }
         if (*cl_playnice).count != 0 {
@@ -14808,7 +14760,7 @@ pub unsafe extern "C" fn LoadSettings(
             outbasename.as_mut_ptr(),
         );
         if !loadingTXT {
-            logo_file = myfopen(
+            logo_file = libc::fopen(
                 logofilename.as_mut_ptr(),
                 b"r+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -14818,11 +14770,11 @@ pub unsafe extern "C" fn LoadSettings(
                     b"The logo mask file exists.\n\0" as *const u8 as *const libc::c_char
                         as *mut libc::c_char,
                 );
-                fclose(logo_file);
+                libc::fclose(logo_file);
                 LoadLogoMaskData();
             }
         }
-        training_file = 0 as *mut FILE;
+        training_file = 0 as *mut libc::FILE;
         tuning_file = training_file;
         dvrmstb_file = tuning_file;
         dvrcut_file = dvrmstb_file;
@@ -14873,12 +14825,12 @@ pub unsafe extern "C" fn LoadSettings(
         }
         if output_default as libc::c_int != 0 && !loadingTXT {
             if !isSecondPass {
-                out_file = myfopen(
+                out_file = libc::fopen(
                     out_filename.as_mut_ptr(),
                     b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if out_file.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         __stderrp,
                         b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                         strerror(*__error()),
@@ -14887,7 +14839,7 @@ pub unsafe extern "C" fn LoadSettings(
                     exit(6 as libc::c_int);
                 } else {
                     output_default = 1 as libc::c_int != 0;
-                    fclose(out_file);
+                    libc::fclose(out_file);
                 }
             }
         }
@@ -15244,7 +15196,7 @@ pub unsafe extern "C" fn RecordCutScene(frame_count_0: libc::c_int, mut brightne
         }
         y += step;
     }
-    cutscene_file = 0 as *mut FILE;
+    cutscene_file = 0 as *mut libc::FILE;
     if *osname.as_mut_ptr().offset(0 as libc::c_int as isize) != 0 {
         strcpy(cutscenefile.as_mut_ptr(), osname.as_mut_ptr());
         strcat(
@@ -15260,22 +15212,22 @@ pub unsafe extern "C" fn RecordCutScene(frame_count_0: libc::c_int, mut brightne
         );
     }
     if cutscenefile[0 as libc::c_int as usize] != 0 {
-        cutscene_file = myfopen(
+        cutscene_file = libc::fopen(
             cutscenefile.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
     }
     if !cutscene_file.is_null() {
-        fwrite(
+        libc::fwrite(
             &mut brightness_0 as *mut libc::c_int as *const libc::c_void,
-            ::std::mem::size_of::<libc::c_int>() as libc::c_ulong,
-            1 as libc::c_int as libc::c_ulong,
+            ::std::mem::size_of::<libc::c_int>() as usize,
+            1,
             cutscene_file,
         );
-        fwrite(
+        libc::fwrite(
             cs.as_mut_ptr() as *const libc::c_void,
-            ::std::mem::size_of::<libc::c_char>() as libc::c_ulong,
-            c as libc::c_ulong,
+            ::std::mem::size_of::<libc::c_char>() as usize,
+            c as usize,
             cutscene_file,
         );
         Debug(
@@ -15285,8 +15237,8 @@ pub unsafe extern "C" fn RecordCutScene(frame_count_0: libc::c_int, mut brightne
             frame_count_0,
             cutscenefile.as_mut_ptr(),
         );
-        fclose(cutscene_file);
-        cutscene_file = 0 as *mut FILE;
+        libc::fclose(cutscene_file);
+        cutscene_file = 0 as *mut libc::FILE;
     }
 }
 #[no_mangle]
@@ -15295,23 +15247,23 @@ pub unsafe extern "C" fn LoadCutScene(filename_0: *const libc::c_char) {
     let mut j: libc::c_int = 0;
     let mut b: libc::c_int = 0;
     let mut c: libc::c_int = 0;
-    cutscene_file = myfopen(
+    cutscene_file = libc::fopen(
         filename_0,
         b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
     if !cutscene_file.is_null() {
         i = cutscenes;
-        fread(
+        libc::fread(
             &mut *csbrightness.as_mut_ptr().offset(i as isize) as *mut libc::c_int
                 as *mut libc::c_void,
-            ::std::mem::size_of::<libc::c_int>() as libc::c_ulong,
-            1 as libc::c_int as libc::c_ulong,
+            ::std::mem::size_of::<libc::c_int>() as usize,
+            1,
             cutscene_file,
         );
-        c = fread(
+        c = libc::fread(
             (cutscene[i as usize]).as_mut_ptr() as *mut libc::c_void,
-            ::std::mem::size_of::<libc::c_char>() as libc::c_ulong,
-            (400 as libc::c_int * 300 as libc::c_int) as libc::c_ulong,
+            ::std::mem::size_of::<libc::c_char>() as usize,
+            400 * 300,
             cutscene_file,
         ) as libc::c_int;
         if c > 0 as libc::c_int {
@@ -15339,7 +15291,7 @@ pub unsafe extern "C" fn LoadCutScene(filename_0: *const libc::c_char) {
                 filename_0,
             );
         }
-        fclose(cutscene_file);
+        libc::fclose(cutscene_file);
     } else {
         Debug(
             1 as libc::c_int,
@@ -15376,7 +15328,7 @@ pub unsafe extern "C" fn ScanBottom(arg: intptr_t) {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
         }
         brightCount = 0 as libc::c_int;
-        max_delta = min(videowidth, height) / 2 as libc::c_int - border;
+        max_delta = std::cmp::min(videowidth, height) / 2 as libc::c_int - border;
         delta = 0 as libc::c_int;
         while delta < max_delta {
             y = border + delta;
@@ -15421,7 +15373,7 @@ pub unsafe extern "C" fn ScanTop(arg: intptr_t) {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
         }
-        max_delta = min(videowidth, height) / 2 as libc::c_int - border;
+        max_delta = std::cmp::min(videowidth, height) / 2 as libc::c_int - border;
         brightCount = 0 as libc::c_int;
         delta = 0 as libc::c_int;
         while delta < max_delta {
@@ -15467,7 +15419,7 @@ pub unsafe extern "C" fn ScanLeft(arg: intptr_t) {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
         }
-        max_delta = min(videowidth, height) / 2 as libc::c_int - border;
+        max_delta = std::cmp::min(videowidth, height) / 2 as libc::c_int - border;
         brightCount = 0 as libc::c_int;
         delta = 0 as libc::c_int;
         while delta < max_delta {
@@ -15513,7 +15465,7 @@ pub unsafe extern "C" fn ScanRight(arg: intptr_t) {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
         }
-        max_delta = min(videowidth, height) / 2 as libc::c_int - border;
+        max_delta = std::cmp::min(videowidth, height) / 2 as libc::c_int - border;
         brightCount = 0 as libc::c_int;
         delta = 0 as libc::c_int;
         while delta < max_delta {
@@ -15625,17 +15577,17 @@ pub unsafe extern "C" fn CheckSceneHasChanged() -> bool {
     if edge_step == 0 as libc::c_int {
         edge_step = step;
     }
-    memcpy(
+    libc::memcpy(
         lastHistogram.as_mut_ptr() as *mut libc::c_void,
         histogram.as_mut_ptr() as *const libc::c_void,
-        ::std::mem::size_of::<[libc::c_long; 256]>() as libc::c_ulong,
+        ::std::mem::size_of::<[libc::c_long; 256]>() as usize,
     );
     last_brightness = brightness;
     brightness = 0 as libc::c_int;
-    memset(
+    libc::memset(
         own_histogram.as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        ::std::mem::size_of::<[[libc::c_int; 256]; 4]>() as libc::c_ulong,
+        ::std::mem::size_of::<[[libc::c_int; 256]; 4]>() as usize,
     );
     if thread_count > 1 as libc::c_int {
         if thread_init_done == 0 {
@@ -15741,10 +15693,10 @@ pub unsafe extern "C" fn CheckSceneHasChanged() -> bool {
         (*frame.offset(frame_count as isize)).maxX = maxX;
     }
     if framenum_real <= 1 as libc::c_int {
-        memcpy(
+        libc::memcpy(
             lastHistogram.as_mut_ptr() as *mut libc::c_void,
             histogram.as_mut_ptr() as *const libc::c_void,
-            ::std::mem::size_of::<[libc::c_long; 256]>() as libc::c_ulong,
+            ::std::mem::size_of::<[libc::c_long; 256]>() as usize,
         );
         last_brightness = brightness;
         if commDetectMethod & 32 as libc::c_int != 0 {
@@ -17830,16 +17782,16 @@ pub unsafe extern "C" fn FillLogoBuffer() {
         }
         i += 1;
     }
-    i = min(
+    i = std::cmp::min(
         logoFrameBufferSize as libc::c_uint as libc::c_int,
         ((width * height) as libc::c_ulong)
             .wrapping_mul(::std::mem::size_of::<libc::c_uchar>() as libc::c_ulong)
             as libc::c_int,
     );
-    memcpy(
+    libc::memcpy(
         *logoFrameBuffer.offset(newestLogoBuffer as isize) as *mut libc::c_void,
         frame_ptr as *const libc::c_void,
-        i as libc::c_ulong,
+        i as usize,
     );
     EdgeDetect(
         *logoFrameBuffer.offset(newestLogoBuffer as isize),
@@ -17869,15 +17821,15 @@ pub unsafe extern "C" fn SearchForLogoEdges() -> bool {
     tlogoMaxX = videowidth - edge_radius - border;
     tlogoMinY = edge_radius + border;
     tlogoMaxY = height - edge_radius - border;
-    memset(
+    libc::memset(
         thoriz_edgemask.as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        (width * height) as libc::c_ulong,
+        (width * height) as usize,
     );
-    memset(
+    libc::memset(
         tvert_edgemask.as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        (width * height) as libc::c_ulong,
+        (width * height) as usize,
     );
     x = edge_radius + border + 4 as libc::c_int * edge_step;
     while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
@@ -18053,15 +18005,15 @@ pub unsafe extern "C" fn SearchForLogoEdges() -> bool {
         clogoMaxX = tlogoMaxX;
         clogoMinY = tlogoMinY;
         clogoMaxY = tlogoMaxY;
-        memcpy(
+        libc::memcpy(
             choriz_edgemask.as_mut_ptr() as *mut libc::c_void,
             thoriz_edgemask.as_mut_ptr() as *const libc::c_void,
-            (width * height) as libc::c_ulong,
+            (width * height) as usize,
         );
-        memcpy(
+        libc::memcpy(
             cvert_edgemask.as_mut_ptr() as *mut libc::c_void,
             tvert_edgemask.as_mut_ptr() as *const libc::c_void,
-            (width * height) as libc::c_ulong,
+            (width * height) as usize,
         );
         logoTrendCounter = num_logo_buffers;
         lastLogoTest = 1 as libc::c_int != 0;
@@ -18149,9 +18101,9 @@ pub unsafe extern "C" fn ClearEdgeMaskArea(
                         current_block_27 = 2873832966593178012;
                         break;
                     }
-                    iy = min(y + offset, height - 1 as libc::c_int);
-                    ix = max(x - offset, 0 as libc::c_int);
-                    while ix <= min(x + offset, width - 1 as libc::c_int) {
+                    iy = std::cmp::min(y + offset, height - 1 as libc::c_int);
+                    ix = std::cmp::max(x - offset, 0 as libc::c_int);
+                    while ix <= std::cmp::min(x + offset, width - 1 as libc::c_int) {
                         if *test.offset((iy * width + ix) as isize) as libc::c_int
                             == 1 as libc::c_int
                         {
@@ -18159,9 +18111,9 @@ pub unsafe extern "C" fn ClearEdgeMaskArea(
                         }
                         ix += edge_step;
                     }
-                    iy = max(y - offset, 0 as libc::c_int);
-                    ix = max(x - offset, 0 as libc::c_int);
-                    while ix <= min(x + offset, width - 1 as libc::c_int) {
+                    iy = std::cmp::max(y - offset, 0 as libc::c_int);
+                    ix = std::cmp::max(x - offset, 0 as libc::c_int);
+                    while ix <= std::cmp::min(x + offset, width - 1 as libc::c_int) {
                         if *test.offset((iy * width + ix) as isize) as libc::c_int
                             == 1 as libc::c_int
                         {
@@ -18169,9 +18121,9 @@ pub unsafe extern "C" fn ClearEdgeMaskArea(
                         }
                         ix += edge_step;
                     }
-                    ix = min(x + offset, width - 1 as libc::c_int);
-                    iy = max(y - offset + edge_step, 0 as libc::c_int);
-                    while iy <= min(y + offset - edge_step, height - 1 as libc::c_int) {
+                    ix = std::cmp::min(x + offset, width - 1 as libc::c_int);
+                    iy = std::cmp::max(y - offset + edge_step, 0 as libc::c_int);
+                    while iy <= std::cmp::min(y + offset - edge_step, height - 1 as libc::c_int) {
                         if *test.offset((iy * width + ix) as isize) as libc::c_int
                             == 1 as libc::c_int
                         {
@@ -18179,9 +18131,9 @@ pub unsafe extern "C" fn ClearEdgeMaskArea(
                         }
                         iy += edge_step;
                     }
-                    ix = max(x - offset, 0 as libc::c_int);
-                    iy = max(y - offset + edge_step, 0 as libc::c_int);
-                    while iy <= min(y + offset - edge_step, height - 1 as libc::c_int) {
+                    ix = std::cmp::max(x - offset, 0 as libc::c_int);
+                    iy = std::cmp::max(y - offset + edge_step, 0 as libc::c_int);
+                    while iy <= std::cmp::min(y + offset - edge_step, height - 1 as libc::c_int) {
                         if *test.offset((iy * width + ix) as isize) as libc::c_int
                             == 1 as libc::c_int
                         {
@@ -18555,15 +18507,15 @@ pub unsafe extern "C" fn CheckFramesForReffer(
 }
 #[no_mangle]
 pub unsafe extern "C" fn SaveLogoMaskData() {
-    let mut logo_file: *mut FILE = 0 as *mut FILE;
+    let mut logo_file: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
-    logo_file = myfopen(
+    logo_file = libc::fopen(
         logofilename.as_mut_ptr(),
         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
     if logo_file.is_null() {
-        fprintf(
+        libc::fprintf(
             __stderrp,
             b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
             strerror(*__error()),
@@ -18580,41 +18532,41 @@ pub unsafe extern "C" fn SaveLogoMaskData() {
             exit(7 as libc::c_int);
         }
     }
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"logoMinX=%i\n\0" as *const u8 as *const libc::c_char,
         clogoMinX,
     );
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"logoMaxX=%i\n\0" as *const u8 as *const libc::c_char,
         clogoMaxX,
     );
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"logoMinY=%i\n\0" as *const u8 as *const libc::c_char,
         clogoMinY,
     );
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"logoMaxY=%i\n\0" as *const u8 as *const libc::c_char,
         clogoMaxY,
     );
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"picWidth=%i\n\0" as *const u8 as *const libc::c_char,
         width,
     );
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"picHeight=%i\n\0" as *const u8 as *const libc::c_char,
         height,
     );
-    fprintf(
+    libc::fprintf(
         logo_file,
         b"\nCombined Logo Mask\n\0" as *const u8 as *const libc::c_char,
     );
-    fprintf(logo_file, b"\x82\n\0" as *const u8 as *const libc::c_char);
+    libc::fprintf(logo_file, b"\x82\n\0" as *const u8 as *const libc::c_char);
     y = clogoMinY;
     while y <= clogoMaxY {
         x = clogoMinX;
@@ -18622,31 +18574,31 @@ pub unsafe extern "C" fn SaveLogoMaskData() {
             match choriz_edgemask[(y * width + x) as usize] as libc::c_int {
                 0 => {
                     if cvert_edgemask[(y * width + x) as usize] as libc::c_int == 1 as libc::c_int {
-                        fprintf(logo_file, b"-\0" as *const u8 as *const libc::c_char);
+                        libc::fprintf(logo_file, b"-\0" as *const u8 as *const libc::c_char);
                     } else {
-                        fprintf(logo_file, b" \0" as *const u8 as *const libc::c_char);
+                        libc::fprintf(logo_file, b" \0" as *const u8 as *const libc::c_char);
                     }
                 }
                 1 => {
                     if cvert_edgemask[(y * width + x) as usize] as libc::c_int == 1 as libc::c_int {
-                        fprintf(logo_file, b"+\0" as *const u8 as *const libc::c_char);
+                        libc::fprintf(logo_file, b"+\0" as *const u8 as *const libc::c_char);
                     } else {
-                        fprintf(logo_file, b"|\0" as *const u8 as *const libc::c_char);
+                        libc::fprintf(logo_file, b"|\0" as *const u8 as *const libc::c_char);
                     }
                 }
                 _ => {}
             }
             x += 1;
         }
-        fprintf(logo_file, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(logo_file, b"\n\0" as *const u8 as *const libc::c_char);
         y += 1;
     }
-    fclose(logo_file);
+    libc::fclose(logo_file);
 }
 #[no_mangle]
 pub unsafe extern "C" fn LoadLogoMaskData() {
-    let mut logo_file: *mut FILE = 0 as *mut FILE;
-    let mut txt_file: *mut FILE = 0 as *mut FILE;
+    let mut logo_file: *mut libc::FILE = 0 as *mut libc::FILE;
+    let mut txt_file: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
     let mut tmp: libc::c_double = 0.;
@@ -18655,7 +18607,7 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
     let mut ptr: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut tmpLong: libc::c_long = 0 as libc::c_int as libc::c_long;
     let mut len: size_t = 0 as libc::c_int as size_t;
-    logo_file = myfopen(
+    logo_file = libc::fopen(
         logofilename.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -18665,13 +18617,8 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
             b"Using %s for logo data.\n\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             logofilename.as_mut_ptr(),
         );
-        len = fread(
-            data.as_mut_ptr() as *mut libc::c_void,
-            1 as libc::c_int as libc::c_ulong,
-            1999 as libc::c_int as libc::c_ulong,
-            logo_file,
-        );
-        fclose(logo_file);
+        len = libc::fread(data.as_mut_ptr() as *mut libc::c_void, 1, 1999, logo_file) as u64;
+        libc::fclose(logo_file);
         data[len as usize] = '\0' as i32 as libc::c_char;
         tmp = FindNumber(
             data.as_mut_ptr(),
@@ -18731,13 +18678,13 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
         logoInfoAvailable = 0 as libc::c_int != 0;
         return;
     }
-    logo_file = myfopen(
+    logo_file = libc::fopen(
         logofilename.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
     loop {
         temp = getc(logo_file) as libc::c_char;
-        if !(temp as libc::c_int != -128i32 && feof(logo_file) == 0) {
+        if !(temp as libc::c_int != -128i32 && libc::feof(logo_file) == 0) {
             break;
         }
     }
@@ -18762,14 +18709,14 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
         }
         y += 1;
     }
-    fclose(logo_file);
-    logo_file = myfopen(
+    libc::fclose(logo_file);
+    logo_file = libc::fopen(
         logofilename.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
     loop {
         temp = getc(logo_file) as libc::c_char;
-        if !(temp as libc::c_int != -127i32 && feof(logo_file) == 0) {
+        if !(temp as libc::c_int != -127i32 && libc::feof(logo_file) == 0) {
             break;
         }
     }
@@ -18794,18 +18741,18 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
         }
         y += 1;
     }
-    fclose(logo_file);
-    logo_file = myfopen(
+    libc::fclose(logo_file);
+    logo_file = libc::fopen(
         logofilename.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
     loop {
         temp = getc(logo_file) as libc::c_char;
-        if !(temp as libc::c_int != -126i32 && feof(logo_file) == 0) {
+        if !(temp as libc::c_int != -126i32 && libc::feof(logo_file) == 0) {
             break;
         }
     }
-    if feof(logo_file) == 0 {
+    if libc::feof(logo_file) == 0 {
         y = clogoMinY;
         while y <= clogoMaxY {
             x = clogoMinX;
@@ -18846,7 +18793,7 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
             y += 1;
         }
     }
-    fclose(logo_file);
+    libc::fclose(logo_file);
     logoInfoAvailable = 1 as libc::c_int != 0;
     startOverAfterLogoInfoAvail = 1 as libc::c_int != 0;
     secondLogoSearch = 1 as libc::c_int != 0;
@@ -18856,20 +18803,20 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
     if !loadingCSV {
         DumpEdgeMasks();
     }
-    memset(
+    libc::memset(
         data.as_mut_ptr() as *mut libc::c_void,
         0 as libc::c_int,
-        ::std::mem::size_of::<[libc::c_char; 2000]>() as libc::c_ulong,
+        ::std::mem::size_of::<[libc::c_char; 2000]>() as usize,
     );
-    fflush(0 as *mut FILE);
+    libc::fflush(0 as *mut libc::FILE);
     if output_default {
-        txt_file = myfopen(
+        txt_file = libc::fopen(
             out_filename.as_mut_ptr(),
             b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
         if txt_file.is_null() {
             usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-            txt_file = myfopen(
+            txt_file = libc::fopen(
                 out_filename.as_mut_ptr(),
                 b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -18884,16 +18831,16 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
                 return;
             }
         }
-        if fseek(txt_file, 0 as libc::c_long, 0 as libc::c_int) != 0 {
+        if libc::fseek(txt_file, 0 as libc::c_long, 0 as libc::c_int) != 0 {
             Debug(
                 0 as libc::c_int,
                 b"ERROR SEEKING\n\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
         }
-        while !(fgets(data.as_mut_ptr(), 1999 as libc::c_int, txt_file)).is_null() {
+        while !(libc::fgets(data.as_mut_ptr(), 1999 as libc::c_int, txt_file)).is_null() {
             if !(strstr(
                 data.as_mut_ptr(),
-                b"FILE PROCESSING COMPLETE\0" as *const u8 as *const libc::c_char,
+                b"libc::FILE PROCESSING COMPLETE\0" as *const u8 as *const libc::c_char,
             ))
             .is_null()
             {
@@ -18910,7 +18857,7 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
                 }
             }
         }
-        fclose(txt_file);
+        libc::fclose(txt_file);
     }
     Debug(
         10 as libc::c_int,
@@ -18945,7 +18892,7 @@ pub unsafe extern "C" fn CountSceneChanges(
 #[no_mangle]
 pub unsafe extern "C" fn Debug(level: libc::c_int, fmt: *mut libc::c_char, args: ...) {
     let mut ap: ::std::ffi::VaListImpl;
-    let mut log_file_0: *mut FILE = 0 as *mut FILE;
+    let mut log_file_0: *mut libc::FILE = 0 as *mut libc::FILE;
     if verbose < level {
         return;
     }
@@ -18958,19 +18905,19 @@ pub unsafe extern "C" fn Debug(level: libc::c_int, fmt: *mut libc::c_char, args:
         );
     }
     if log_file_0.is_null() {
-        log_file_0 = myfopen(
+        log_file_0 = libc::fopen(
             logfilename.as_mut_ptr(),
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
     }
     if !log_file_0.is_null() {
-        fprintf(
+        libc::fprintf(
             log_file_0,
             b"%s\0" as *const u8 as *const libc::c_char,
             debugText.as_mut_ptr(),
         );
-        fclose(log_file_0);
-        log_file_0 = 0 as *mut FILE;
+        libc::fclose(log_file_0);
+        log_file_0 = 0 as *mut libc::FILE;
     }
     debugText[0 as libc::c_int as usize] = '\0' as i32 as libc::c_char;
 }
@@ -18978,9 +18925,8 @@ pub unsafe extern "C" fn Debug(level: libc::c_int, fmt: *mut libc::c_char, args:
 pub unsafe extern "C" fn InitLogoBuffers() {
     let mut i: libc::c_int = 0;
     if logoFrameNum.is_null() {
-        logoFrameNum = malloc(
-            (num_logo_buffers as libc::c_ulong)
-                .wrapping_mul(::std::mem::size_of::<libc::c_int>() as libc::c_ulong),
+        logoFrameNum = libc::malloc(
+            (num_logo_buffers as usize).wrapping_mul(::std::mem::size_of::<libc::c_int>()) as usize,
         ) as *mut libc::c_int;
     }
     if logoFrameNum.is_null() {
@@ -18991,16 +18937,15 @@ pub unsafe extern "C" fn InitLogoBuffers() {
         );
         exit(14 as libc::c_int);
     }
-    memset(
+    libc::memset(
         logoFrameNum as *mut libc::c_void,
         0 as libc::c_int,
-        (num_logo_buffers as libc::c_ulong)
-            .wrapping_mul(::std::mem::size_of::<libc::c_int>() as libc::c_ulong),
+        (num_logo_buffers as usize).wrapping_mul(::std::mem::size_of::<libc::c_int>()),
     );
     if logoFrameBuffer.is_null() {
-        logoFrameBuffer = malloc(
-            (num_logo_buffers as libc::c_ulong)
-                .wrapping_mul(::std::mem::size_of::<*mut libc::c_uchar>() as libc::c_ulong),
+        logoFrameBuffer = libc::malloc(
+            (num_logo_buffers as usize)
+                .wrapping_mul(::std::mem::size_of::<*mut libc::c_uchar>() as usize),
         ) as *mut *mut libc::c_uchar;
         if !logoFrameBuffer.is_null() {
             lheight = 1200 as libc::c_int;
@@ -19011,7 +18956,7 @@ pub unsafe extern "C" fn InitLogoBuffers() {
             i = 0 as libc::c_int;
             while i < num_logo_buffers {
                 let ref mut fresh85 = *logoFrameBuffer.offset(i as isize);
-                *fresh85 = malloc(logoFrameBufferSize as libc::c_ulong) as *mut libc::c_uchar;
+                *fresh85 = libc::malloc(logoFrameBufferSize as usize) as *mut libc::c_uchar;
                 if (*logoFrameBuffer.offset(i as isize)).is_null() {
                     Debug(
                         0 as libc::c_int,
@@ -19066,10 +19011,9 @@ pub unsafe extern "C" fn InitComSkip() {
             max_frame_count = (((60 as libc::c_int * 60 as libc::c_int) as libc::c_double * fps)
                 as libc::c_int
                 + 1 as libc::c_int) as libc::c_long;
-            frame = malloc(
-                ((max_frame_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<frame_info>() as libc::c_ulong)
-                    as libc::c_int as libc::c_ulong,
+            frame = libc::malloc(
+                ((max_frame_count + 1) as usize).wrapping_mul(::std::mem::size_of::<frame_info>())
+                    as usize,
             ) as *mut frame_info;
         }
         if frame.is_null() {
@@ -19082,11 +19026,10 @@ pub unsafe extern "C" fn InitComSkip() {
         }
     }
     if !initialized {
-        max_black_count = 500 as libc::c_int as libc::c_long;
-        black = malloc(
-            ((max_black_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                .wrapping_mul(::std::mem::size_of::<black_frame_info>() as libc::c_ulong)
-                as libc::c_int as libc::c_ulong,
+        max_black_count = 500;
+        black = libc::malloc(
+            ((max_black_count + 1) as usize).wrapping_mul(::std::mem::size_of::<black_frame_info>())
+                as usize,
         ) as *mut black_frame_info;
     }
     if black.is_null() {
@@ -19099,11 +19042,11 @@ pub unsafe extern "C" fn InitComSkip() {
     }
     if commDetectMethod & 2 as libc::c_int != 0 {
         if !initialized {
-            max_logo_block_count = 1000 as libc::c_int as libc::c_long;
-            logo_block = malloc(
-                ((max_logo_block_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<logo_block_info>() as libc::c_ulong)
-                    as libc::c_int as libc::c_ulong,
+            max_logo_block_count = 1000;
+            logo_block = libc::malloc(
+                ((max_logo_block_count + 1) as usize)
+                    .wrapping_mul(::std::mem::size_of::<logo_block_info>())
+                    as usize,
             ) as *mut logo_block_info;
         }
         if logo_block.is_null() {
@@ -19115,24 +19058,23 @@ pub unsafe extern "C" fn InitComSkip() {
             exit(13 as libc::c_int);
         }
         InitLogoBuffers();
-        memset(
+        libc::memset(
             max_br.as_mut_ptr() as *mut libc::c_void,
             0 as libc::c_int,
-            ::std::mem::size_of::<[libc::c_uchar; 4608000]>() as libc::c_ulong,
+            ::std::mem::size_of::<[libc::c_uchar; 4608000]>() as usize,
         );
-        memset(
+        libc::memset(
             min_br.as_mut_ptr() as *mut libc::c_void,
             255 as libc::c_int,
-            ::std::mem::size_of::<[libc::c_uchar; 4608000]>() as libc::c_ulong,
+            ::std::mem::size_of::<[libc::c_uchar; 4608000]>() as usize,
         );
     }
     if commDetectMethod & 4 as libc::c_int != 0 {
         if !initialized {
             max_schange_count = 2000 as libc::c_int as libc::c_long;
-            schange = malloc(
-                ((max_schange_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<schange_info>() as libc::c_ulong)
-                    as libc::c_int as libc::c_ulong,
+            schange = libc::malloc(
+                ((max_schange_count + 1) as usize)
+                    .wrapping_mul(::std::mem::size_of::<schange_info>()) as usize,
             ) as *mut schange_info;
         }
         if schange.is_null() {
@@ -19147,9 +19089,9 @@ pub unsafe extern "C" fn InitComSkip() {
     if processCC {
         if !initialized {
             max_cc_block_count = 500 as libc::c_int as libc::c_long;
-            cc_block = malloc(
-                ((max_cc_block_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<cc_block_info>() as libc::c_ulong),
+            cc_block = libc::malloc(
+                ((max_cc_block_count + 1) as usize)
+                    .wrapping_mul(::std::mem::size_of::<cc_block_info>() as usize),
             ) as *mut cc_block_info;
         }
         if cc_block.is_null() {
@@ -19173,25 +19115,21 @@ pub unsafe extern "C" fn InitComSkip() {
             i += 1;
         }
         if !initialized {
-            cc_memory = malloc(
-                (15 as libc::c_int as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<*mut libc::c_uchar>() as libc::c_ulong),
+            cc_memory = libc::malloc(
+                (15 as usize).wrapping_mul(::std::mem::size_of::<*mut libc::c_uchar>()),
             ) as *mut *mut libc::c_uchar;
-            cc_screen = malloc(
-                (15 as libc::c_int as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<*mut libc::c_uchar>() as libc::c_ulong),
+            cc_screen = libc::malloc(
+                (15 as usize).wrapping_mul(::std::mem::size_of::<*mut libc::c_uchar>()),
             ) as *mut *mut libc::c_uchar;
             i = 0 as libc::c_int;
             while i < 15 as libc::c_int {
                 let ref mut fresh86 = *cc_memory.offset(i as isize);
-                *fresh86 = malloc(
-                    (32 as libc::c_int as libc::c_ulong)
-                        .wrapping_mul(::std::mem::size_of::<libc::c_uchar>() as libc::c_ulong),
+                *fresh86 = libc::malloc(
+                    (32 as usize).wrapping_mul(::std::mem::size_of::<libc::c_uchar>()),
                 ) as *mut libc::c_uchar;
                 let ref mut fresh87 = *cc_screen.offset(i as isize);
-                *fresh87 = malloc(
-                    (32 as libc::c_int as libc::c_ulong)
-                        .wrapping_mul(::std::mem::size_of::<libc::c_uchar>() as libc::c_ulong),
+                *fresh87 = libc::malloc(
+                    (32 as usize).wrapping_mul(::std::mem::size_of::<libc::c_uchar>()),
                 ) as *mut libc::c_uchar;
                 i += 1;
             }
@@ -19210,9 +19148,9 @@ pub unsafe extern "C" fn InitComSkip() {
         }
         if !initialized {
             max_cc_text_count = 1 as libc::c_int as libc::c_long;
-            cc_text = malloc(
-                ((max_cc_text_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                    .wrapping_mul(::std::mem::size_of::<cc_text_info>() as libc::c_ulong),
+            cc_text = libc::malloc(
+                ((max_cc_text_count + 1) as usize)
+                    .wrapping_mul(::std::mem::size_of::<cc_text_info>()),
             ) as *mut cc_text_info;
         }
         if cc_text.is_null() {
@@ -19241,16 +19179,14 @@ pub unsafe extern "C" fn InitComSkip() {
     }
     if !initialized {
         max_ar_block_count = 100 as libc::c_int as libc::c_long;
-        ar_block = malloc(
-            ((max_ar_block_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                .wrapping_mul(::std::mem::size_of::<ar_block_info>() as libc::c_ulong)
-                as libc::c_int as libc::c_ulong,
+        ar_block = libc::malloc(
+            ((max_ar_block_count + 1) as usize)
+                .wrapping_mul(::std::mem::size_of::<ar_block_info>()),
         ) as *mut ar_block_info;
         max_ac_block_count = 100 as libc::c_int as libc::c_long;
-        ac_block = malloc(
-            ((max_ac_block_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                .wrapping_mul(::std::mem::size_of::<ac_block_info>() as libc::c_ulong)
-                as libc::c_int as libc::c_ulong,
+        ac_block = libc::malloc(
+            ((max_ac_block_count + 1) as usize)
+                .wrapping_mul(::std::mem::size_of::<ac_block_info>()),
         ) as *mut ac_block_info;
     }
     if ar_block.is_null() {
@@ -19326,25 +19262,20 @@ pub unsafe extern "C" fn FindScoreThreshold(percentile: libc::c_double) -> libc:
     let mut targetCount: libc::c_long = 0;
     let mut totalframes: libc::c_long = 0 as libc::c_int as libc::c_long;
     let mut hadToSwap: bool = 0 as libc::c_int != 0;
-    score = malloc(
-        (::std::mem::size_of::<libc::c_double>() as libc::c_ulong)
-            .wrapping_mul(block_count as libc::c_ulong),
+    score = libc::malloc(
+        (::std::mem::size_of::<libc::c_double>() as usize).wrapping_mul(block_count as usize),
     ) as *mut libc::c_double;
-    count = malloc(
-        (::std::mem::size_of::<libc::c_long>() as libc::c_ulong)
-            .wrapping_mul(block_count as libc::c_ulong),
+    count = libc::malloc(
+        (::std::mem::size_of::<libc::c_long>() as usize).wrapping_mul(block_count as usize),
     ) as *mut libc::c_long;
-    start = malloc(
-        (::std::mem::size_of::<libc::c_long>() as libc::c_ulong)
-            .wrapping_mul(block_count as libc::c_ulong),
+    start = libc::malloc(
+        (::std::mem::size_of::<libc::c_long>() as usize).wrapping_mul(block_count as usize),
     ) as *mut libc::c_long;
-    blocknr = malloc(
-        (::std::mem::size_of::<libc::c_int>() as libc::c_ulong)
-            .wrapping_mul(block_count as libc::c_ulong),
+    blocknr = libc::malloc(
+        (::std::mem::size_of::<libc::c_int>() as usize).wrapping_mul(block_count as usize),
     ) as *mut libc::c_int;
-    percent = malloc(
-        (::std::mem::size_of::<libc::c_double>() as libc::c_ulong)
-            .wrapping_mul(block_count as libc::c_ulong),
+    percent = libc::malloc(
+        (::std::mem::size_of::<libc::c_double>() as usize).wrapping_mul(block_count as usize),
     ) as *mut libc::c_double;
     if score.is_null()
         || count.is_null()
@@ -19436,9 +19367,9 @@ pub unsafe extern "C" fn FindScoreThreshold(percentile: libc::c_double) -> libc:
         }
     }
     tempScore = *score.offset(i as isize);
-    free(score as *mut libc::c_void);
-    free(count as *mut libc::c_void);
-    free(percent as *mut libc::c_void);
+    libc::free(score as *mut libc::c_void);
+    libc::free(count as *mut libc::c_void);
+    libc::free(percent as *mut libc::c_void);
     Debug(
         6 as libc::c_int,
         b"The %.2f percentile of %i frames is %.2f\n\0" as *const u8 as *const libc::c_char
@@ -19648,15 +19579,15 @@ pub unsafe extern "C" fn FindBlackThreshold(percentile: libc::c_double) -> libc:
     let mut tempCount: libc::c_long = 0;
     let mut targetCount: libc::c_long = 0;
     let mut totalframes: libc::c_long = 0 as libc::c_int as libc::c_long;
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let mut raw: *mut libc::FILE = 0 as *mut libc::FILE;
     if output_training != 0 {
-        raw = myfopen(
+        raw = libc::fopen(
             b"black.csv\0" as *const u8 as *const libc::c_char,
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
     }
     if !raw.is_null() {
-        fprintf(
+        libc::fprintf(
             raw,
             b"\"%s\"\0" as *const u8 as *const libc::c_char,
             inbasename.as_mut_ptr(),
@@ -19670,7 +19601,7 @@ pub unsafe extern "C" fn FindBlackThreshold(percentile: libc::c_double) -> libc:
     i = 0 as libc::c_int;
     while i < 35 as libc::c_int {
         if !raw.is_null() {
-            fprintf(
+            libc::fprintf(
                 raw,
                 b",%6.2f\0" as *const u8 as *const libc::c_char,
                 1000.0f64 * brightHistogram[i as usize] as libc::c_double
@@ -19680,10 +19611,10 @@ pub unsafe extern "C" fn FindBlackThreshold(percentile: libc::c_double) -> libc:
         i += 1;
     }
     if !raw.is_null() {
-        fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
     }
     if !raw.is_null() {
-        fclose(raw);
+        libc::fclose(raw);
     }
     tempCount = 0 as libc::c_int as libc::c_long;
     targetCount = (totalframes as libc::c_double * percentile) as libc::c_long;
@@ -19704,15 +19635,15 @@ pub unsafe extern "C" fn FindUniformThreshold(percentile: libc::c_double) -> lib
     let mut tempCount: libc::c_long = 0;
     let mut targetCount: libc::c_long = 0;
     let mut totalframes: libc::c_long = 0 as libc::c_int as libc::c_long;
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let mut raw: *mut libc::FILE = 0 as *mut libc::FILE;
     if output_training != 0 {
-        raw = myfopen(
+        raw = libc::fopen(
             b"uniform.csv\0" as *const u8 as *const libc::c_char,
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
     }
     if !raw.is_null() {
-        fprintf(
+        libc::fprintf(
             raw,
             b"\"%s\"\0" as *const u8 as *const libc::c_char,
             inbasename.as_mut_ptr(),
@@ -19726,7 +19657,7 @@ pub unsafe extern "C" fn FindUniformThreshold(percentile: libc::c_double) -> lib
     i = 0 as libc::c_int;
     while i < 35 as libc::c_int {
         if !raw.is_null() {
-            fprintf(
+            libc::fprintf(
                 raw,
                 b",%6.2f\0" as *const u8 as *const libc::c_char,
                 1000.0f64 * uniformHistogram[i as usize] as libc::c_double
@@ -19736,10 +19667,10 @@ pub unsafe extern "C" fn FindUniformThreshold(percentile: libc::c_double) -> lib
         i += 1;
     }
     if !raw.is_null() {
-        fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
     }
     if !raw.is_null() {
-        fclose(raw);
+        libc::fclose(raw);
     }
     tempCount = 0 as libc::c_int as libc::c_long;
     targetCount = (totalframes as libc::c_double * percentile) as libc::c_long;
@@ -19761,7 +19692,7 @@ pub unsafe extern "C" fn FindUniformThreshold(percentile: libc::c_double) -> lib
 pub unsafe extern "C" fn OutputFrame(frame_number: libc::c_int) {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let mut raw: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut array: [libc::c_char; 1024] = [0; 1024];
     sprintf(
         array.as_mut_ptr(),
@@ -19775,7 +19706,7 @@ pub unsafe extern "C" fn OutputFrame(frame_number: libc::c_int) {
         5 as libc::c_int,
         b"Sending frame to file\n\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    raw = myfopen(
+    raw = libc::fopen(
         array.as_mut_ptr(),
         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -19787,22 +19718,22 @@ pub unsafe extern "C" fn OutputFrame(frame_number: libc::c_int) {
         );
         return;
     }
-    fprintf(raw, b"0;\0" as *const u8 as *const libc::c_char);
+    libc::fprintf(raw, b"0;\0" as *const u8 as *const libc::c_char);
     x = 0 as libc::c_int;
     while x < videowidth {
-        fprintf(raw, b";%3i\0" as *const u8 as *const libc::c_char, x);
+        libc::fprintf(raw, b";%3i\0" as *const u8 as *const libc::c_char, x);
         x += 1;
     }
-    fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
+    libc::fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
     y = 0 as libc::c_int;
     while y < height {
-        fprintf(raw, b"%3i\0" as *const u8 as *const libc::c_char, y);
+        libc::fprintf(raw, b"%3i\0" as *const u8 as *const libc::c_char, y);
         x = 0 as libc::c_int;
         while x < videowidth {
             if (*frame_ptr.offset((y * width + x) as isize) as libc::c_int) < 30 as libc::c_int {
-                fprintf(raw, b";   \0" as *const u8 as *const libc::c_char);
+                libc::fprintf(raw, b";   \0" as *const u8 as *const libc::c_char);
             } else {
-                fprintf(
+                libc::fprintf(
                     raw,
                     b";%3i\0" as *const u8 as *const libc::c_char,
                     *frame_ptr.offset((y * width + x) as isize) as libc::c_int,
@@ -19810,10 +19741,10 @@ pub unsafe extern "C" fn OutputFrame(frame_number: libc::c_int) {
             }
             x += 1;
         }
-        fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
+        libc::fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
         y += 1;
     }
-    fclose(raw);
+    libc::fclose(raw);
 }
 #[no_mangle]
 pub unsafe extern "C" fn FindFrameWithPts(t: libc::c_double) -> libc::c_int {
@@ -19856,14 +19787,14 @@ pub unsafe extern "C" fn InputReffer(
     let mut line: [libc::c_char; 2048] = [0; 2048];
     let mut split: [libc::c_char; 256] = [0; 256];
     let mut array: [libc::c_char; 1024] = [0; 1024];
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let mut raw: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut x: libc::c_int = 0;
     let mut col: libc::c_int = 0;
     let mut lineProcessed: bool = false;
     let mut frames: libc::c_int = 0 as libc::c_int;
     let mut co: libc::c_char = 0;
     let mut re: libc::c_char = 0;
-    let mut raw2: *mut FILE = 0 as *mut FILE;
+    let mut raw2: *mut libc::FILE = 0 as *mut libc::FILE;
     sprintf(
         array.as_mut_ptr(),
         b"%.*s%s\0" as *const u8 as *const libc::c_char,
@@ -19872,7 +19803,7 @@ pub unsafe extern "C" fn InputReffer(
         logfilename.as_mut_ptr(),
         extension,
     );
-    raw = myfopen(
+    raw = libc::fopen(
         array.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -19881,7 +19812,7 @@ pub unsafe extern "C" fn InputReffer(
             return 0 as libc::c_int;
         }
     } else {
-        fgets(
+        libc::fgets(
             line.as_mut_ptr(),
             ::std::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong as libc::c_int,
             raw,
@@ -19915,12 +19846,12 @@ pub unsafe extern "C" fn InputReffer(
             }
         }
         reffer_count = -(1 as libc::c_int);
-        fgets(
+        libc::fgets(
             line.as_mut_ptr(),
             ::std::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong as libc::c_int,
             raw,
         );
-        while !(fgets(
+        while !(libc::fgets(
             line.as_mut_ptr(),
             ::std::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong as libc::c_int,
             raw,
@@ -20011,7 +19942,7 @@ pub unsafe extern "C" fn InputReffer(
                 i += 1;
             }
         }
-        fclose(raw);
+        libc::fclose(raw);
     }
     if reffer_count >= 0 as libc::c_int {
         if frames == 0 as libc::c_int {
@@ -20034,7 +19965,7 @@ pub unsafe extern "C" fn InputReffer(
             as libc::c_int,
         logfilename.as_mut_ptr(),
     );
-    raw = myfopen(
+    raw = libc::fopen(
         array.as_mut_ptr(),
         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -20057,13 +19988,13 @@ pub unsafe extern "C" fn InputReffer(
         > 2 as libc::c_int as libc::c_long
     {
         if output_training > 1 as libc::c_int {
-            raw2 = myfopen(
+            raw2 = libc::fopen(
                 b"quality.csv\0" as *const u8 as *const libc::c_char,
                 b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
         }
         if !raw2.is_null() {
-            fprintf(
+            libc::fprintf(
                 raw2,
                 b"\"%s\", %6ld, %6.1f, %6.1f, %6.1f\n\0" as *const u8 as *const libc::c_char,
                 inbasename.as_mut_ptr(),
@@ -20123,7 +20054,7 @@ pub unsafe extern "C" fn InputReffer(
             reffer[i as usize].start_frame as libc::c_double / fps
         });
         if !raw2.is_null() {
-            fclose(raw2);
+            libc::fclose(raw2);
         }
     }
     while (k as libc::c_long) < commercial[commercial_count as usize].end_frame
@@ -20164,14 +20095,14 @@ pub unsafe extern "C" fn InputReffer(
                             > 2 as libc::c_int as libc::c_long
                         {
                             if output_training > 1 as libc::c_int {
-                                raw2 = myfopen(
+                                raw2 = libc::fopen(
                                     b"quality.csv\0" as *const u8 as *const libc::c_char,
                                     b"a+\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
                             }
                             if !raw2.is_null() {
-                                fprintf(
+                                libc::fprintf(
                                     raw2,
                                     b"\"%s\", %6ld, %6.1f, %6.1f, %6.1f\n\0" as *const u8
                                         as *const libc::c_char,
@@ -20259,7 +20190,7 @@ pub unsafe extern "C" fn InputReffer(
                                 reffer[i as usize].start_frame as libc::c_double / fps
                             });
                             if !raw2.is_null() {
-                                fclose(raw2);
+                                libc::fclose(raw2);
                             }
                         }
                     }
@@ -20284,14 +20215,14 @@ pub unsafe extern "C" fn InputReffer(
                             > 2 as libc::c_int as libc::c_long
                         {
                             if output_training > 1 as libc::c_int {
-                                raw2 = myfopen(
+                                raw2 = libc::fopen(
                                     b"quality.csv\0" as *const u8 as *const libc::c_char,
                                     b"a+\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
                             }
                             if !raw2.is_null() {
-                                fprintf(
+                                libc::fprintf(
                                     raw2,
                                     b"\"%s\", %6ld, %6.1f, %6.1f, %6.1f\n\0" as *const u8
                                         as *const libc::c_char,
@@ -20379,7 +20310,7 @@ pub unsafe extern "C" fn InputReffer(
                                 reffer[i as usize].start_frame as libc::c_double / fps
                             });
                             if !raw2.is_null() {
-                                fclose(raw2);
+                                libc::fclose(raw2);
                             }
                         }
                     }
@@ -20401,14 +20332,14 @@ pub unsafe extern "C" fn InputReffer(
                             > 2 as libc::c_int as libc::c_long
                         {
                             if output_training > 1 as libc::c_int {
-                                raw2 = myfopen(
+                                raw2 = libc::fopen(
                                     b"quality.csv\0" as *const u8 as *const libc::c_char,
                                     b"a+\0" as *const u8 as *const libc::c_char
                                         as *mut libc::c_char,
                                 );
                             }
                             if !raw2.is_null() {
-                                fprintf(
+                                libc::fprintf(
                                     raw2,
                                     b"\"%s\", %6ld, %6.1f, %6.1f, %6.1f\n\0" as *const u8
                                         as *const libc::c_char,
@@ -20496,7 +20427,7 @@ pub unsafe extern "C" fn InputReffer(
                                 reffer[i as usize].start_frame as libc::c_double / fps
                             });
                             if !raw2.is_null() {
-                                fclose(raw2);
+                                libc::fclose(raw2);
                             }
                         }
                     }
@@ -20505,13 +20436,13 @@ pub unsafe extern "C" fn InputReffer(
                     k = commercial[j as usize].start_frame as libc::c_int;
                 }
                 if output_training > 1 as libc::c_int {
-                    raw2 = myfopen(
+                    raw2 = libc::fopen(
                         b"quality.csv\0" as *const u8 as *const libc::c_char,
                         b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
                 }
                 if !raw2.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         raw2,
                         b"\"%s\", %6d, %6.1f, %6.1f, %6.1f\n\0" as *const u8 as *const libc::c_char,
                         inbasename.as_mut_ptr(),
@@ -20571,9 +20502,9 @@ pub unsafe extern "C" fn InputReffer(
                     pk as libc::c_double / fps
                 });
                 if !raw2.is_null() {
-                    fclose(raw2);
+                    libc::fclose(raw2);
                 }
-                raw2 = 0 as *mut FILE;
+                raw2 = 0 as *mut libc::FILE;
             }
             3 => {
                 if i > reffer_count
@@ -20589,13 +20520,13 @@ pub unsafe extern "C" fn InputReffer(
                     k = reffer[i as usize].start_frame as libc::c_int;
                 }
                 if output_training > 1 as libc::c_int {
-                    raw2 = myfopen(
+                    raw2 = libc::fopen(
                         b"quality.csv\0" as *const u8 as *const libc::c_char,
                         b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
                 }
                 if !raw2.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         raw2,
                         b"\"%s\", %6d, %6.1f, %6.1f, %6.1f\n\0" as *const u8 as *const libc::c_char,
                         inbasename.as_mut_ptr(),
@@ -20655,21 +20586,21 @@ pub unsafe extern "C" fn InputReffer(
                     pk as libc::c_double / fps
                 });
                 if !raw2.is_null() {
-                    fclose(raw2);
+                    libc::fclose(raw2);
                 }
-                raw2 = 0 as *mut FILE;
+                raw2 = 0 as *mut libc::FILE;
             }
             _ => {}
         }
     }
     if output_training != 0 {
-        raw2 = myfopen(
+        raw2 = libc::fopen(
             b"quality.csv\0" as *const u8 as *const libc::c_char,
             b"a+\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
     }
     if !raw2.is_null() {
-        fprintf(
+        libc::fprintf(
             raw2,
             b"\"%s\", %6d, %6.1f, %6.1f, %6.1f\n\0" as *const u8 as *const libc::c_char,
             inbasename.as_mut_ptr(),
@@ -20680,17 +20611,17 @@ pub unsafe extern "C" fn InputReffer(
         );
     }
     if !raw2.is_null() {
-        fclose(raw2);
+        libc::fclose(raw2);
     }
     j = 0 as libc::c_int as libc::c_long;
     i = 0 as libc::c_int;
     while i <= reffer_count && j <= commercial_count as libc::c_long {
-        k = min(
+        k = std::cmp::min(
             reffer[i as usize].start_frame as libc::c_int,
             commercial[j as usize].start_frame as libc::c_int,
         );
         if commercial[j as usize].end_frame < reffer[i as usize].start_frame {
-            fprintf(
+            libc::fprintf(
                 raw,
                 b"Found %6ld %6ld    Reference %6ld %6ld    Difference %+6.1f    %+6.1f\n\0"
                     as *const u8 as *const libc::c_char,
@@ -20751,7 +20682,7 @@ pub unsafe extern "C" fn InputReffer(
             );
             j += 1;
         } else if commercial[j as usize].start_frame > reffer[i as usize].end_frame {
-            fprintf(
+            libc::fprintf(
                 raw,
                 b"Found %6ld %6ld    Reference %6ld %6ld    Difference %+6.1f    %+6.1f\n\0"
                     as *const u8 as *const libc::c_char,
@@ -20817,7 +20748,7 @@ pub unsafe extern "C" fn InputReffer(
                 || labs(reffer[i as usize].end_frame - commercial[j as usize].end_frame)
                     > 40 as libc::c_int as libc::c_long
             {
-                fprintf(
+                libc::fprintf(
                     raw,
                     b"Found %6ld %6ld    Reference %6ld %6ld    Difference %+6.1f    %+6.1f\n\0"
                         as *const u8 as *const libc::c_char,
@@ -20882,7 +20813,7 @@ pub unsafe extern "C" fn InputReffer(
         }
     }
     while j <= commercial_count as libc::c_long {
-        fprintf(
+        libc::fprintf(
             raw,
             b"Found %6ld %6ld    Reference %6ld %6ld    Difference %+6.1f    %+6.1f\n\0"
                 as *const u8 as *const libc::c_char,
@@ -20944,7 +20875,7 @@ pub unsafe extern "C" fn InputReffer(
         j += 1;
     }
     while i <= reffer_count {
-        fprintf(
+        libc::fprintf(
             raw,
             b"Found %6ld %6ld    Reference %6ld %6ld    Difference %+6.1f    %+6.1f\n\0"
                 as *const u8 as *const libc::c_char,
@@ -21016,7 +20947,7 @@ pub unsafe extern "C" fn InputReffer(
             (cblock[i as usize].f_end - cblock[i as usize].b_tail as libc::c_long) as libc::c_int,
         );
         if co as libc::c_int != re as libc::c_int {
-            fprintf(
+            libc::fprintf(
                 raw,
                 b"Block %6d has mismatch %c%c with cause %s\n\0" as *const u8
                     as *const libc::c_char,
@@ -21029,14 +20960,14 @@ pub unsafe extern "C" fn InputReffer(
         cblock[i as usize].reffer = re;
         i += 1;
     }
-    fclose(raw);
+    libc::fclose(raw);
     return frames;
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputAspect() {
     let mut i: libc::c_int = 0;
     let mut array: [libc::c_char; 1024] = [0; 1024];
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let mut raw: *mut libc::FILE = 0 as *mut libc::FILE;
     if !output_aspect {
         return;
     }
@@ -21047,7 +20978,7 @@ pub unsafe extern "C" fn OutputAspect() {
             as libc::c_int,
         logfilename.as_mut_ptr(),
     );
-    raw = myfopen(
+    raw = libc::fopen(
         array.as_mut_ptr(),
         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -21061,7 +20992,7 @@ pub unsafe extern "C" fn OutputAspect() {
     }
     i = 0 as libc::c_int;
     while (i as libc::c_long) < ar_block_count {
-        fprintf(
+        libc::fprintf(
             raw,
             b"%s %4dx%4d %.2f minX=%4d, minY=%4d, maxX=%4d, maxY=%4d\n\0" as *const u8
                 as *const libc::c_char,
@@ -21086,19 +21017,19 @@ pub unsafe extern "C" fn OutputAspect() {
         );
         i += 1;
     }
-    fclose(raw);
+    libc::fclose(raw);
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputBlackArray() {
     let i: libc::c_int = 0;
     let array: [libc::c_char; 1024] = [0; 1024];
-    let raw: *mut FILE = 0 as *mut FILE;
+    let raw: *mut libc::FILE = 0 as *mut libc::FILE;
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputFrameArray(screenOnly: bool) {
     let mut i: libc::c_int = 0;
     let mut array: [libc::c_char; 1024] = [0; 1024];
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let mut raw: *mut libc::FILE = 0 as *mut libc::FILE;
     let mut lp: [libc::c_char; 10] = [0; 10];
     sprintf(
         array.as_mut_ptr(),
@@ -21107,7 +21038,7 @@ pub unsafe extern "C" fn OutputFrameArray(screenOnly: bool) {
             as libc::c_int,
         logfilename.as_mut_ptr(),
     );
-    raw = myfopen(
+    raw = libc::fopen(
         array.as_mut_ptr(),
         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -21119,13 +21050,13 @@ pub unsafe extern "C" fn OutputFrameArray(screenOnly: bool) {
         );
         return;
     }
-    fprintf(
+    libc::fprintf(
         raw,
         b"sep=,\nframe,brightness,scene_change,logo,uniform,sound,minY,MaxY,ar_ratio,goodEdge,isblack,cutscene, MinX, MaxX, hasBright, Dimcount,PTS,%f\0"
             as *const u8 as *const libc::c_char,
         fps,
     );
-    fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
+    libc::fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
     if screenOnly {
         Debug(
             1 as libc::c_int,
@@ -21145,7 +21076,7 @@ pub unsafe extern "C" fn OutputFrameArray(screenOnly: bool) {
                 lp.as_mut_ptr(),
             );
         } else {
-            fprintf(
+            libc::fprintf(
                 raw,
                 b"%i,%i,%i,%i,%i,%i,%i,%i,%f,%f,%i,%i,%i,%i,%i,%i,%f,%i,%i\0" as *const u8
                     as *const libc::c_char,
@@ -21169,11 +21100,11 @@ pub unsafe extern "C" fn OutputFrameArray(screenOnly: bool) {
                 (*frame.offset(i as isize)).cur_segment,
                 (*frame.offset(i as isize)).audio_channels,
             );
-            fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
+            libc::fprintf(raw, b"\n\0" as *const u8 as *const libc::c_char);
         }
         i += 1;
     }
-    fclose(raw);
+    libc::fclose(raw);
 }
 #[no_mangle]
 pub unsafe extern "C" fn InitializeFrameArray(i: libc::c_long) {
@@ -21400,7 +21331,7 @@ pub unsafe extern "C" fn PrintArgs() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
+pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut libc::FILE) {
     let mut lineProcessed: bool = 0 as libc::c_int != 0;
     let mut lastLogoTest_0: bool = 0 as libc::c_int != 0;
     let mut curLogoTest_0: bool = 0 as libc::c_int != 0;
@@ -21430,7 +21361,7 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
             );
             exit(22 as libc::c_int);
         }
-        fgets(
+        libc::fgets(
             line.as_mut_ptr(),
             ::std::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong as libc::c_int,
             in_file_0,
@@ -21440,7 +21371,7 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
             b"sep=,\n\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
-            fgets(
+            libc::fgets(
                 line.as_mut_ptr(),
                 ::std::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong as libc::c_int,
                 in_file_0,
@@ -21503,7 +21434,7 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
         InitComSkip();
         frame_count = 1 as libc::c_int as libc::c_long;
         pict_type = '?' as i32 as libc::c_char;
-        while !(fgets(
+        while !(libc::fgets(
             line.as_mut_ptr(),
             ::std::mem::size_of::<[libc::c_char; 2048]>() as libc::c_ulong as libc::c_int,
             in_file_0,
@@ -21739,7 +21670,7 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
                 b"%s.data\0" as *const u8 as *const libc::c_char,
                 workbasename.as_mut_ptr(),
             );
-            dump_data_file = myfopen(
+            dump_data_file = libc::fopen(
                 line.as_mut_ptr(),
                 b"rb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
             );
@@ -21761,8 +21692,8 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
             b"CSV file loaded into memory.\n\0" as *const u8 as *const libc::c_char
                 as *mut libc::c_char,
         );
-        fclose(in_file_0);
-        in_file_0 = 0 as *mut FILE;
+        libc::fclose(in_file_0);
+        in_file_0 = 0 as *mut libc::FILE;
         black_count = 0 as libc::c_int as libc::c_long;
         logo_block_count = 0 as libc::c_int as libc::c_long;
         black_count = 0 as libc::c_int as libc::c_long;
@@ -21773,12 +21704,8 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
             framenum_real = i;
             loop {
                 if !dump_data_file.is_null() && ccDataFrame == 0 as libc::c_int {
-                    cont = fread(
-                        line.as_mut_ptr() as *mut libc::c_void,
-                        8 as libc::c_int as libc::c_ulong,
-                        1 as libc::c_int as libc::c_ulong,
-                        dump_data_file,
-                    ) as libc::c_int;
+                    cont = libc::fread(line.as_mut_ptr() as *mut libc::c_void, 8, 1, dump_data_file)
+                        as libc::c_int;
                     line[8 as libc::c_int as usize] = 0 as libc::c_int as libc::c_char;
                     sscanf(
                         line.as_mut_ptr(),
@@ -21792,12 +21719,8 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
                 if !(cont != 0 && ccDataFrame <= i) {
                     break;
                 }
-                cont = fread(
-                    line.as_mut_ptr() as *mut libc::c_void,
-                    4 as libc::c_int as libc::c_ulong,
-                    1 as libc::c_int as libc::c_ulong,
-                    dump_data_file,
-                ) as libc::c_int;
+                cont = libc::fread(line.as_mut_ptr() as *mut libc::c_void, 4, 1, dump_data_file)
+                    as libc::c_int;
                 if cont == 0 {
                     break;
                 }
@@ -21807,10 +21730,10 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
                     b"%4d\0" as *const u8 as *const libc::c_char,
                     &mut ccDataLen as *mut libc::c_int,
                 );
-                cont = fread(
+                cont = libc::fread(
                     ccData.as_mut_ptr() as *mut libc::c_void,
-                    ccDataLen as libc::c_ulong,
-                    1 as libc::c_int as libc::c_ulong,
+                    ccDataLen as usize,
+                    1,
                     dump_data_file,
                 ) as libc::c_int;
                 if cont == 0 {
@@ -22196,9 +22119,9 @@ pub unsafe extern "C" fn OutputCCBlock(i: libc::c_long) {
 pub unsafe extern "C" fn Init_XDS_block() {
     if XDS_block.is_null() {
         max_XDS_block_count = 2000 as libc::c_int as libc::c_long;
-        XDS_block = malloc(
-            ((max_XDS_block_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
-                .wrapping_mul(::std::mem::size_of::<XDS_block_info>() as libc::c_ulong),
+        XDS_block = libc::malloc(
+            ((max_XDS_block_count + 1) as usize)
+                .wrapping_mul(::std::mem::size_of::<XDS_block_info>()),
         ) as *mut XDS_block_info;
         if XDS_block.is_null() {
             Debug(
@@ -23785,8 +23708,8 @@ pub unsafe extern "C" fn ProcessCCDict() -> bool {
     let mut ptr: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut phrase: [libc::c_char; 1024] = [0; 1024];
     let mut goodPhrase: bool = 1 as libc::c_int != 0;
-    let mut dict: *mut FILE = 0 as *mut FILE;
-    dict = myfopen(
+    let mut dict: *mut libc::FILE = 0 as *mut libc::FILE;
+    dict = libc::fopen(
         dictfilename.as_mut_ptr(),
         b"r\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
@@ -23798,7 +23721,7 @@ pub unsafe extern "C" fn ProcessCCDict() -> bool {
         b"\n\nStarting to process dictionary\n-------------------------------------\n\0"
             as *const u8 as *const libc::c_char as *mut libc::c_char,
     );
-    while !(fgets(
+    while !(libc::fgets(
         phrase.as_mut_ptr(),
         ::std::mem::size_of::<[libc::c_char; 1024]>() as libc::c_ulong as libc::c_int,
         dict,
@@ -23911,7 +23834,7 @@ pub unsafe extern "C" fn ProcessCCDict() -> bool {
             }
         }
     }
-    fclose(dict);
+    libc::fclose(dict);
     return 1 as libc::c_int != 0;
 }
 #[no_mangle]
@@ -23971,12 +23894,12 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                 || (*black.offset(i as isize)).cause & (1 as libc::c_int) << 4 as libc::c_int != 0
                 || (*black.offset(i as isize)).cause & (1 as libc::c_int) << 3 as libc::c_int != 0
             {
-                j = max(
+                j = std::cmp::max(
                     1 as libc::c_int,
                     ((*black.offset(i as isize)).frame as libc::c_double - shrink_logo * fps)
                         as libc::c_int,
                 );
-                while j < min(
+                while j < std::cmp::min(
                     framenum_real,
                     ((*black.offset(i as isize)).frame as libc::c_double + shrink_logo * fps)
                         as libc::c_int,
@@ -24000,13 +23923,13 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                         & (1 as libc::c_int as libc::c_long) << 18 as libc::c_int
                         != 0
                 {
-                    j = max(
+                    j = std::cmp::max(
                         1 as libc::c_int,
                         ((*black.offset(i as isize)).frame as libc::c_double
                             - volume_slip as libc::c_double * fps)
                             as libc::c_int,
                     );
-                    while j < min(
+                    while j < std::cmp::min(
                         framenum_real,
                         ((*black.offset(i as isize)).frame as libc::c_double
                             + volume_slip as libc::c_double * fps)
@@ -24181,13 +24104,13 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
             || output_dvrmstb as libc::c_int != 0
         {
             if output_default {
-                out_file = myfopen(
+                out_file = libc::fopen(
                     out_filename.as_mut_ptr(),
                     b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if out_file.is_null() {
                     usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-                    out_file = myfopen(
+                    out_file = libc::fopen(
                         out_filename.as_mut_ptr(),
                         b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
@@ -24208,13 +24131,13 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                     b"%s.edl\0" as *const u8 as *const libc::c_char,
                     outbasename.as_mut_ptr(),
                 );
-                edl_file = myfopen(
+                edl_file = libc::fopen(
                     filename_0.as_mut_ptr(),
                     b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if edl_file.is_null() {
                     usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-                    edl_file = myfopen(
+                    edl_file = libc::fopen(
                         filename_0.as_mut_ptr(),
                         b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
@@ -24235,13 +24158,13 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                     b"%s.live\0" as *const u8 as *const libc::c_char,
                     outbasename.as_mut_ptr(),
                 );
-                live_file = myfopen(
+                live_file = libc::fopen(
                     filename_0.as_mut_ptr(),
                     b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if live_file.is_null() {
                     usleep((50 as libc::c_long * 1000 as libc::c_long) as useconds_t);
-                    live_file = myfopen(
+                    live_file = libc::fopen(
                         filename_0.as_mut_ptr(),
                         b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                     );
@@ -24256,25 +24179,25 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                     }
                 }
             }
-            dvrmstb_file = 0 as *mut FILE;
+            dvrmstb_file = 0 as *mut libc::FILE;
             if output_dvrmstb {
                 sprintf(
                     filename_0.as_mut_ptr(),
                     b"%s.xml\0" as *const u8 as *const libc::c_char,
                     outbasename.as_mut_ptr(),
                 );
-                dvrmstb_file = myfopen(
+                dvrmstb_file = libc::fopen(
                     filename_0.as_mut_ptr(),
                     b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if !dvrmstb_file.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         dvrmstb_file,
                         b"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<root>\n\0" as *const u8
                             as *const libc::c_char,
                     );
                 } else {
-                    fprintf(
+                    libc::fprintf(
                         __stderrp,
                         b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                         strerror(*__error()),
@@ -24333,7 +24256,7 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                             commercial[reffer_count as usize].end_frame;
                     }
                     if !out_file.is_null() {
-                        fprintf(
+                        libc::fprintf(
                             out_file,
                             b"%li\t%li\n\0" as *const u8 as *const libc::c_char,
                             c_start[i as usize] + padding as libc::c_long,
@@ -24341,17 +24264,17 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                         );
                     }
                     if !edl_file.is_null() {
-                        fprintf(
+                        libc::fprintf(
                             edl_file,
                             b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
-                            max(
+                            std::cmp::max(
                                 (c_start[i as usize] + padding as libc::c_long
                                     - edl_offset as libc::c_long)
                                     as libc::c_int,
                                 0 as libc::c_int,
                             ) as libc::c_double
                                 / fps,
-                            max(
+                            std::cmp::max(
                                 (c_end[i as usize]
                                     - padding as libc::c_long
                                     - edl_offset as libc::c_long)
@@ -24363,17 +24286,17 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                         );
                     }
                     if !live_file.is_null() {
-                        fprintf(
+                        libc::fprintf(
                             live_file,
                             b"%.2f\t%.2f\t%d\n\0" as *const u8 as *const libc::c_char,
-                            max(
+                            std::cmp::max(
                                 (c_start[i as usize] + padding as libc::c_long
                                     - edl_offset as libc::c_long)
                                     as libc::c_int,
                                 0 as libc::c_int,
                             ) as libc::c_double
                                 / fps,
-                            max(
+                            std::cmp::max(
                                 (c_end[i as usize]
                                     - padding as libc::c_long
                                     - edl_offset as libc::c_long)
@@ -24385,7 +24308,7 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                         );
                     }
                     if !dvrmstb_file.is_null() {
-                        fprintf(
+                        libc::fprintf(
                             dvrmstb_file,
                             b"  <commercial start=\"%f\" end=\"%f\" />\n\0" as *const u8
                                 as *const libc::c_char,
@@ -24397,33 +24320,33 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                 i += 1;
             }
             if !out_file.is_null() {
-                fflush(out_file);
+                libc::fflush(out_file);
             }
             if !out_file.is_null() {
-                fclose(out_file);
+                libc::fclose(out_file);
             }
-            out_file = 0 as *mut FILE;
+            out_file = 0 as *mut libc::FILE;
             if !edl_file.is_null() {
-                fflush(edl_file);
+                libc::fflush(edl_file);
             }
             if !edl_file.is_null() {
-                fclose(edl_file);
+                libc::fclose(edl_file);
             }
-            edl_file = 0 as *mut FILE;
+            edl_file = 0 as *mut libc::FILE;
             if !live_file.is_null() {
-                fflush(live_file);
+                libc::fflush(live_file);
             }
             if !live_file.is_null() {
-                fclose(live_file);
+                libc::fclose(live_file);
             }
-            live_file = 0 as *mut FILE;
+            live_file = 0 as *mut libc::FILE;
             if !dvrmstb_file.is_null() {
-                fprintf(
+                libc::fprintf(
                     dvrmstb_file,
                     b" </root>\n\0" as *const u8 as *const libc::c_char,
                 );
-                fclose(dvrmstb_file);
-                dvrmstb_file = 0 as *mut FILE;
+                libc::fclose(dvrmstb_file);
+                dvrmstb_file = 0 as *mut libc::FILE;
             }
             if output_incommercial {
                 sprintf(
@@ -24431,12 +24354,12 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                     b"%s.incommercial\0" as *const u8 as *const libc::c_char,
                     workbasename.as_mut_ptr(),
                 );
-                incommercial_file = myfopen(
+                incommercial_file = libc::fopen(
                     filename_0.as_mut_ptr(),
                     b"w\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
                 );
                 if incommercial_file.is_null() {
-                    fprintf(
+                    libc::fprintf(
                         __stderrp,
                         b"%s - could not create file %s\n\0" as *const u8 as *const libc::c_char,
                         strerror(*__error()),
@@ -24446,21 +24369,21 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
                     if commercial[commercial_count as usize].end_frame
                         > (framenum_real - incommercial_frames) as libc::c_long
                     {
-                        fprintf(
+                        libc::fprintf(
                             incommercial_file,
                             b"1\n\0" as *const u8 as *const libc::c_char,
                         );
                     } else {
-                        fprintf(
+                        libc::fprintf(
                             incommercial_file,
                             b"0\n\0" as *const u8 as *const libc::c_char,
                         );
                     }
-                    fclose(incommercial_file);
+                    libc::fclose(incommercial_file);
                 }
             }
         }
-        free(onTheFlyBlackFrame as *mut libc::c_void);
+        libc::free(onTheFlyBlackFrame as *mut libc::c_void);
     }
 }
 #[no_mangle]
@@ -24577,7 +24500,7 @@ pub unsafe extern "C" fn set_frame_volume(f: libc::c_uint, volume: libc::c_int) 
     }
 }
 #[no_mangle]
-pub static mut dump_audio_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut dump_audio_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
 pub unsafe extern "C" fn dump_audio_start() {
     let mut temp: [libc::c_char; 256] = [0; 256];
@@ -24590,7 +24513,7 @@ pub unsafe extern "C" fn dump_audio_start() {
             b"%s.mp2\0" as *const u8 as *const libc::c_char,
             workbasename.as_mut_ptr(),
         );
-        dump_audio_file = myfopen(
+        dump_audio_file = libc::fopen(
             temp.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -24604,15 +24527,15 @@ pub unsafe extern "C" fn dump_audio(start: *mut libc::c_char, end: *mut libc::c_
     if dump_audio_file.is_null() {
         return;
     }
-    fwrite(
+    libc::fwrite(
         start as *const libc::c_void,
-        end.offset_from(start) as libc::c_long as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        end.offset_from(start) as usize,
+        1,
         dump_audio_file,
     );
 }
 #[no_mangle]
-pub static mut dump_video_file: *mut FILE = 0 as *const FILE as *mut FILE;
+pub static mut dump_video_file: *mut libc::FILE = 0 as *const libc::FILE as *mut libc::FILE;
 #[no_mangle]
 pub unsafe extern "C" fn dump_video_start() {
     let mut temp: [libc::c_char; 256] = [0; 256];
@@ -24625,7 +24548,7 @@ pub unsafe extern "C" fn dump_video_start() {
             b"%s.m2v\0" as *const u8 as *const libc::c_char,
             workbasename.as_mut_ptr(),
         );
-        dump_video_file = myfopen(
+        dump_video_file = libc::fopen(
             temp.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -24639,10 +24562,10 @@ pub unsafe extern "C" fn dump_video(start: *mut libc::c_char, end: *mut libc::c_
     if dump_video_file.is_null() {
         return;
     }
-    fwrite(
+    libc::fwrite(
         start as *const libc::c_void,
-        end.offset_from(start) as libc::c_long as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        end.offset_from(start) as usize,
+        1,
         dump_video_file,
     );
 }
@@ -24652,13 +24575,13 @@ pub unsafe extern "C" fn close_dump() {
         return;
     }
     if !dump_audio_file.is_null() {
-        fclose(dump_audio_file);
+        libc::fclose(dump_audio_file);
     }
-    dump_audio_file = 0 as *mut FILE;
+    dump_audio_file = 0 as *mut libc::FILE;
     if !dump_video_file.is_null() {
-        fclose(dump_video_file);
+        libc::fclose(dump_video_file);
     }
-    dump_video_file = 0 as *mut FILE;
+    dump_video_file = 0 as *mut libc::FILE;
 }
 #[no_mangle]
 pub unsafe extern "C" fn dump_data(start: *mut libc::c_char, length: libc::c_int) {
@@ -24676,7 +24599,7 @@ pub unsafe extern "C" fn dump_data(start: *mut libc::c_char, length: libc::c_int
             b"%s.data\0" as *const u8 as *const libc::c_char,
             workbasename.as_mut_ptr(),
         );
-        dump_data_file = myfopen(
+        dump_data_file = libc::fopen(
             temp.as_mut_ptr(),
             b"wb\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
         );
@@ -24692,22 +24615,22 @@ pub unsafe extern "C" fn dump_data(start: *mut libc::c_char, length: libc::c_int
     );
     i = 0 as libc::c_int;
     while i < length {
-        temp[(i + 12 as libc::c_int) as usize] =
+        temp[(i + 12) as usize] =
             (*start.offset(i as isize) as libc::c_int & 0xff as libc::c_int) as libc::c_char;
         i += 1;
     }
-    fwrite(
+    libc::fwrite(
         temp.as_mut_ptr() as *const libc::c_void,
-        (length + 12 as libc::c_int) as libc::c_ulong,
-        1 as libc::c_int as libc::c_ulong,
+        (length + 12) as usize,
+        1,
         dump_data_file,
     );
 }
 #[no_mangle]
 pub unsafe extern "C" fn close_data() {
     if !dump_data_file.is_null() {
-        fclose(dump_data_file);
-        dump_data_file = 0 as *mut FILE;
+        libc::fclose(dump_data_file);
+        dump_data_file = 0 as *mut libc::FILE;
     }
 }
 unsafe extern "C" fn run_static_initializers() {

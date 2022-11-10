@@ -1,11 +1,5 @@
 extern "C" {
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
-    fn memcpy(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn memmove(_: *mut libc::c_void, _: *const libc::c_void, _: libc::c_ulong)
-        -> *mut libc::c_void;
-    fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
-    fn free(_: *mut libc::c_void);
     fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
     fn exit(_: libc::c_int) -> !;
     fn lseek(_: libc::c_int, _: off_t, _: libc::c_int) -> off_t;
@@ -395,10 +389,10 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
         && *meat.offset(1 as libc::c_int as isize) as libc::c_int == 'v' as i32
         && *meat.offset(2 as libc::c_int as isize) as libc::c_int == '0' as i32
     {
-        memcpy(
+        libc::memcpy(
             &mut linemask as *mut LONG as *mut libc::c_void,
             meat.offset(3 as libc::c_int as isize) as *const libc::c_void,
-            8 as libc::c_int as libc::c_ulong,
+            8,
         );
         meat = meat.offset(11 as libc::c_int as isize);
     } else if *meat.offset(0 as libc::c_int as isize) as libc::c_int == 'T' as i32
@@ -525,10 +519,10 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
             let mut buf: [libc::c_uchar; 8] = [0; 8];
             if 8 as libc::c_int <= bytesinbuffer - filebuffer_pos {
                 if !buf.as_mut_ptr().is_null() {
-                    memcpy(
+                    libc::memcpy(
                         buf.as_mut_ptr() as *mut libc::c_void,
                         filebuffer.offset(filebuffer_pos as isize) as *const libc::c_void,
-                        8 as libc::c_int as libc::c_ulong,
+                        8,
                     );
                 }
                 filebuffer_pos += 8 as libc::c_int;
@@ -537,10 +531,10 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
                 result = buffered_read_opt(buf.as_mut_ptr(), 8 as libc::c_int as libc::c_uint);
             }
             buffered_seek(-(8 as libc::c_int));
-            if memcmp(
+            if libc::memcmp(
                 buf.as_mut_ptr() as *const libc::c_void,
                 avs_seqh.as_ptr() as *const libc::c_void,
-                4 as libc::c_int as libc::c_ulong,
+                4,
             ) == 0
                 && (buf[6 as libc::c_int as usize] as libc::c_int != 0 as libc::c_int
                     || buf[7 as libc::c_int as usize] as libc::c_int != 1 as libc::c_int)
@@ -608,10 +602,10 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
     av.type_0 = type_0;
     if av.size <= bytesinbuffer - filebuffer_pos {
         if !(av.data).is_null() {
-            memcpy(
+            libc::memcpy(
                 av.data as *mut libc::c_void,
                 filebuffer.offset(filebuffer_pos as isize) as *const libc::c_void,
-                av.size as libc::c_ulong,
+                av.size as usize,
             );
         }
         filebuffer_pos += av.size;
@@ -663,7 +657,7 @@ pub unsafe extern "C" fn myth_loop() {
         printf(b"Not enough memory.\n\0" as *const u8 as *const libc::c_char);
         exit(-(3 as libc::c_int));
     }
-    desp = malloc(65536 as libc::c_int as libc::c_ulong) as *mut libc::c_uchar;
+    desp = libc::malloc(65536) as *mut libc::c_uchar;
     saved = 0 as libc::c_int as LONG;
     while processed_enough == 0 && {
         rc = mpegps_read_packet();
@@ -700,16 +694,16 @@ pub unsafe extern "C" fn myth_loop() {
                     pts_set = 1 as libc::c_int;
                 }
             }
-            memcpy(
+            libc::memcpy(
                 desp.offset(saved as isize) as *mut libc::c_void,
                 av.data as *const libc::c_void,
-                av.size as libc::c_ulong,
+                av.size as usize,
             );
             used = process_block(desp, length);
-            memmove(
+            libc::memmove(
                 desp as *mut libc::c_void,
                 desp.offset(used as isize) as *const libc::c_void,
-                (length - used) as libc::c_uint as libc::c_ulong,
+                (length - used) as usize,
             );
             saved = length - used;
         }
@@ -732,5 +726,5 @@ pub unsafe extern "C" fn myth_loop() {
             }
         }
     }
-    free(av.data as *mut libc::c_void);
+    libc::free(av.data as *mut libc::c_void);
 }
