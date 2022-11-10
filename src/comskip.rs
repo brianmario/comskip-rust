@@ -1,10 +1,4 @@
-#![allow(
-    non_camel_case_types,
-    non_snake_case,
-    non_upper_case_globals,
-    unused_parens,
-    path_statements
-)]
+#![allow(unused_parens, path_statements)]
 extern "C" {
     pub type __sFILEX;
     pub type dispatch_semaphore_s;
