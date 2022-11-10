@@ -1,9 +1,4 @@
-#![allow(
-    mutable_transmutes,
-    non_camel_case_types,
-    non_snake_case,
-    non_upper_case_globals
-)]
+#![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 extern "C" {
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
     fn memcmp(_: *const libc::c_void, _: *const libc::c_void, _: libc::c_ulong) -> libc::c_int;
