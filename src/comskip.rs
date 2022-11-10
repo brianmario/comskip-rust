@@ -1,4 +1,3 @@
-#![allow(path_statements)]
 extern "C" {
     pub type __sFILEX;
     pub type dispatch_semaphore_s;
@@ -3783,7 +3782,6 @@ pub unsafe extern "C" fn DetectCommercials(f: libc::c_int, mut pts: libc::c_doub
                         return 1 as libc::c_int;
                     }
                 }
-                logoInfoAvailable;
             }
         }
         if logoInfoAvailable {
@@ -13876,7 +13874,6 @@ pub unsafe extern "C" fn LoadSettings(
         {
             output_debugwindow = 1 as libc::c_int != 0;
         }
-        output_debugwindow;
     }
     if arg_nullcheck(argtable.as_mut_ptr()) != 0 as libc::c_int {
         Debug(
