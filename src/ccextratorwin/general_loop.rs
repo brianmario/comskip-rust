@@ -3,8 +3,7 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
-    unused_assignments,
-    unused_mut
+    unused_assignments
 )]
 extern "C" {
     pub type __sFILEX;
@@ -182,7 +181,7 @@ pub static mut p_caption: *mut libc::c_uchar = 0 as *const libc::c_uchar as *mut
 pub static mut non_compliant_DVD: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub unsafe extern "C" fn calculate_ccblock_gop_time(mut g: *mut gop_time_code) {
-    let mut seconds: libc::c_int = (*g).time_code_hours * 3600 as libc::c_int
+    let seconds: libc::c_int = (*g).time_code_hours * 3600 as libc::c_int
         + (*g).time_code_minutes * 60 as libc::c_int
         + (*g).time_code_seconds;
     (*g).ccblocks =
@@ -194,7 +193,7 @@ pub unsafe extern "C" fn calculate_ccblock_gop_time(mut g: *mut gop_time_code) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn gop_accepted(mut g: *mut gop_time_code) -> libc::c_int {
+pub unsafe extern "C" fn gop_accepted(g: *mut gop_time_code) -> libc::c_int {
     if !((*g).time_code_hours <= 23 as libc::c_int
         && (*g).time_code_minutes <= 59 as libc::c_int
         && (*g).time_code_seconds <= 59 as libc::c_int
@@ -218,7 +217,7 @@ pub unsafe extern "C" fn gop_accepted(mut g: *mut gop_time_code) -> libc::c_int 
     return 1 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn set_cc_pts(mut pts: int64_t) {
+pub unsafe extern "C" fn set_cc_pts(pts: int64_t) {
     current_pts = pts as LONG;
     if pts_set == 0 as libc::c_int {
         pts_set = 1 as libc::c_int;
@@ -286,7 +285,7 @@ pub static mut filebuffer_pos: libc::c_int = 0;
 #[no_mangle]
 pub static mut bytesinbuffer: libc::c_int = 0;
 #[no_mangle]
-pub unsafe extern "C" fn do_padding(mut mis1: libc::c_int, mut mis2: libc::c_int) {
+pub unsafe extern "C" fn do_padding(mis1: libc::c_int, mis2: libc::c_int) {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while i < mis1 {
@@ -314,10 +313,10 @@ pub unsafe extern "C" fn do_padding(mut mis1: libc::c_int, mut mis2: libc::c_int
 #[no_mangle]
 pub unsafe extern "C" fn gop_padding() {
     if first_gop_time.inited != 0 {
-        let mut mis1: libc::c_int = (gop_time.ccblocks + frames_since_last_gop as libc::c_long
+        let mis1: libc::c_int = (gop_time.ccblocks + frames_since_last_gop as libc::c_long
             - first_gop_time.ccblocks
             - c1count as libc::c_long) as libc::c_int;
-        let mut mis2: libc::c_int = (gop_time.ccblocks + frames_since_last_gop as libc::c_long
+        let mis2: libc::c_int = (gop_time.ccblocks + frames_since_last_gop as libc::c_long
             - first_gop_time.ccblocks
             - c2count as libc::c_long) as libc::c_int;
         do_padding(mis1, mis2);
@@ -325,10 +324,10 @@ pub unsafe extern "C" fn gop_padding() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn pts_padding() {
-    let mut exp: libc::c_int = ((current_pts - min_pts) as libc::c_double * 29.97f64
+    let exp: libc::c_int = ((current_pts - min_pts) as libc::c_double * 29.97f64
         / 90000 as libc::c_int as libc::c_double) as libc::c_int;
-    let mut mis1: libc::c_int = (exp as libc::c_uint).wrapping_sub(c1count) as libc::c_int;
-    let mut mis2: libc::c_int = (exp as libc::c_uint).wrapping_sub(c2count) as libc::c_int;
+    let mis1: libc::c_int = (exp as libc::c_uint).wrapping_sub(c1count) as libc::c_int;
+    let mis2: libc::c_int = (exp as libc::c_uint).wrapping_sub(c2count) as libc::c_int;
     do_padding(mis1, mis2);
 }
 #[no_mangle]
@@ -347,7 +346,7 @@ pub unsafe extern "C" fn init_file_buffer() -> libc::c_int {
     return 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn buffered_seek(mut offset: libc::c_int) {
+pub unsafe extern "C" fn buffered_seek(offset: libc::c_int) {
     if offset < 0 as libc::c_int {
         filebuffer_pos += offset;
         if filebuffer_pos < 0 as libc::c_int {
@@ -686,25 +685,25 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                             & 1 as libc::c_int
                                             != 0
                                     {
-                                        let mut bits_9: libc::c_uint =
+                                        let bits_9: libc::c_uint =
                                             ((pts_raw[0 as libc::c_int as usize] as libc::c_int
                                                 & 0xe as libc::c_int)
                                                 << 28 as libc::c_int)
                                                 as libc::c_uint;
-                                        let mut bits_10: libc::c_uint =
+                                        let bits_10: libc::c_uint =
                                             ((pts_raw[1 as libc::c_int as usize] as libc::c_int)
                                                 << 22 as libc::c_int)
                                                 as libc::c_uint;
-                                        let mut bits_11: libc::c_uint =
+                                        let bits_11: libc::c_uint =
                                             ((pts_raw[2 as libc::c_int as usize] as libc::c_int
                                                 & 0xfe as libc::c_int)
                                                 << 14 as libc::c_int)
                                                 as libc::c_uint;
-                                        let mut bits_12: libc::c_uint =
+                                        let bits_12: libc::c_uint =
                                             ((pts_raw[3 as libc::c_int as usize] as libc::c_int)
                                                 << 7 as libc::c_int)
                                                 as libc::c_uint;
-                                        let mut bits_13: libc::c_uint =
+                                        let bits_13: libc::c_uint =
                                             (pts_raw[4 as libc::c_int as usize] as libc::c_int
                                                 >> 1 as libc::c_int)
                                                 as libc::c_uint;
@@ -814,7 +813,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
 #[no_mangle]
 pub unsafe extern "C" fn general_getmoredata() -> LONG {
     loop {
-        let mut want: libc::c_int = ((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
+        let want: libc::c_int = ((256 as libc::c_int * 1024 as libc::c_int + 120 as libc::c_int)
             as libc::c_long
             - inbuf) as libc::c_int;
         if want <= bytesinbuffer - filebuffer_pos {
@@ -870,12 +869,12 @@ pub unsafe extern "C" fn raw_loop() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn process_block(mut data: *mut libc::c_uchar, mut length: LONG) -> LONG {
+pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -> LONG {
     let mut limit: libc::c_int = 0;
     let mut printed: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut header: *mut libc::c_uchar = data;
-    let mut endofbuffer: *mut libc::c_uchar = data.offset(length as isize);
+    let endofbuffer: *mut libc::c_uchar = data.offset(length as isize);
     if length < 4 as libc::c_int as libc::c_long {
         return length;
     }
@@ -1486,7 +1485,7 @@ pub unsafe extern "C" fn general_loop() {
         }
         pos += got;
         if inputsize > 0 as libc::c_int as libc::c_long {
-            let mut progress: libc::c_int =
+            let progress: libc::c_int =
                 ((past >> 8 as libc::c_int) * 100 as libc::c_int as libc::c_long
                     / (inputsize >> 8 as libc::c_int)) as libc::c_int;
             if last_reported_progress != progress {

@@ -3,8 +3,7 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
-    unused_assignments,
-    unused_mut
+    unused_assignments
 )]
 extern "C" {
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
@@ -166,10 +165,10 @@ unsafe extern "C" fn get_pts(mut c: libc::c_int) -> LONG {
     return pts;
 }
 unsafe extern "C" fn find_next_start_code(
-    mut size_ptr: *mut libc::c_int,
-    mut header_state_0: *mut libc::c_uint,
+    size_ptr: *mut libc::c_int,
+    header_state_0: *mut libc::c_uint,
 ) -> libc::c_int {
-    let mut current_block: u64;
+    let current_block: u64;
     let mut state: libc::c_uint = 0;
     let mut v: libc::c_uint = 0;
     let mut val: libc::c_int = 0;
@@ -217,7 +216,7 @@ unsafe extern "C" fn find_next_start_code(
     return val;
 }
 #[no_mangle]
-pub unsafe extern "C" fn url_fskip(mut length: libc::c_int) {
+pub unsafe extern "C" fn url_fskip(length: libc::c_int) {
     buffered_seek(length);
 }
 unsafe extern "C" fn mpegps_psm_parse() -> libc::c_long {
@@ -231,9 +230,9 @@ unsafe extern "C" fn mpegps_psm_parse() -> libc::c_long {
     url_fskip(ps_info_length);
     es_map_length = get_be16();
     while es_map_length >= 4 as libc::c_int {
-        let mut type_0: libc::c_uchar = get_byte() as libc::c_uchar;
-        let mut es_id: libc::c_uchar = get_byte() as libc::c_uchar;
-        let mut es_info_length: libc::c_uint = get_be16() as libc::c_uint;
+        let type_0: libc::c_uchar = get_byte() as libc::c_uchar;
+        let es_id: libc::c_uchar = get_byte() as libc::c_uchar;
+        let es_info_length: libc::c_uint = get_be16() as libc::c_uint;
         psm_es_type[es_id as usize] = type_0;
         url_fskip(es_info_length as libc::c_int);
         es_map_length = (es_map_length as libc::c_uint)
@@ -244,9 +243,9 @@ unsafe extern "C" fn mpegps_psm_parse() -> libc::c_long {
     return (2 as libc::c_int + psm_length) as libc::c_long;
 }
 unsafe extern "C" fn mpegps_read_pes_header(
-    mut pstart_code: *mut libc::c_int,
-    mut ppts: *mut LONG,
-    mut pdts: *mut LONG,
+    pstart_code: *mut libc::c_int,
+    ppts: *mut LONG,
+    pdts: *mut LONG,
 ) -> libc::c_int {
     let mut len: libc::c_int = 0;
     let mut size: libc::c_int = 0;
@@ -375,10 +374,10 @@ unsafe extern "C" fn mpegps_read_pes_header(
     return len;
 }
 unsafe extern "C" fn cc608_good_parity(
-    mut parity_table: *const libc::c_int,
-    mut data: libc::c_uint,
+    parity_table: *const libc::c_int,
+    data: libc::c_uint,
 ) -> libc::c_int {
-    let mut ret: libc::c_int =
+    let ret: libc::c_int =
         (*parity_table.offset((data & 0xff as libc::c_int as libc::c_uint) as isize) != 0
             && *parity_table.offset(
                 ((data & 0xff00 as libc::c_int as libc::c_uint) >> 8 as libc::c_int) as isize,
@@ -440,7 +439,7 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
             match id2 {
                 4 => {
                     if 21 as libc::c_int as libc::c_uint == line {
-                        let mut data: libc::c_int = (*meat.offset(2 as libc::c_int as isize)
+                        let data: libc::c_int = (*meat.offset(2 as libc::c_int as isize)
                             as libc::c_int)
                             << 8 as libc::c_int
                             | *meat.offset(1 as libc::c_int as isize) as libc::c_int;
@@ -631,7 +630,7 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
     av.dts = dts;
     return 0 as libc::c_int;
 }
-unsafe extern "C" fn cc608_parity(mut byte: libc::c_uint) -> libc::c_int {
+unsafe extern "C" fn cc608_parity(byte: libc::c_uint) -> libc::c_int {
     let mut ones: libc::c_int = 0 as libc::c_int;
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
@@ -643,7 +642,7 @@ unsafe extern "C" fn cc608_parity(mut byte: libc::c_uint) -> libc::c_int {
     }
     return ones & 1 as libc::c_int;
 }
-unsafe extern "C" fn cc608_build_parity_table(mut parity_table: *mut libc::c_int) {
+unsafe extern "C" fn cc608_build_parity_table(parity_table: *mut libc::c_int) {
     let mut byte: libc::c_uint = 0;
     let mut parity_v: libc::c_int = 0;
     byte = 0 as libc::c_int as libc::c_uint;
@@ -693,7 +692,7 @@ pub unsafe extern "C" fn myth_loop() {
             && av.type_0 == CODEC_TYPE_VIDEO as libc::c_int
             && has_vbi == 0
         {
-            let mut length: LONG = saved + av.size as libc::c_long;
+            let length: LONG = saved + av.size as libc::c_long;
             let mut used: LONG = 0;
             if length > 65536 as libc::c_int as libc::c_long {
                 printf(
@@ -723,8 +722,8 @@ pub unsafe extern "C" fn myth_loop() {
         }
         if inputsize > 0 as libc::c_int as libc::c_long {
             let mut cur_sec: libc::c_int = 0;
-            let mut at: LONG = lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
-            let mut progress: libc::c_int =
+            let at: LONG = lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
+            let progress: libc::c_int =
                 ((at >> 8 as libc::c_int) * 100 as libc::c_int as libc::c_long
                     / (inputsize >> 8 as libc::c_int)) as libc::c_int;
             if last_reported_progress != progress {

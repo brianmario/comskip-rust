@@ -3,8 +3,7 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
-    unused_assignments,
-    unused_mut
+    unused_assignments
 )]
 extern "C" {
     pub type __sFILEX;
@@ -109,27 +108,27 @@ pub unsafe extern "C" fn toupper(mut _c: libc::c_int) -> libc::c_int {
     return __toupper(_c);
 }
 #[no_mangle]
-pub unsafe extern "C" fn mystat(mut f: *mut libc::c_char, mut s: stath) -> libc::c_int {
+pub unsafe extern "C" fn mystat(f: *mut libc::c_char, s: stath) -> libc::c_int {
     return stat(f, s);
 }
 #[no_mangle]
-pub unsafe extern "C" fn myfopen(mut f: *const libc::c_char, mut m: *mut libc::c_char) -> fileh {
+pub unsafe extern "C" fn myfopen(f: *const libc::c_char, m: *mut libc::c_char) -> fileh {
     return fopen(f, m);
 }
 #[no_mangle]
-pub unsafe extern "C" fn myremove(mut f: *mut libc::c_char) -> libc::c_int {
+pub unsafe extern "C" fn myremove(f: *mut libc::c_char) -> libc::c_int {
     return unlink(f);
 }
 #[no_mangle]
-pub unsafe extern "C" fn min(mut i: libc::c_int, mut j: libc::c_int) -> libc::c_int {
+pub unsafe extern "C" fn min(i: libc::c_int, j: libc::c_int) -> libc::c_int {
     return if i < j { i } else { j };
 }
 #[no_mangle]
-pub unsafe extern "C" fn max(mut i: libc::c_int, mut j: libc::c_int) -> libc::c_int {
+pub unsafe extern "C" fn max(i: libc::c_int, j: libc::c_int) -> libc::c_int {
     return if i > j { i } else { j };
 }
 #[no_mangle]
-pub unsafe extern "C" fn _strupr(mut string: *mut libc::c_char) -> *mut libc::c_char {
+pub unsafe extern "C" fn _strupr(string: *mut libc::c_char) -> *mut libc::c_char {
     let mut s: *mut libc::c_char = 0 as *mut libc::c_char;
     if !string.is_null() {
         s = string;

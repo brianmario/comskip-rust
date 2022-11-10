@@ -4,7 +4,6 @@
     non_snake_case,
     non_upper_case_globals,
     unused_assignments,
-    unused_mut,
     unused_parens,
     path_statements
 )]
@@ -584,7 +583,7 @@ pub unsafe extern "C" fn isspace(mut _c: libc::c_int) -> libc::c_int {
     return __istype(_c, 0x4000 as libc::c_long as libc::c_ulong);
 }
 #[no_mangle]
-pub unsafe extern "C" fn __vaDriverInit_iHD(mut ctx: *mut libc::c_void) -> libc::c_int {
+pub unsafe extern "C" fn __vaDriverInit_iHD(ctx: *mut libc::c_void) -> libc::c_int {
     return -(1 as libc::c_int);
 }
 #[no_mangle]
@@ -1578,13 +1577,13 @@ pub static mut graph: [libc::c_uchar; 13824000] = [0; 13824000];
 #[no_mangle]
 pub static mut gy: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
-pub unsafe extern "C" fn CauseString(mut i: libc::c_int) -> *mut libc::c_char {
+pub unsafe extern "C" fn CauseString(i: libc::c_int) -> *mut libc::c_char {
     static mut cs: [[libc::c_char; 80]; 4] = [[0; 80]; 4];
     static mut ii: libc::c_int = 0 as libc::c_int;
     let mut c: *mut libc::c_char = &mut *(*cs.as_mut_ptr().offset(ii as isize))
         .as_mut_ptr()
         .offset(0 as libc::c_int as isize) as *mut libc::c_char;
-    let mut rc: *mut libc::c_char = &mut *(*cs.as_mut_ptr().offset(ii as isize))
+    let rc: *mut libc::c_char = &mut *(*cs.as_mut_ptr().offset(ii as isize))
         .as_mut_ptr()
         .offset(0 as libc::c_int as isize) as *mut libc::c_char;
     let fresh0 = c;
@@ -1770,9 +1769,9 @@ pub unsafe extern "C" fn CauseString(mut i: libc::c_int) -> *mut libc::c_char {
 }
 #[no_mangle]
 pub unsafe extern "C" fn ValidateBlackFrames(
-    mut reason: libc::c_long,
-    mut ratio: libc::c_double,
-    mut remove: libc::c_int,
+    reason: libc::c_long,
+    ratio: libc::c_double,
+    remove: libc::c_int,
 ) -> libc::c_double {
     let mut i: libc::c_int = 0;
     let mut k: libc::c_int = 0;
@@ -2117,7 +2116,7 @@ pub unsafe extern "C" fn ValidateBlackFrames(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn BuildBlocks(mut recalc: bool) -> bool {
+pub unsafe extern "C" fn BuildBlocks(recalc: bool) -> bool {
     let mut i: libc::c_int = 0 as libc::c_int;
     let mut j: libc::c_int = 0 as libc::c_int;
     let mut k: libc::c_int = 0 as libc::c_int;
@@ -2764,7 +2763,7 @@ pub unsafe extern "C" fn BuildBlocks(mut recalc: bool) -> bool {
     }
     i = (block_count - 1 as libc::c_int as libc::c_long) as libc::c_int;
     while i >= 1 as libc::c_int {
-        let mut bfcount: libc::c_uint = (cblock[i as usize].b_head)
+        let bfcount: libc::c_uint = (cblock[i as usize].b_head)
             .wrapping_add(cblock[(i - 1 as libc::c_int) as usize].b_tail);
         if bfcount < min_black_frames_for_break
             && cblock[(i - 1 as libc::c_int) as usize].cause
@@ -2830,7 +2829,7 @@ pub unsafe extern "C" fn BuildBlocks(mut recalc: bool) -> bool {
 #[no_mangle]
 pub unsafe extern "C" fn FindLogoThreshold() {
     let mut i: libc::c_int = 0;
-    let mut buckets: libc::c_int = 20 as libc::c_int;
+    let buckets: libc::c_int = 20 as libc::c_int;
     let mut counter: libc::c_int = 0 as libc::c_int;
     if framearray {
         i = 1 as libc::c_int;
@@ -3131,12 +3130,7 @@ pub static mut show_XDS: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub static mut show_silence: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
-pub unsafe extern "C" fn OutputDebugWindow(
-    mut showVideo: bool,
-    mut frm: libc::c_int,
-    mut grf: libc::c_int,
-) {
-}
+pub unsafe extern "C" fn OutputDebugWindow(showVideo: bool, frm: libc::c_int, grf: libc::c_int) {}
 static mut shift: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub unsafe extern "C" fn Recalc() {
@@ -3152,7 +3146,7 @@ pub unsafe extern "C" fn ReviewResult() -> bool {
     let mut review_file: *mut FILE = 0 as *mut FILE;
     let mut curframe: libc::c_int = 1 as libc::c_int;
     let mut lastcurframe: libc::c_int = -(1 as libc::c_int);
-    let mut bartop: libc::c_int = 0 as libc::c_int;
+    let bartop: libc::c_int = 0 as libc::c_int;
     let mut grf: libc::c_int = 2 as libc::c_int;
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
@@ -3650,10 +3644,7 @@ pub unsafe extern "C" fn ReviewResult() -> bool {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn DetectCommercials(
-    mut f: libc::c_int,
-    mut pts: libc::c_double,
-) -> libc::c_int {
+pub unsafe extern "C" fn DetectCommercials(f: libc::c_int, mut pts: libc::c_double) -> libc::c_int {
     let mut isBlack: bool = 0 as libc::c_int != 0;
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
@@ -3908,18 +3899,15 @@ pub unsafe extern "C" fn DetectCommercials(
     return 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn Max(mut i: libc::c_int, mut j: libc::c_int) -> libc::c_int {
+pub unsafe extern "C" fn Max(i: libc::c_int, j: libc::c_int) -> libc::c_int {
     return if i > j { i } else { j };
 }
 #[no_mangle]
-pub unsafe extern "C" fn Min(mut i: libc::c_int, mut j: libc::c_int) -> libc::c_int {
+pub unsafe extern "C" fn Min(i: libc::c_int, j: libc::c_int) -> libc::c_int {
     return if i < j { i } else { j };
 }
 #[no_mangle]
-pub unsafe extern "C" fn AverageARForBlock(
-    mut start: libc::c_int,
-    mut end: libc::c_int,
-) -> libc::c_double {
+pub unsafe extern "C" fn AverageARForBlock(start: libc::c_int, end: libc::c_int) -> libc::c_double {
     let mut i: libc::c_int = 0;
     let mut maxSize: libc::c_int = 0;
     let mut Ar: libc::c_double = 0.;
@@ -3943,10 +3931,7 @@ pub unsafe extern "C" fn AverageARForBlock(
     return Ar;
 }
 #[no_mangle]
-pub unsafe extern "C" fn AverageACForBlock(
-    mut start: libc::c_int,
-    mut end: libc::c_int,
-) -> libc::c_int {
+pub unsafe extern "C" fn AverageACForBlock(start: libc::c_int, end: libc::c_int) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut maxSize: libc::c_int = 0;
     let mut Ac: libc::c_int = 0;
@@ -3970,7 +3955,7 @@ pub unsafe extern "C" fn AverageACForBlock(
     return Ac;
 }
 #[no_mangle]
-pub unsafe extern "C" fn FindARFromHistogram(mut ar_ratio: libc::c_double) -> libc::c_double {
+pub unsafe extern "C" fn FindARFromHistogram(ar_ratio: libc::c_double) -> libc::c_double {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while i < 1000 as libc::c_int {
@@ -4006,7 +3991,7 @@ pub unsafe extern "C" fn FindARFromHistogram(mut ar_ratio: libc::c_double) -> li
     return 0.0f64;
 }
 #[no_mangle]
-pub unsafe extern "C" fn FillARHistogram(mut refill: bool) {
+pub unsafe extern "C" fn FillARHistogram(refill: bool) {
     let mut i: libc::c_int = 0;
     let mut hadToSwap: bool = false;
     let mut tempFrames: libc::c_long = 0;
@@ -4088,7 +4073,7 @@ pub unsafe extern "C" fn FillARHistogram(mut refill: bool) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn FillACHistogram(mut refill: bool) {
+pub unsafe extern "C" fn FillACHistogram(refill: bool) {
     let mut i: libc::c_int = 0;
     let mut hadToSwap: bool = false;
     let mut tempFrames: libc::c_long = 0;
@@ -4171,11 +4156,11 @@ pub unsafe extern "C" fn FillACHistogram(mut refill: bool) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn InsertBlackFrame(
-    mut f: libc::c_int,
-    mut b: libc::c_int,
-    mut u: libc::c_int,
-    mut v: libc::c_int,
-    mut c: libc::c_int,
+    f: libc::c_int,
+    b: libc::c_int,
+    u: libc::c_int,
+    v: libc::c_int,
+    c: libc::c_int,
 ) {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
@@ -5803,9 +5788,9 @@ pub unsafe extern "C" fn BuildMasterCommList() -> bool {
 }
 #[no_mangle]
 pub unsafe extern "C" fn WithinDivisibleTolerance(
-    mut test_number: libc::c_double,
-    mut divisor: libc::c_double,
-    mut tolerance: libc::c_double,
+    test_number: libc::c_double,
+    divisor: libc::c_double,
+    tolerance: libc::c_double,
 ) -> bool {
     let mut added: libc::c_double = 0.;
     let mut remainder: libc::c_double = 0.;
@@ -5960,7 +5945,7 @@ pub unsafe extern "C" fn WeighBlocks() {
     let mut wscore: libc::c_double = 0.0f64;
     let mut lscore: libc::c_double = 0.0f64;
     let mut max_score: libc::c_double = 99.99f64;
-    let mut max_combined_count: libc::c_int = 25 as libc::c_int;
+    let max_combined_count: libc::c_int = 25 as libc::c_int;
     let mut breakforcombine: bool = 0 as libc::c_int != 0;
     if commDetectMethod & 32 as libc::c_int != 0 {
         SetARofBlocks();
@@ -8590,16 +8575,16 @@ pub unsafe extern "C" fn OpenOutputFiles() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputCommercialBlock(
-    mut i: libc::c_int,
-    mut prev: libc::c_long,
+    i: libc::c_int,
+    prev: libc::c_long,
     mut start: libc::c_long,
-    mut end: libc::c_long,
-    mut last: bool,
+    end: libc::c_long,
+    last: bool,
 ) {
     let mut s_start: libc::c_int = 0;
     let mut s_end: libc::c_int = 0;
     let mut count: libc::c_int = 0;
-    let mut minutes: libc::c_double = (if !frame.is_null() {
+    let minutes: libc::c_double = (if !frame.is_null() {
         (if frame_count <= 0 as libc::c_int as libc::c_long {
             (*frame.offset(1 as libc::c_int as isize)).pts
         } else {
@@ -8851,7 +8836,7 @@ pub unsafe extern "C" fn OutputCommercialBlock(
         fclose(zoomplayer_chapter_file);
     }
     if !scf_file.is_null() && prev < start && (end - start) as libc::c_double > fps {
-        let mut rounded_fps: libc::c_int = (fps + 0.5f64) as libc::c_int;
+        let rounded_fps: libc::c_int = (fps + 0.5f64) as libc::c_int;
         fprintf(
             scf_file,
             b"CHAPTER%02i=%02li:%02li:%02li.%03li\n\0" as *const u8 as *const libc::c_char,
@@ -9882,9 +9867,9 @@ pub unsafe extern "C" fn OutputCommercialBlock(
 }
 #[no_mangle]
 pub unsafe extern "C" fn CompareLetter(
-    mut value: libc::c_int,
-    mut average: libc::c_int,
-    mut i: libc::c_int,
+    value: libc::c_int,
+    average: libc::c_int,
+    i: libc::c_int,
 ) -> libc::c_char {
     if cblock[i as usize].reffer as libc::c_int == '+' as i32
         || cblock[i as usize].reffer as libc::c_int == '-' as i32
@@ -11460,9 +11445,9 @@ pub unsafe extern "C" fn OutputBlocks() -> bool {
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputStrict(
-    mut len: libc::c_double,
-    mut delta: libc::c_double,
-    mut tol: libc::c_double,
+    len: libc::c_double,
+    delta: libc::c_double,
+    tol: libc::c_double,
 ) {
     if output_training != 0 && training_file.is_null() {
         training_file = myfopen(
@@ -11715,9 +11700,9 @@ pub unsafe extern "C" fn OutputCleanMpg() -> bool {
 }
 #[no_mangle]
 pub unsafe extern "C" fn LengthWithinTolerance(
-    mut test_length: libc::c_double,
-    mut expected_length: libc::c_double,
-    mut tolerance: libc::c_double,
+    test_length: libc::c_double,
+    expected_length: libc::c_double,
+    tolerance: libc::c_double,
 ) -> bool {
     return abs((test_length * fps) as libc::c_int - (expected_length * fps) as libc::c_int)
         <= (tolerance * fps) as libc::c_int;
@@ -11725,14 +11710,14 @@ pub unsafe extern "C" fn LengthWithinTolerance(
 #[no_mangle]
 pub unsafe extern "C" fn IsStandardCommercialLength(
     mut length: libc::c_double,
-    mut tolerance: libc::c_double,
-    mut strict: bool,
+    tolerance: libc::c_double,
+    strict: bool,
 ) -> bool {
     let mut i: libc::c_int = 0;
     let mut local_tolerance: libc::c_double = 0.;
     let mut length_count: libc::c_int = 0;
     let mut delta: libc::c_double = 0.;
-    let mut standard_length: [libc::c_int; 17] = [
+    let standard_length: [libc::c_int; 17] = [
         10 as libc::c_int,
         15 as libc::c_int,
         20 as libc::c_int,
@@ -11790,8 +11775,8 @@ pub unsafe extern "C" fn IsStandardCommercialLength(
 #[no_mangle]
 pub unsafe extern "C" fn FindNumber(
     mut str1: *mut libc::c_char,
-    mut str2: *mut libc::c_char,
-    mut v: libc::c_double,
+    str2: *mut libc::c_char,
+    v: libc::c_double,
 ) -> libc::c_double {
     let mut tmp: [libc::c_char; 255] = [0; 255];
     let mut negative: bool = 0 as libc::c_int != 0;
@@ -11973,7 +11958,7 @@ pub unsafe extern "C" fn FindString(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn AddIniString(mut s: *mut libc::c_char) {
+pub unsafe extern "C" fn AddIniString(s: *mut libc::c_char) {
     strcat(ini_text.as_mut_ptr(), s);
 }
 #[no_mangle]
@@ -13607,8 +13592,8 @@ pub unsafe extern "C" fn LoadIniFile() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn LoadSettings(
-    mut argc: libc::c_int,
-    mut argv: *mut *mut libc::c_char,
+    argc: libc::c_int,
+    argv: *mut *mut libc::c_char,
 ) -> *mut FILE {
     let mut tempstr: [libc::c_char; 4096] = [0; 4096];
     let mut logo_file: *mut FILE = 0 as *mut FILE;
@@ -13618,53 +13603,53 @@ pub unsafe extern "C" fn LoadSettings(
     let mut ltime: time_t = 0;
     let mut now: *mut tm = 0 as *mut tm;
     let mut mil_time: libc::c_int = 0;
-    let mut cl_playnice: *mut arg_lit = arg_lit0(
+    let cl_playnice: *mut arg_lit = arg_lit0(
         b"n\0" as *const u8 as *const libc::c_char,
         b"playnice\0" as *const u8 as *const libc::c_char,
         b"Slows detection down\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_zp_cutlist: *mut arg_lit = arg_lit0(
+    let cl_output_zp_cutlist: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"zpcut\0" as *const u8 as *const libc::c_char,
         b"Outputs a ZoomPlayer cutlist\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_zp_chapter: *mut arg_lit = arg_lit0(
+    let cl_output_zp_chapter: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"zpchapter\0" as *const u8 as *const libc::c_char,
         b"Outputs a ZoomPlayer chapter file\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_scf: *mut arg_lit = arg_lit0(
+    let cl_output_scf: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"scf\0" as *const u8 as *const libc::c_char,
         b"Outputs a simple chapter file for mkvmerge\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_vredo: *mut arg_lit = arg_lit0(
+    let cl_output_vredo: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"videoredo\0" as *const u8 as *const libc::c_char,
         b"Outputs a VideoRedo cutlist\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_vredo3: *mut arg_lit = arg_lit0(
+    let cl_output_vredo3: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"videoredo3\0" as *const u8 as *const libc::c_char,
         b"Outputs a VideoRedo3 cutlist\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_csv: *mut arg_lit = arg_lit0(
+    let cl_output_csv: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"csvout\0" as *const u8 as *const libc::c_char,
         b"Outputs a csv of the frame array\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_training: *mut arg_lit = arg_lit0(
+    let cl_output_training: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"quality\0" as *const u8 as *const libc::c_char,
         b"Outputs a csv of false detection segments\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_output_plist: *mut arg_lit = arg_lit0(
+    let cl_output_plist: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"plist\0" as *const u8 as *const libc::c_char,
         b"Outputs a mac-style plist for addition to an EyeTV archive as the 'markers' property\0"
             as *const u8 as *const libc::c_char,
     );
-    let mut cl_detectmethod: *mut arg_int = arg_intn(
+    let cl_detectmethod: *mut arg_int = arg_intn(
         b"d\0" as *const u8 as *const libc::c_char,
         b"detectmethod\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13672,7 +13657,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"An integer sum of the detection methods to use\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_pid: *mut arg_str = arg_strn(
+    let cl_pid: *mut arg_str = arg_strn(
         b"p\0" as *const u8 as *const libc::c_char,
         b"pid\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13680,7 +13665,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"The PID of the video in the TS\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_dump: *mut arg_int = arg_intn(
+    let cl_dump: *mut arg_int = arg_intn(
         b"u\0" as *const u8 as *const libc::c_char,
         b"dump\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13688,53 +13673,53 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Dump the cutscene at this frame number\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_ts: *mut arg_lit = arg_lit0(
+    let cl_ts: *mut arg_lit = arg_lit0(
         b"t\0" as *const u8 as *const libc::c_char,
         b"ts\0" as *const u8 as *const libc::c_char,
         b"The input file is a Transport Stream\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_help: *mut arg_lit = arg_lit0(
+    let cl_help: *mut arg_lit = arg_lit0(
         b"h\0" as *const u8 as *const libc::c_char,
         b"help\0" as *const u8 as *const libc::c_char,
         b"Display syntax\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_show: *mut arg_lit = arg_lit0(
+    let cl_show: *mut arg_lit = arg_lit0(
         b"s\0" as *const u8 as *const libc::c_char,
         b"play\0" as *const u8 as *const libc::c_char,
         b"Play the video\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_timing: *mut arg_lit = arg_lit0(
+    let cl_timing: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"timing\0" as *const u8 as *const libc::c_char,
         b"Dump the timing into a file\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_debugwindow: *mut arg_lit = arg_lit0(
+    let cl_debugwindow: *mut arg_lit = arg_lit0(
         b"w\0" as *const u8 as *const libc::c_char,
         b"debugwindow\0" as *const u8 as *const libc::c_char,
         b"Show debug window\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_quiet: *mut arg_lit = arg_lit0(
+    let cl_quiet: *mut arg_lit = arg_lit0(
         b"q\0" as *const u8 as *const libc::c_char,
         b"quiet\0" as *const u8 as *const libc::c_char,
         b"Not output logging to the console window\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_demux: *mut arg_lit = arg_lit0(
+    let cl_demux: *mut arg_lit = arg_lit0(
         b"m\0" as *const u8 as *const libc::c_char,
         b"demux\0" as *const u8 as *const libc::c_char,
         b"Demux the input into elementary streams\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_hwassist: *mut arg_lit = arg_lit0(
+    let cl_hwassist: *mut arg_lit = arg_lit0(
         0 as *const libc::c_char,
         b"hwassist\0" as *const u8 as *const libc::c_char,
         b"Activate Hardware Assisted video decoding\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_threads: *mut arg_int = arg_int0(
+    let cl_threads: *mut arg_int = arg_int0(
         0 as *const libc::c_char,
         b"threads\0" as *const u8 as *const libc::c_char,
         b"<int>\0" as *const u8 as *const libc::c_char,
         b"The number of threads to use\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_verbose: *mut arg_int = arg_intn(
+    let cl_verbose: *mut arg_int = arg_intn(
         b"v\0" as *const u8 as *const libc::c_char,
         b"verbose\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13742,7 +13727,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Verbose level\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_ini: *mut arg_file = arg_filen(
+    let cl_ini: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         b"ini\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13750,7 +13735,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Ini file to use\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_logo: *mut arg_file = arg_filen(
+    let cl_logo: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         b"logo\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13758,7 +13743,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Logo file to use\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_cut: *mut arg_file = arg_filen(
+    let cl_cut: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         b"cut\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13766,7 +13751,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"CutScene file to use\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_work: *mut arg_file = arg_filen(
+    let cl_work: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         b"output\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13774,7 +13759,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Folder to use for all output files\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_work_fname: *mut arg_file = arg_filen(
+    let cl_work_fname: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         b"output-filename\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13782,7 +13767,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Filename base to use for all output files\0" as *const u8 as *const libc::c_char,
     );
-    let mut cl_selftest: *mut arg_int = arg_intn(
+    let cl_selftest: *mut arg_int = arg_intn(
         0 as *const libc::c_char,
         b"selftest\0" as *const u8 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13790,7 +13775,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Execute a selftest\0" as *const u8 as *const libc::c_char,
     );
-    let mut in_0: *mut arg_file = arg_filen(
+    let in_0: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         0 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13798,7 +13783,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Input file\0" as *const u8 as *const libc::c_char,
     );
-    let mut out: *mut arg_file = arg_filen(
+    let out: *mut arg_file = arg_filen(
         0 as *const libc::c_char,
         0 as *const libc::c_char,
         0 as *const libc::c_char,
@@ -13806,7 +13791,7 @@ pub unsafe extern "C" fn LoadSettings(
         1 as libc::c_int,
         b"Output folder for cutlist\0" as *const u8 as *const libc::c_char,
     );
-    let mut end: *mut arg_end = arg_end(20 as libc::c_int);
+    let end: *mut arg_end = arg_end(20 as libc::c_int);
     let mut argtable: [*mut libc::c_void; 31] = [
         cl_help as *mut libc::c_void,
         cl_debugwindow as *mut libc::c_void,
@@ -15004,8 +14989,8 @@ pub unsafe extern "C" fn ProcessARInfoInit(
     mut minX_0: libc::c_int,
     mut maxX_0: libc::c_int,
 ) {
-    let mut pictureHeight: libc::c_double = (maxY_0 - minY_0) as libc::c_double;
-    let mut pictureWidth: libc::c_double = (maxX_0 - minX_0) as libc::c_double;
+    let pictureHeight: libc::c_double = (maxY_0 - minY_0) as libc::c_double;
+    let pictureWidth: libc::c_double = (maxX_0 - minX_0) as libc::c_double;
     if minX_0 <= border {
         minX_0 = 1 as libc::c_int;
     }
@@ -15184,7 +15169,7 @@ pub unsafe extern "C" fn ProcessARInfo(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn ProcessACInfoInit(mut audio_channels_0: libc::c_int) {
+pub unsafe extern "C" fn ProcessACInfoInit(audio_channels_0: libc::c_int) {
     (*ac_block.offset(ac_block_count as isize)).start = framenum_real;
     (*ac_block.offset(ac_block_count as isize)).audio_channels = audio_channels_0;
     last_audio_channels = audio_channels_0;
@@ -15196,7 +15181,7 @@ pub unsafe extern "C" fn ProcessACInfoInit(mut audio_channels_0: libc::c_int) {
     );
 }
 #[no_mangle]
-pub unsafe extern "C" fn ProcessACInfo(mut audio_channels_0: libc::c_int) {
+pub unsafe extern "C" fn ProcessACInfo(audio_channels_0: libc::c_int) {
     if last_audio_channels == audio_channels_0 {
         return;
     }
@@ -15215,7 +15200,7 @@ pub unsafe extern "C" fn ProcessACInfo(mut audio_channels_0: libc::c_int) {
     );
 }
 #[no_mangle]
-pub unsafe extern "C" fn MatchCutScene(mut cutscene_0: *mut libc::c_uchar) -> libc::c_int {
+pub unsafe extern "C" fn MatchCutScene(cutscene_0: *mut libc::c_uchar) -> libc::c_int {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
     let mut d: libc::c_int = 0;
@@ -15250,10 +15235,7 @@ pub unsafe extern "C" fn MatchCutScene(mut cutscene_0: *mut libc::c_uchar) -> li
     return delta;
 }
 #[no_mangle]
-pub unsafe extern "C" fn RecordCutScene(
-    mut frame_count_0: libc::c_int,
-    mut brightness_0: libc::c_int,
-) {
+pub unsafe extern "C" fn RecordCutScene(frame_count_0: libc::c_int, mut brightness_0: libc::c_int) {
     let mut cs: [libc::c_char; 120000] = [0; 120000];
     let mut c: libc::c_int = 0;
     let mut x: libc::c_int = 0;
@@ -15328,7 +15310,7 @@ pub unsafe extern "C" fn RecordCutScene(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn LoadCutScene(mut filename_0: *const libc::c_char) {
+pub unsafe extern "C" fn LoadCutScene(filename_0: *const libc::c_char) {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut b: libc::c_int = 0;
@@ -15398,7 +15380,7 @@ static mut th2: pthread_t = 0 as *const _opaque_pthread_t as *mut _opaque_pthrea
 static mut th3: pthread_t = 0 as *const _opaque_pthread_t as *mut _opaque_pthread_t;
 static mut th4: pthread_t = 0 as *const _opaque_pthread_t as *mut _opaque_pthread_t;
 #[no_mangle]
-pub unsafe extern "C" fn ScanBottom(mut arg: intptr_t) {
+pub unsafe extern "C" fn ScanBottom(arg: intptr_t) {
     let mut i: libc::c_int = 0;
     let mut i_max: libc::c_int = 0;
     let mut i_step: libc::c_int = 0;
@@ -15408,7 +15390,7 @@ pub unsafe extern "C" fn ScanBottom(mut arg: intptr_t) {
     let mut max_delta: libc::c_int = 0;
     let mut hereBright: libc::c_int = 0;
     let mut brightCount: libc::c_int = 0;
-    let mut w: libc::c_int = arg as libc::c_int;
+    let w: libc::c_int = arg as libc::c_int;
     loop {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
@@ -15444,7 +15426,7 @@ pub unsafe extern "C" fn ScanBottom(mut arg: intptr_t) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn ScanTop(mut arg: intptr_t) {
+pub unsafe extern "C" fn ScanTop(arg: intptr_t) {
     let mut i: libc::c_int = 0;
     let mut i_max: libc::c_int = 0;
     let mut i_step: libc::c_int = 0;
@@ -15454,7 +15436,7 @@ pub unsafe extern "C" fn ScanTop(mut arg: intptr_t) {
     let mut max_delta: libc::c_int = 0;
     let mut hereBright: libc::c_int = 0;
     let mut brightCount: libc::c_int = 0;
-    let mut w: libc::c_int = arg as libc::c_int;
+    let w: libc::c_int = arg as libc::c_int;
     loop {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
@@ -15490,7 +15472,7 @@ pub unsafe extern "C" fn ScanTop(mut arg: intptr_t) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn ScanLeft(mut arg: intptr_t) {
+pub unsafe extern "C" fn ScanLeft(arg: intptr_t) {
     let mut i: libc::c_int = 0;
     let mut i_max: libc::c_int = 0;
     let mut i_step: libc::c_int = 0;
@@ -15500,7 +15482,7 @@ pub unsafe extern "C" fn ScanLeft(mut arg: intptr_t) {
     let mut max_delta: libc::c_int = 0;
     let mut hereBright: libc::c_int = 0;
     let mut brightCount: libc::c_int = 0;
-    let mut w: libc::c_int = arg as libc::c_int;
+    let w: libc::c_int = arg as libc::c_int;
     loop {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
@@ -15536,7 +15518,7 @@ pub unsafe extern "C" fn ScanLeft(mut arg: intptr_t) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn ScanRight(mut arg: intptr_t) {
+pub unsafe extern "C" fn ScanRight(arg: intptr_t) {
     let mut i: libc::c_int = 0;
     let mut i_max: libc::c_int = 0;
     let mut i_step: libc::c_int = 0;
@@ -15546,7 +15528,7 @@ pub unsafe extern "C" fn ScanRight(mut arg: intptr_t) {
     let mut max_delta: libc::c_int = 0;
     let mut hereBright: libc::c_int = 0;
     let mut brightCount: libc::c_int = 0;
-    let mut w: libc::c_int = arg as libc::c_int;
+    let w: libc::c_int = arg as libc::c_int;
     loop {
         if thread_count > 1 as libc::c_int {
             dispatch_semaphore_wait(thwait[w as usize], !(0 as libc::c_ulonglong));
@@ -15582,7 +15564,7 @@ pub unsafe extern "C" fn ScanRight(mut arg: intptr_t) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn DetectCredits(mut frame_count_0: libc::c_int) {
+pub unsafe extern "C" fn DetectCredits(frame_count_0: libc::c_int) {
     static mut credit_length: libc::c_int = 0 as libc::c_int;
     static mut prev_credit_length: libc::c_int = 0 as libc::c_int;
     static mut prev_credit_end: libc::c_int = 0 as libc::c_int;
@@ -16687,10 +16669,7 @@ pub unsafe extern "C" fn PrintCCBlocks() {
     );
 }
 #[no_mangle]
-pub unsafe extern "C" fn EdgeDetect(
-    mut frame_ptr_0: *mut libc::c_uchar,
-    mut maskNumber: libc::c_int,
-) {
+pub unsafe extern "C" fn EdgeDetect(frame_ptr_0: *mut libc::c_uchar, maskNumber: libc::c_int) {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
     hedge_count = 0 as libc::c_int;
@@ -16698,12 +16677,12 @@ pub unsafe extern "C" fn EdgeDetect(
     if aggressive_logo_rejection == 1 as libc::c_int {
         x = edge_radius + border + 4 as libc::c_int * edge_step;
         while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-            let mut y_max_test: libc::c_int = if subtitles != 0 {
+            let y_max_test: libc::c_int = if subtitles != 0 {
                 height / 2 as libc::c_int
             } else {
                 height - edge_radius - border - 4 as libc::c_int * edge_step
             };
-            let mut y_step_test: libc::c_int = height / 3 as libc::c_int;
+            let y_step_test: libc::c_int = height / 3 as libc::c_int;
             y = if logo_at_bottom != 0 {
                 height / 2 as libc::c_int
             } else {
@@ -16755,12 +16734,12 @@ pub unsafe extern "C" fn EdgeDetect(
     } else if aggressive_logo_rejection == 2 as libc::c_int {
         x = edge_radius + border + 4 as libc::c_int * edge_step;
         while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-            let mut y_max_test_0: libc::c_int = if subtitles != 0 {
+            let y_max_test_0: libc::c_int = if subtitles != 0 {
                 height / 2 as libc::c_int
             } else {
                 height - edge_radius - border - 4 as libc::c_int * edge_step
             };
-            let mut y_step_test_0: libc::c_int = height / 3 as libc::c_int;
+            let y_step_test_0: libc::c_int = height / 3 as libc::c_int;
             y = if logo_at_bottom != 0 {
                 height / 2 as libc::c_int
             } else {
@@ -16835,12 +16814,12 @@ pub unsafe extern "C" fn EdgeDetect(
     } else if aggressive_logo_rejection == 3 as libc::c_int {
         x = edge_radius + border + 4 as libc::c_int * edge_step;
         while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-            let mut y_max_test_1: libc::c_int = if subtitles != 0 {
+            let y_max_test_1: libc::c_int = if subtitles != 0 {
                 height / 2 as libc::c_int
             } else {
                 height - edge_radius - border - 4 as libc::c_int * edge_step
             };
-            let mut y_step_test_1: libc::c_int = height / 3 as libc::c_int;
+            let y_step_test_1: libc::c_int = height / 3 as libc::c_int;
             y = if logo_at_bottom != 0 {
                 height / 2 as libc::c_int
             } else {
@@ -16916,12 +16895,12 @@ pub unsafe extern "C" fn EdgeDetect(
     } else if aggressive_logo_rejection == 4 as libc::c_int {
         x = edge_radius + border + 4 as libc::c_int * edge_step;
         while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-            let mut y_max_test_2: libc::c_int = if subtitles != 0 {
+            let y_max_test_2: libc::c_int = if subtitles != 0 {
                 height / 2 as libc::c_int
             } else {
                 height - edge_radius - border - 4 as libc::c_int * edge_step
             };
-            let mut y_step_test_2: libc::c_int = height / 3 as libc::c_int;
+            let y_step_test_2: libc::c_int = height / 3 as libc::c_int;
             y = if logo_at_bottom != 0 {
                 height / 2 as libc::c_int
             } else {
@@ -17002,12 +16981,12 @@ pub unsafe extern "C" fn EdgeDetect(
     } else {
         x = edge_radius + border + 4 as libc::c_int * edge_step;
         while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-            let mut y_max_test_3: libc::c_int = if subtitles != 0 {
+            let y_max_test_3: libc::c_int = if subtitles != 0 {
                 height / 2 as libc::c_int
             } else {
                 height - edge_radius - border - 4 as libc::c_int * edge_step
             };
-            let mut y_step_test_3: libc::c_int = height / 3 as libc::c_int;
+            let y_step_test_3: libc::c_int = height / 3 as libc::c_int;
             y = if logo_at_bottom != 0 {
                 height / 2 as libc::c_int
             } else {
@@ -17084,7 +17063,7 @@ pub unsafe extern "C" fn EdgeDetect(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn CheckStationLogoEdge(mut testFrame: *mut libc::c_uchar) -> libc::c_double {
+pub unsafe extern "C" fn CheckStationLogoEdge(testFrame: *mut libc::c_uchar) -> libc::c_double {
     let mut index: libc::c_int = 0;
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
@@ -17327,7 +17306,7 @@ pub unsafe extern "C" fn CheckStationLogoEdge(mut testFrame: *mut libc::c_uchar)
 }
 #[no_mangle]
 pub unsafe extern "C" fn DoubleCheckStationLogoEdge(
-    mut testFrame: *mut libc::c_uchar,
+    testFrame: *mut libc::c_uchar,
 ) -> libc::c_double {
     let mut index: libc::c_int = 0;
     let mut x: libc::c_int = 0;
@@ -17578,7 +17557,7 @@ pub unsafe extern "C" fn InitProcessLogoTest() {
 pub unsafe extern "C" fn ProcessLogoTest(
     mut framenum_real_0: libc::c_int,
     mut curLogoTest_0: libc::c_int,
-    mut close_0: libc::c_int,
+    close_0: libc::c_int,
 ) -> bool {
     let mut i: libc::c_int = 0;
     let mut s1: libc::c_double = 0.;
@@ -17897,7 +17876,7 @@ pub unsafe extern "C" fn SearchForLogoEdges() -> bool {
     let mut i: libc::c_int = 0;
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
-    let mut scale: libc::c_double = height as libc::c_double / 572 as libc::c_int as libc::c_double
+    let scale: libc::c_double = height as libc::c_double / 572 as libc::c_int as libc::c_double
         * (videowidth as libc::c_double / 720 as libc::c_int as libc::c_double);
     let mut logoPercentageOfScreen: libc::c_double = 0.;
     let mut LogoIsThere: bool = false;
@@ -17924,12 +17903,12 @@ pub unsafe extern "C" fn SearchForLogoEdges() -> bool {
     );
     x = edge_radius + border + 4 as libc::c_int * edge_step;
     while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-        let mut y_max_test: libc::c_int = if subtitles != 0 {
+        let y_max_test: libc::c_int = if subtitles != 0 {
             height / 2 as libc::c_int
         } else {
             height - edge_radius - border - 4 as libc::c_int * edge_step
         };
-        let mut y_step_test: libc::c_int = height / 3 as libc::c_int;
+        let y_step_test: libc::c_int = height / 3 as libc::c_int;
         y = if logo_at_bottom != 0 {
             height / 2 as libc::c_int
         } else {
@@ -18156,8 +18135,8 @@ pub unsafe extern "C" fn SearchForLogoEdges() -> bool {
 }
 #[no_mangle]
 pub unsafe extern "C" fn ClearEdgeMaskArea(
-    mut temp: *mut libc::c_uchar,
-    mut test: *mut libc::c_uchar,
+    temp: *mut libc::c_uchar,
+    test: *mut libc::c_uchar,
 ) -> libc::c_int {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
@@ -18168,12 +18147,12 @@ pub unsafe extern "C" fn ClearEdgeMaskArea(
     let mut iy: libc::c_int = 0;
     x = edge_radius + border + 4 as libc::c_int * edge_step;
     while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-        let mut y_max_test: libc::c_int = if subtitles != 0 {
+        let y_max_test: libc::c_int = if subtitles != 0 {
             height / 2 as libc::c_int
         } else {
             height - edge_radius - border - 4 as libc::c_int * edge_step
         };
-        let mut y_step_test: libc::c_int = height / 3 as libc::c_int;
+        let y_step_test: libc::c_int = height / 3 as libc::c_int;
         let mut current_block_27: u64;
         y = if logo_at_bottom != 0 {
             height / 2 as libc::c_int
@@ -18262,7 +18241,7 @@ pub unsafe extern "C" fn ClearEdgeMaskArea(
     return valid;
 }
 #[no_mangle]
-pub unsafe extern "C" fn SetEdgeMaskArea(mut temp: *mut libc::c_uchar) {
+pub unsafe extern "C" fn SetEdgeMaskArea(temp: *mut libc::c_uchar) {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
     tlogoMinX = videowidth - 1 as libc::c_int;
@@ -18271,12 +18250,12 @@ pub unsafe extern "C" fn SetEdgeMaskArea(mut temp: *mut libc::c_uchar) {
     tlogoMaxY = 0 as libc::c_int;
     x = edge_radius + border + 4 as libc::c_int * edge_step;
     while x < videowidth - edge_radius - border - 4 as libc::c_int * edge_step {
-        let mut y_max_test: libc::c_int = if subtitles != 0 {
+        let y_max_test: libc::c_int = if subtitles != 0 {
             height / 2 as libc::c_int
         } else {
             height - edge_radius - border - 4 as libc::c_int * edge_step
         };
-        let mut y_step_test: libc::c_int = height / 3 as libc::c_int;
+        let y_step_test: libc::c_int = height / 3 as libc::c_int;
         y = if logo_at_bottom != 0 {
             height / 2 as libc::c_int
         } else {
@@ -18347,7 +18326,7 @@ pub unsafe extern "C" fn CountEdgePixels() -> libc::c_int {
     return count;
 }
 #[no_mangle]
-pub unsafe extern "C" fn DumpEdgeMask(mut buffer: *mut libc::c_uchar, mut direction: libc::c_int) {
+pub unsafe extern "C" fn DumpEdgeMask(buffer: *mut libc::c_uchar, direction: libc::c_int) {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
     let mut outbuf: [libc::c_char; 3841] = [0; 3841];
@@ -18480,7 +18459,7 @@ pub unsafe extern "C" fn DumpEdgeMasks() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn CheckFramesForLogo(mut start: libc::c_int, mut end: libc::c_int) -> bool {
+pub unsafe extern "C" fn CheckFramesForLogo(start: libc::c_int, end: libc::c_int) -> bool {
     let mut i: libc::c_int = 0;
     let mut sum: libc::c_double = 0.0f64;
     i = start;
@@ -18500,8 +18479,8 @@ pub unsafe extern "C" fn CheckFramesForLogo(mut start: libc::c_int, mut end: lib
 }
 #[no_mangle]
 pub unsafe extern "C" fn CalculateLogoFraction(
-    mut start: libc::c_int,
-    mut end: libc::c_int,
+    start: libc::c_int,
+    end: libc::c_int,
 ) -> libc::c_double {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
@@ -18527,7 +18506,7 @@ pub unsafe extern "C" fn CalculateLogoFraction(
     return count as libc::c_double / (end - start + 1 as libc::c_int) as libc::c_double;
 }
 #[no_mangle]
-pub unsafe extern "C" fn CheckFrameForLogo(mut i: libc::c_int) -> bool {
+pub unsafe extern "C" fn CheckFrameForLogo(i: libc::c_int) -> bool {
     let mut j: libc::c_int = 0 as libc::c_int;
     while (j as libc::c_long) < logo_block_count && i > (*logo_block.offset(j as isize)).end {
         j += 1;
@@ -18542,8 +18521,8 @@ pub unsafe extern "C" fn CheckFrameForLogo(mut i: libc::c_int) -> bool {
 }
 #[no_mangle]
 pub unsafe extern "C" fn CheckFramesForCommercial(
-    mut start: libc::c_int,
-    mut end: libc::c_int,
+    start: libc::c_int,
+    end: libc::c_int,
 ) -> libc::c_char {
     let mut i: libc::c_int = 0;
     if start >= end {
@@ -18566,8 +18545,8 @@ pub unsafe extern "C" fn CheckFramesForCommercial(
 }
 #[no_mangle]
 pub unsafe extern "C" fn CheckFramesForReffer(
-    mut start: libc::c_int,
-    mut end: libc::c_int,
+    start: libc::c_int,
+    end: libc::c_int,
 ) -> libc::c_char {
     let mut i: libc::c_int = 0;
     if reffer_count < 0 as libc::c_int {
@@ -18965,8 +18944,8 @@ pub unsafe extern "C" fn LoadLogoMaskData() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn CountSceneChanges(
-    mut StartFrame: libc::c_int,
-    mut EndFrame: libc::c_int,
+    StartFrame: libc::c_int,
+    EndFrame: libc::c_int,
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut p: libc::c_double = 0 as libc::c_int as libc::c_double;
@@ -18986,7 +18965,7 @@ pub unsafe extern "C" fn CountSceneChanges(
     return count;
 }
 #[no_mangle]
-pub unsafe extern "C" fn Debug(mut level: libc::c_int, mut fmt: *mut libc::c_char, mut args: ...) {
+pub unsafe extern "C" fn Debug(level: libc::c_int, fmt: *mut libc::c_char, args: ...) {
     let mut ap: ::std::ffi::VaListImpl;
     let mut log_file_0: *mut FILE = 0 as *mut FILE;
     if verbose < level {
@@ -19354,7 +19333,7 @@ pub unsafe extern "C" fn InitComSkip() {
 #[no_mangle]
 pub unsafe extern "C" fn FindIniFile() {}
 #[no_mangle]
-pub unsafe extern "C" fn FindScoreThreshold(mut percentile: libc::c_double) -> libc::c_double {
+pub unsafe extern "C" fn FindScoreThreshold(percentile: libc::c_double) -> libc::c_double {
     let mut i: libc::c_int = 0;
     let mut counter: libc::c_int = 0;
     let mut score: *mut libc::c_double = 0 as *mut libc::c_double;
@@ -19493,11 +19472,11 @@ pub unsafe extern "C" fn FindScoreThreshold(mut percentile: libc::c_double) -> l
     return tempScore;
 }
 #[no_mangle]
-pub unsafe extern "C" fn OutputLogoHistogram(mut buckets: libc::c_int) {
+pub unsafe extern "C" fn OutputLogoHistogram(buckets: libc::c_int) {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut max_0: libc::c_long = 0 as libc::c_int as libc::c_long;
-    let mut columns: libc::c_int = 200 as libc::c_int;
+    let columns: libc::c_int = 200 as libc::c_int;
     let mut divisor: libc::c_double = 0.;
     let mut stars: [libc::c_char; 256] = [0; 256];
     let mut counter: libc::c_long = 0 as libc::c_int as libc::c_long;
@@ -19542,7 +19521,7 @@ pub unsafe extern "C" fn OutputbrightHistogram() {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut max_0: libc::c_long = 0 as libc::c_int as libc::c_long;
-    let mut columns: libc::c_int = 200 as libc::c_int;
+    let columns: libc::c_int = 200 as libc::c_int;
     let mut divisor: libc::c_double = 0.;
     let mut counter: libc::c_long = 0 as libc::c_int as libc::c_long;
     let mut stars: [libc::c_char; 256] = [0; 256];
@@ -19587,7 +19566,7 @@ pub unsafe extern "C" fn OutputuniformHistogram() {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut max_0: libc::c_long = 0 as libc::c_int as libc::c_long;
-    let mut columns: libc::c_int = 200 as libc::c_int;
+    let columns: libc::c_int = 200 as libc::c_int;
     let mut divisor: libc::c_double = 0.;
     let mut counter: libc::c_long = 0 as libc::c_int as libc::c_long;
     let mut stars: [libc::c_char; 256] = [0; 256];
@@ -19629,15 +19608,15 @@ pub unsafe extern "C" fn OutputuniformHistogram() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputHistogram(
-    mut histogram_0: *mut libc::c_int,
-    mut scale: libc::c_int,
-    mut title: *mut libc::c_char,
-    mut truncate: bool,
+    histogram_0: *mut libc::c_int,
+    scale: libc::c_int,
+    title: *mut libc::c_char,
+    truncate: bool,
 ) {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
     let mut max_0: libc::c_long = 0 as libc::c_int as libc::c_long;
-    let mut columns: libc::c_int = 70 as libc::c_int;
+    let columns: libc::c_int = 70 as libc::c_int;
     let mut divisor: libc::c_double = 0.;
     let mut counter: libc::c_long = 0 as libc::c_int as libc::c_long;
     let mut stars: [libc::c_char; 256] = [0; 256];
@@ -19686,7 +19665,7 @@ pub unsafe extern "C" fn OutputHistogram(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn FindBlackThreshold(mut percentile: libc::c_double) -> libc::c_int {
+pub unsafe extern "C" fn FindBlackThreshold(percentile: libc::c_double) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut tempCount: libc::c_long = 0;
     let mut targetCount: libc::c_long = 0;
@@ -19742,7 +19721,7 @@ pub unsafe extern "C" fn FindBlackThreshold(mut percentile: libc::c_double) -> l
     return i;
 }
 #[no_mangle]
-pub unsafe extern "C" fn FindUniformThreshold(mut percentile: libc::c_double) -> libc::c_int {
+pub unsafe extern "C" fn FindUniformThreshold(percentile: libc::c_double) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut tempCount: libc::c_long = 0;
     let mut targetCount: libc::c_long = 0;
@@ -19801,7 +19780,7 @@ pub unsafe extern "C" fn FindUniformThreshold(mut percentile: libc::c_double) ->
     return (i + 1 as libc::c_int) * 100 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn OutputFrame(mut frame_number: libc::c_int) {
+pub unsafe extern "C" fn OutputFrame(frame_number: libc::c_int) {
     let mut x: libc::c_int = 0;
     let mut y: libc::c_int = 0;
     let mut raw: *mut FILE = 0 as *mut FILE;
@@ -19859,7 +19838,7 @@ pub unsafe extern "C" fn OutputFrame(mut frame_number: libc::c_int) {
     fclose(raw);
 }
 #[no_mangle]
-pub unsafe extern "C" fn FindFrameWithPts(mut t: libc::c_double) -> libc::c_int {
+pub unsafe extern "C" fn FindFrameWithPts(t: libc::c_double) -> libc::c_int {
     let mut mx: libc::c_int = 0;
     let mut mn: libc::c_int = 0;
     mx = frame_count as libc::c_int;
@@ -19884,8 +19863,8 @@ pub unsafe extern "C" fn FindFrameWithPts(mut t: libc::c_double) -> libc::c_int 
 }
 #[no_mangle]
 pub unsafe extern "C" fn InputReffer(
-    mut extension: *mut libc::c_char,
-    mut setfps: libc::c_int,
+    extension: *mut libc::c_char,
+    setfps: libc::c_int,
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut j: libc::c_long = 0;
@@ -21137,12 +21116,12 @@ pub unsafe extern "C" fn OutputAspect() {
 }
 #[no_mangle]
 pub unsafe extern "C" fn OutputBlackArray() {
-    let mut i: libc::c_int = 0;
-    let mut array: [libc::c_char; 1024] = [0; 1024];
-    let mut raw: *mut FILE = 0 as *mut FILE;
+    let i: libc::c_int = 0;
+    let array: [libc::c_char; 1024] = [0; 1024];
+    let raw: *mut FILE = 0 as *mut FILE;
 }
 #[no_mangle]
-pub unsafe extern "C" fn OutputFrameArray(mut screenOnly: bool) {
+pub unsafe extern "C" fn OutputFrameArray(screenOnly: bool) {
     let mut i: libc::c_int = 0;
     let mut array: [libc::c_char; 1024] = [0; 1024];
     let mut raw: *mut FILE = 0 as *mut FILE;
@@ -21223,7 +21202,7 @@ pub unsafe extern "C" fn OutputFrameArray(mut screenOnly: bool) {
     fclose(raw);
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeFrameArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeFrameArray(i: libc::c_long) {
     if frame_count + 1000 as libc::c_int as libc::c_long >= max_frame_count {
         max_frame_count +=
             (60 as libc::c_int * 60 as libc::c_int * 25 as libc::c_int) as libc::c_long;
@@ -21265,7 +21244,7 @@ pub unsafe extern "C" fn InitializeFrameArray(mut i: libc::c_long) {
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeBlackArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeBlackArray(i: libc::c_long) {
     if black_count >= max_black_count {
         max_black_count += 500 as libc::c_int as libc::c_long;
         black = realloc(
@@ -21285,10 +21264,10 @@ pub unsafe extern "C" fn InitializeBlackArray(mut i: libc::c_long) {
     (*black.offset(i as isize)).volume = curvolume;
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeSchangeArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeSchangeArray(i: libc::c_long) {
     if i >= max_schange_count {
         max_schange_count += 2000 as libc::c_int as libc::c_long;
-        let mut ptr: *mut libc::c_void = realloc(
+        let ptr: *mut libc::c_void = realloc(
             schange as *mut libc::c_void,
             ((max_schange_count + 1 as libc::c_int as libc::c_long) as libc::c_ulong)
                 .wrapping_mul(::std::mem::size_of::<schange_info>() as libc::c_ulong),
@@ -21314,7 +21293,7 @@ pub unsafe extern "C" fn InitializeSchangeArray(mut i: libc::c_long) {
     (*schange.offset(i as isize)).percentage = 100 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeLogoBlockArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeLogoBlockArray(i: libc::c_long) {
     if logo_block_count >= max_logo_block_count {
         max_logo_block_count += 20 as libc::c_int as libc::c_long;
         logo_block = realloc(
@@ -21331,7 +21310,7 @@ pub unsafe extern "C" fn InitializeLogoBlockArray(mut i: libc::c_long) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeARBlockArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeARBlockArray(i: libc::c_long) {
     if ar_block_count >= max_ar_block_count {
         max_ar_block_count += 20 as libc::c_int as libc::c_long;
         ar_block = realloc(
@@ -21348,7 +21327,7 @@ pub unsafe extern "C" fn InitializeARBlockArray(mut i: libc::c_long) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeACBlockArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeACBlockArray(i: libc::c_long) {
     if ac_block_count >= max_ac_block_count {
         max_ac_block_count += 20 as libc::c_int as libc::c_long;
         ac_block = realloc(
@@ -21365,7 +21344,7 @@ pub unsafe extern "C" fn InitializeACBlockArray(mut i: libc::c_long) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeBlockArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeBlockArray(i: libc::c_long) {
     if block_count >= max_block_count {
         Debug(
             0 as libc::c_int,
@@ -21395,7 +21374,7 @@ pub unsafe extern "C" fn InitializeBlockArray(mut i: libc::c_long) {
     cblock[i as usize].uniform = 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeCCBlockArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeCCBlockArray(i: libc::c_long) {
     if cc_block_count >= max_cc_block_count {
         max_cc_block_count += 100 as libc::c_int as libc::c_long;
         cc_block = realloc(
@@ -21415,7 +21394,7 @@ pub unsafe extern "C" fn InitializeCCBlockArray(mut i: libc::c_long) {
     (*cc_block.offset(i as isize)).type_0 = 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn InitializeCCTextArray(mut i: libc::c_long) {
+pub unsafe extern "C" fn InitializeCCTextArray(i: libc::c_long) {
     if cc_text_count >= max_cc_text_count {
         max_cc_text_count += 100 as libc::c_int as libc::c_long;
         cc_text = realloc(
@@ -22204,7 +22183,7 @@ pub unsafe extern "C" fn ProcessCSV(mut in_file_0: *mut FILE) {
     exit(0 as libc::c_int);
 }
 #[no_mangle]
-pub unsafe extern "C" fn OutputCCBlock(mut i: libc::c_long) {
+pub unsafe extern "C" fn OutputCCBlock(i: libc::c_long) {
     if i > 1 as libc::c_int as libc::c_long {
         Debug(
             11 as libc::c_int,
@@ -22300,7 +22279,7 @@ pub static mut ratingSystem: [*mut libc::c_char; 4] = [
     b"CF\0" as *const u8 as *const libc::c_char as *mut libc::c_char,
 ];
 #[no_mangle]
-pub unsafe extern "C" fn AddXDS(mut hi: libc::c_uchar, mut lo: libc::c_uchar) {
+pub unsafe extern "C" fn AddXDS(hi: libc::c_uchar, lo: libc::c_uchar) {
     static mut XDSbuf: [libc::c_uchar; 1024] = [0; 1024];
     static mut c: libc::c_int = 0 as libc::c_int;
     let mut i: libc::c_int = 0;
@@ -22475,8 +22454,7 @@ pub unsafe extern "C" fn AddXDS(mut hi: libc::c_uchar, mut lo: libc::c_uchar) {
                                 + XDSbuf[4 as libc::c_int as usize] as libc::c_int;
                     }
                 } else if XDSbuf[1 as libc::c_int as usize] as libc::c_int == 0x83 as libc::c_int {
-                    let mut n: size_t =
-                        ::std::mem::size_of::<[libc::c_char; 40]>() as libc::c_ulong;
+                    let n: size_t = ::std::mem::size_of::<[libc::c_char; 40]>() as libc::c_ulong;
                     if strncmp(
                         ((*XDS_block.offset(XDS_block_count as isize)).name).as_mut_ptr()
                             as *const libc::c_char,
@@ -22664,12 +22642,12 @@ pub unsafe extern "C" fn AddXDS(mut hi: libc::c_uchar, mut lo: libc::c_uchar) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn AddCC(mut i: libc::c_int) {
+pub unsafe extern "C" fn AddCC(i: libc::c_int) {
     let mut tempBool: bool = false;
     let mut current_frame: libc::c_long = framenum as libc::c_long;
     let mut hi: libc::c_int = 0;
     let mut lo: libc::c_int = 0;
-    let mut charmap: [libc::c_uchar; 96] = [
+    let charmap: [libc::c_uchar; 96] = [
         ' ' as i32 as libc::c_uchar,
         '!' as i32 as libc::c_uchar,
         '"' as i32 as libc::c_uchar,
@@ -23488,7 +23466,7 @@ pub unsafe extern "C" fn ProcessCCData() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn CheckOddParity(mut ch: libc::c_uchar) -> bool {
+pub unsafe extern "C" fn CheckOddParity(ch: libc::c_uchar) -> bool {
     let mut i: libc::c_int = 0;
     let mut test: libc::c_uchar = 1 as libc::c_int as libc::c_uchar;
     let mut count: libc::c_int = 0 as libc::c_int;
@@ -23508,10 +23486,10 @@ pub unsafe extern "C" fn CheckOddParity(mut ch: libc::c_uchar) -> bool {
 }
 #[no_mangle]
 pub unsafe extern "C" fn AddNewCCBlock(
-    mut current_frame: libc::c_long,
-    mut type_0: libc::c_int,
-    mut cc_on_screen_0: bool,
-    mut cc_in_memory_0: bool,
+    current_frame: libc::c_long,
+    type_0: libc::c_int,
+    cc_on_screen_0: bool,
+    cc_in_memory_0: bool,
 ) {
     if (*cc_block.offset(cc_block_count as isize)).type_0 == type_0 {
         (*cc_block.offset(cc_block_count as isize)).end_frame = current_frame;
@@ -23615,7 +23593,7 @@ pub unsafe extern "C" fn AddNewCCBlock(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn CCTypeToStr(mut type_0: libc::c_int) -> *mut libc::c_char {
+pub unsafe extern "C" fn CCTypeToStr(type_0: libc::c_int) -> *mut libc::c_char {
     if processCC {
         match type_0 {
             0 => {
@@ -23663,8 +23641,8 @@ pub unsafe extern "C" fn CCTypeToStr(mut type_0: libc::c_int) -> *mut libc::c_ch
 }
 #[no_mangle]
 pub unsafe extern "C" fn DetermineCCTypeForBlock(
-    mut start: libc::c_long,
-    mut end: libc::c_long,
+    start: libc::c_long,
+    end: libc::c_long,
 ) -> libc::c_int {
     let mut type_0: libc::c_int = 0 as libc::c_int;
     let mut i: libc::c_int = 0 as libc::c_int;
@@ -23963,7 +23941,7 @@ pub unsafe extern "C" fn ProcessCCDict() -> bool {
     return 1 as libc::c_int != 0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn FindBlock(mut frame_0: libc::c_long) -> libc::c_int {
+pub unsafe extern "C" fn FindBlock(frame_0: libc::c_long) -> libc::c_int {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while (i as libc::c_long) < block_count {
@@ -24091,7 +24069,7 @@ pub unsafe extern "C" fn BuildCommListAsYouGo() {
         while i < onTheFlyBlackCount {
             x = i + 1 as libc::c_int;
             while x < onTheFlyBlackCount {
-                let mut gap_length: libc::c_int =
+                let gap_length: libc::c_int =
                     *onTheFlyBlackFrame.offset(x as isize) - *onTheFlyBlackFrame.offset(i as isize);
                 if !((gap_length as libc::c_double) < min_commercial_size * fps) {
                     oldbreak = commercials > 0 as libc::c_int
@@ -24517,13 +24495,13 @@ pub unsafe extern "C" fn get_fps() -> libc::c_double {
 }
 #[no_mangle]
 pub unsafe extern "C" fn set_fps(
-    mut fp: libc::c_double,
-    mut dfps: libc::c_double,
-    mut ticks: libc::c_int,
-    mut rfps: libc::c_double,
-    mut afps: libc::c_double,
+    fp: libc::c_double,
+    dfps: libc::c_double,
+    ticks: libc::c_int,
+    rfps: libc::c_double,
+    afps: libc::c_double,
 ) {
-    let mut old_fps: libc::c_double = fps;
+    let old_fps: libc::c_double = fps;
     static mut showed_fps: libc::c_int = 0 as libc::c_int;
     fps = 1.0f64 / fp;
     if fps != old_fps {
@@ -24582,7 +24560,7 @@ pub unsafe extern "C" fn set_fps(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn set_frame_volume(mut f: libc::c_uint, mut volume: libc::c_int) {
+pub unsafe extern "C" fn set_frame_volume(f: libc::c_uint, volume: libc::c_int) {
     let mut i: libc::c_int = 0;
     let mut act_framenum: libc::c_int = 0;
     if !initialized {
@@ -24645,7 +24623,7 @@ pub unsafe extern "C" fn dump_audio_start() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn dump_audio(mut start: *mut libc::c_char, mut end: *mut libc::c_char) {
+pub unsafe extern "C" fn dump_audio(start: *mut libc::c_char, end: *mut libc::c_char) {
     if !output_demux {
         return;
     }
@@ -24680,7 +24658,7 @@ pub unsafe extern "C" fn dump_video_start() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn dump_video(mut start: *mut libc::c_char, mut end: *mut libc::c_char) {
+pub unsafe extern "C" fn dump_video(start: *mut libc::c_char, end: *mut libc::c_char) {
     if !output_demux {
         return;
     }
@@ -24709,7 +24687,7 @@ pub unsafe extern "C" fn close_dump() {
     dump_video_file = 0 as *mut FILE;
 }
 #[no_mangle]
-pub unsafe extern "C" fn dump_data(mut start: *mut libc::c_char, mut length: libc::c_int) {
+pub unsafe extern "C" fn dump_data(start: *mut libc::c_char, length: libc::c_int) {
     let mut temp: [libc::c_char; 2000] = [0; 2000];
     let mut i: libc::c_int = 0;
     if !output_data {

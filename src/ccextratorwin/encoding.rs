@@ -3,12 +3,11 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
-    unused_assignments,
-    unused_mut
+    unused_assignments
 )]
 pub type __darwin_ct_rune_t = libc::c_int;
 #[no_mangle]
-pub unsafe extern "C" fn get_char_in_latin_1(mut buffer: *mut libc::c_uchar, mut c: libc::c_uchar) {
+pub unsafe extern "C" fn get_char_in_latin_1(buffer: *mut libc::c_uchar, c: libc::c_uchar) {
     let mut c1: libc::c_uchar = '?' as i32 as libc::c_uchar;
     if (c as libc::c_int) < 0x80 as libc::c_int {
         match c as libc::c_int {
@@ -384,7 +383,7 @@ pub unsafe extern "C" fn get_char_in_latin_1(mut buffer: *mut libc::c_uchar, mut
     *buffer = c1;
 }
 #[no_mangle]
-pub unsafe extern "C" fn get_char_in_unicode(mut buffer: *mut libc::c_uchar, mut c: libc::c_uchar) {
+pub unsafe extern "C" fn get_char_in_unicode(buffer: *mut libc::c_uchar, c: libc::c_uchar) {
     let mut c1: libc::c_uchar = 0;
     let mut c2: libc::c_uchar = 0;
     match c as libc::c_int {
@@ -426,8 +425,8 @@ pub unsafe extern "C" fn get_char_in_unicode(mut buffer: *mut libc::c_uchar, mut
 }
 #[no_mangle]
 pub unsafe extern "C" fn get_char_in_utf_8(
-    mut buffer: *mut libc::c_uchar,
-    mut c: libc::c_uchar,
+    buffer: *mut libc::c_uchar,
+    c: libc::c_uchar,
 ) -> libc::c_int {
     if (c as libc::c_int) < 0x80 as libc::c_int {
         match c as libc::c_int {
@@ -883,7 +882,7 @@ pub unsafe extern "C" fn get_char_in_utf_8(
 }
 use crate::ccextratorwin::ccextractor;
 #[no_mangle]
-pub unsafe extern "C" fn cctolower(mut c: libc::c_uchar) -> libc::c_uchar {
+pub unsafe extern "C" fn cctolower(c: libc::c_uchar) -> libc::c_uchar {
     if c as libc::c_int >= 'A' as i32 && c as libc::c_int <= 'Z' as i32 {
         return ccextractor::tolower(c as libc::c_int) as libc::c_uchar;
     }
@@ -920,7 +919,7 @@ pub unsafe extern "C" fn cctolower(mut c: libc::c_uchar) -> libc::c_uchar {
 }
 use crate::platform;
 #[no_mangle]
-pub unsafe extern "C" fn cctoupper(mut c: libc::c_uchar) -> libc::c_uchar {
+pub unsafe extern "C" fn cctoupper(c: libc::c_uchar) -> libc::c_uchar {
     if c as libc::c_int >= 'a' as i32 && c as libc::c_int <= 'z' as i32 {
         return platform::toupper(c as libc::c_int) as libc::c_uchar;
     }

@@ -3,8 +3,7 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
-    unused_assignments,
-    unused_mut
+    unused_assignments
 )]
 extern "C" {
     pub type __sFILEX;
@@ -607,9 +606,9 @@ pub static mut spell_builtin: [*const libc::c_char; 30] = [
     0 as *const libc::c_char,
 ];
 #[no_mangle]
-pub unsafe extern "C" fn getfilesize(mut in_1: libc::c_int) -> LONG {
-    let mut current: LONG = lseek(in_1, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
-    let mut length: LONG = lseek(in_1, 0 as libc::c_int as off_t, 2 as libc::c_int) as LONG;
+pub unsafe extern "C" fn getfilesize(in_1: libc::c_int) -> LONG {
+    let current: LONG = lseek(in_1, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
+    let length: LONG = lseek(in_1, 0 as libc::c_int as off_t, 2 as libc::c_int) as LONG;
     lseek(in_1, current as off_t, 0 as libc::c_int);
     return length;
 }
@@ -1045,8 +1044,8 @@ pub unsafe extern "C" fn init_write(mut wb: *mut s_write) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn writeraw(
-    mut data: *const libc::c_uchar,
-    mut length: libc::c_int,
+    data: *const libc::c_uchar,
+    length: libc::c_int,
     mut wb: *mut s_write,
 ) {
     if buffer_output != 0 {
@@ -1087,12 +1086,12 @@ pub unsafe extern "C" fn writeraw(
 }
 #[no_mangle]
 pub unsafe extern "C" fn writedata(
-    mut data: *const libc::c_uchar,
-    mut length: libc::c_int,
-    mut wb: *mut s_write,
+    data: *const libc::c_uchar,
+    length: libc::c_int,
+    wb: *mut s_write,
 ) {
     if extraction_end.set != 0 {
-        let mut pg: libc::c_uint = if c1global != 0 { c1global } else { c2global };
+        let pg: libc::c_uint = if c1global != 0 { c1global } else { c2global };
         if pg.wrapping_add(totalblockswritten_thisfile()) as libc::c_long
             > extraction_end.time_in_ccblocks
         {
@@ -1107,7 +1106,7 @@ pub unsafe extern "C" fn writedata(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn flushbuffer(mut wb: *mut s_write, mut closefile: libc::c_int) {
+pub unsafe extern "C" fn flushbuffer(wb: *mut s_write, closefile: libc::c_int) {
     if buffer_output != 0 {
         writedata(0 as *const libc::c_uchar, 0 as libc::c_int, wb);
     }
@@ -1118,7 +1117,7 @@ pub unsafe extern "C" fn flushbuffer(mut wb: *mut s_write, mut closefile: libc::
 #[no_mangle]
 pub unsafe extern "C" fn too_many_blocks() -> libc::c_int {
     if first_gop_time.inited != 0 {
-        let mut mis1: libc::c_int = (gop_time.ccblocks - first_gop_time.ccblocks
+        let mis1: libc::c_int = (gop_time.ccblocks - first_gop_time.ccblocks
             + frames_since_last_gop as libc::c_long
             - c1count as libc::c_long) as libc::c_int;
         if mis1 < 0 as libc::c_int {
@@ -1129,10 +1128,10 @@ pub unsafe extern "C" fn too_many_blocks() -> libc::c_int {
 }
 #[no_mangle]
 pub unsafe extern "C" fn printdata(
-    mut data1: *const libc::c_uchar,
-    mut length1: libc::c_int,
-    mut data2: *const libc::c_uchar,
-    mut length2: libc::c_int,
+    data1: *const libc::c_uchar,
+    length1: libc::c_int,
+    data2: *const libc::c_uchar,
+    length2: libc::c_int,
 ) {
     if rawmode == 0 as libc::c_int {
         if length1 != 0 && extract != 2 as libc::c_int {
@@ -1212,7 +1211,7 @@ pub unsafe extern "C" fn printdata(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn dump(mut start: *mut libc::c_uchar, mut l: libc::c_int) {
+pub unsafe extern "C" fn dump(start: *mut libc::c_uchar, mut l: libc::c_int) {
     let mut x: libc::c_int = 0;
     x = 0 as libc::c_int;
     while x < l {
@@ -1288,7 +1287,7 @@ pub unsafe extern "C" fn prepare_for_new_file() {
     init_file_buffer();
 }
 #[no_mangle]
-pub unsafe extern "C" fn parsedelay(mut par: *mut libc::c_char) -> libc::c_int {
+pub unsafe extern "C" fn parsedelay(par: *mut libc::c_char) -> libc::c_int {
     let mut sign: libc::c_int = 0 as libc::c_int;
     let mut c: *mut libc::c_char = par;
     while *c != 0 {
@@ -1324,7 +1323,7 @@ pub unsafe extern "C" fn init_boundary_time(mut bt: *mut boundary_time) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn stringztoms(
-    mut s: *mut libc::c_char,
+    s: *mut libc::c_char,
     mut bt: *mut boundary_time,
 ) -> libc::c_int {
     let mut ss: libc::c_uint = 0 as libc::c_int as libc::c_uint;
@@ -1378,7 +1377,7 @@ pub unsafe extern "C" fn stringztoms(
     return 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn add_word(mut word: *const libc::c_char) -> libc::c_int {
+pub unsafe extern "C" fn add_word(word: *const libc::c_char) -> libc::c_int {
     let mut len: size_t = 0;
     let mut i: size_t = 0;
     let mut new_lower: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -1439,8 +1438,8 @@ pub unsafe extern "C" fn add_built_in_words() -> libc::c_int {
     return 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn process_cap_file(mut filename: *mut libc::c_char) -> libc::c_int {
-    let mut fi: *mut FILE = fopen(filename, b"rt\0" as *const u8 as *const libc::c_char);
+pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::c_int {
+    let fi: *mut FILE = fopen(filename, b"rt\0" as *const u8 as *const libc::c_char);
     let mut num: libc::c_int = 0 as libc::c_int;
     let mut line: [libc::c_char; 35] = [0; 35];
     if fi.is_null() {
@@ -1519,10 +1518,7 @@ pub unsafe extern "C" fn CEW_reinit() {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn CEW_init(
-    mut argc: libc::c_int,
-    mut argv: *mut *mut libc::c_char,
-) -> libc::c_int {
+pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut output_filename: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut clean_filename: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut c: *mut libc::c_char = 0 as *mut libc::c_char;

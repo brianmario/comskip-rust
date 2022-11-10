@@ -4,7 +4,6 @@
     non_snake_case,
     non_upper_case_globals,
     unused_assignments,
-    unused_mut,
     unused_variables,
     unused_must_use
 )]
@@ -2286,11 +2285,11 @@ pub static mut pass: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub static mut test_pts: libc::c_double = 0.0f64;
 #[inline]
-unsafe extern "C" fn av_q2d(mut a: AVRational) -> libc::c_double {
+unsafe extern "C" fn av_q2d(a: AVRational) -> libc::c_double {
     return a.num as libc::c_double / a.den as libc::c_double;
 }
 #[inline(always)]
-unsafe extern "C" fn avio_tell(mut s: *mut AVIOContext) -> int64_t {
+unsafe extern "C" fn avio_tell(s: *mut AVIOContext) -> int64_t {
     return avio_seek(s, 0 as libc::c_int as int64_t, 1 as libc::c_int);
 }
 #[no_mangle]
@@ -2453,7 +2452,7 @@ pub static mut seekIter: libc::c_int = 0 as libc::c_int;
 pub static mut seekDirection: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub static mut retries: libc::c_int = 0;
-unsafe extern "C" fn signal_handler(mut sig: libc::c_int) {
+unsafe extern "C" fn signal_handler(sig: libc::c_int) {
     sigint = 1 as libc::c_int;
     signal(sig, None);
 }
@@ -2475,15 +2474,15 @@ pub static mut frames_without_sound: libc::c_int = 0 as libc::c_int;
 pub static mut frames_with_loud_sound: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub unsafe extern "C" fn retreive_frame_volume(
-    mut from_pts: libc::c_double,
-    mut to_pts: libc::c_double,
+    from_pts: libc::c_double,
+    to_pts: libc::c_double,
 ) -> libc::c_int {
     let mut buffer: *mut libc::c_short = 0 as *mut libc::c_short;
     let mut volume: libc::c_int = -(1 as libc::c_int);
-    let mut is_0: *mut VideoState = global_video_state;
+    let is_0: *mut VideoState = global_video_state;
     let mut i: libc::c_int = 0;
     let mut calculated_delay: libc::c_double = 0.;
-    let mut s_per_frame: libc::c_int = ((to_pts - from_pts)
+    let s_per_frame: libc::c_int = ((to_pts - from_pts)
         * ((*(*(*is_0).audio_st).codec).sample_rate + 1 as libc::c_int) as libc::c_double)
         as libc::c_int;
     if s_per_frame > 1 as libc::c_int && base_apts <= from_pts && to_pts < top_apts {
@@ -2601,11 +2600,11 @@ pub unsafe extern "C" fn backfill_frame_volumes() {
 pub static mut ALIGN_AC3_PACKETS: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
 pub unsafe extern "C" fn sound_to_frames(
-    mut is_0: *mut VideoState,
-    mut b: *mut *mut libc::c_short,
-    mut s: libc::c_int,
-    mut c: libc::c_int,
-    mut format: libc::c_int,
+    is_0: *mut VideoState,
+    b: *mut *mut libc::c_short,
+    s: libc::c_int,
+    c: libc::c_int,
+    format: libc::c_int,
 ) {
     let mut i: libc::c_int = 0;
     let mut l: libc::c_int = 0;
@@ -2615,7 +2614,7 @@ pub unsafe extern "C" fn sound_to_frames(
     static mut old_audio_clock: libc::c_double = 0.0f64;
     let mut calculated_delay: libc::c_double = 0.0f64;
     let mut avg_volume: libc::c_double = 0.0f64;
-    let mut planar: libc::c_int = av_sample_fmt_is_planar(format as AVSampleFormat);
+    let planar: libc::c_int = av_sample_fmt_is_planar(format as AVSampleFormat);
     let mut fb: [*mut libc::c_float; 16] = [0 as *mut libc::c_float; 16];
     let mut sb: [*mut libc::c_short; 16] = [0 as *mut libc::c_short; 16];
     static mut old_sample_rate: libc::c_int = 0 as libc::c_int;
@@ -2824,7 +2823,7 @@ pub static mut data_size: libc::c_int = 0;
 #[no_mangle]
 pub static mut ac3_package_misalignment_count: libc::c_int = 0 as libc::c_int;
 #[no_mangle]
-pub unsafe extern "C" fn audio_packet_process(mut is_0: *mut VideoState, mut pkt: *mut AVPacket) {
+pub unsafe extern "C" fn audio_packet_process(mut is_0: *mut VideoState, pkt: *mut AVPacket) {
     let mut prev_codec_id: libc::c_int = -(1 as libc::c_int);
     let mut len1: libc::c_int = 0;
     let mut data_size_0: libc::c_int = 0;
@@ -3075,7 +3074,7 @@ pub unsafe extern "C" fn audio_packet_process(mut is_0: *mut VideoState, mut pkt
         ac3_packet_index = ps;
     }
 }
-unsafe extern "C" fn print_fps(mut final_0: libc::c_int) -> libc::c_double {
+unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
     static mut frame_counter: uint32_t = 0 as libc::c_int as uint32_t;
     static mut tv_beg: timeval = timeval {
         tv_sec: 0,
@@ -3183,9 +3182,9 @@ unsafe extern "C" fn print_fps(mut final_0: libc::c_int) -> libc::c_double {
 }
 #[no_mangle]
 pub unsafe extern "C" fn SubmitFrame(
-    mut video_st: *mut AVStream,
-    mut pFrame: *mut AVFrame,
-    mut pts_0: libc::c_double,
+    video_st: *mut AVStream,
+    pFrame: *mut AVFrame,
+    pts_0: libc::c_double,
 ) -> libc::c_int {
     let mut res: libc::c_int = 0 as libc::c_int;
     let mut changed: libc::c_int = 0 as libc::c_int;
@@ -3323,15 +3322,15 @@ pub unsafe extern "C" fn SubmitFrame(
 }
 #[no_mangle]
 pub unsafe extern "C" fn Set_seek(mut is_0: *mut VideoState, mut pts_0: libc::c_double) {
-    let mut ic: *mut AVFormatContext = (*is_0).pFormatCtx;
-    let mut length: libc::c_double = (*is_0).duration;
+    let ic: *mut AVFormatContext = (*is_0).pFormatCtx;
+    let length: libc::c_double = (*is_0).duration;
     (*is_0).seek_flags = 4 as libc::c_int;
     (*is_0).seek_flags = 1 as libc::c_int;
     (*is_0).seek_req = 1 as libc::c_int;
     (*is_0).seek_pts = pts_0;
     pts_0 = fmax(0.0f64, pts_0 - 2.0f64);
     if (*is_0).seek_by_bytes != 0 {
-        let mut size: uint64_t = avio_size((*ic).pb) as uint64_t;
+        let size: uint64_t = avio_size((*ic).pb) as uint64_t;
         if length < 0 as libc::c_int as libc::c_double {
             (*is_0).seek_pos =
                 (size as libc::c_double * fmax(0 as libc::c_int as libc::c_double, pts_0 - 4.0f64)
@@ -3416,7 +3415,7 @@ pub unsafe extern "C" fn DoSeekRequest(mut is_0: *mut VideoState) {
     (*is_0).seek_no_flush = 0 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn DecodeOnePicture(mut f: *mut FILE, mut pts_0: libc::c_double) {
+pub unsafe extern "C" fn DecodeOnePicture(f: *mut FILE, pts_0: libc::c_double) {
     let mut is_0: *mut VideoState = global_video_state;
     let mut packet: *mut AVPacket = 0 as *mut AVPacket;
     file_open();
@@ -3448,15 +3447,14 @@ pub unsafe extern "C" fn DecodeOnePicture(mut f: *mut FILE, mut pts_0: libc::c_d
                     if !((*is_0).seek_req != 0) {
                         break;
                     }
-                    let mut packet_time: libc::c_double = ((*packet).pts
+                    let packet_time: libc::c_double = ((*packet).pts
                         - (if (*(*is_0).video_st).start_time
                             != 0x8000000000000000 as libc::c_ulonglong as int64_t
                         {
                             (*(*is_0).video_st).start_time
                         } else {
                             0 as libc::c_int as libc::c_longlong
-                        }))
-                        as libc::c_double
+                        })) as libc::c_double
                         * av_q2d((*(*is_0).video_st).time_base);
                     if (*packet).pts == 0x8000000000000000 as libc::c_ulonglong as int64_t {
                         av_packet_unref(packet);
@@ -3511,9 +3509,9 @@ pub unsafe extern "C" fn filter() -> libc::c_int {
 #[no_mangle]
 pub unsafe extern "C" fn video_packet_process(
     mut is_0: *mut VideoState,
-    mut packet: *mut AVPacket,
+    packet: *mut AVPacket,
 ) -> libc::c_int {
-    let mut current_block: u64;
+    let current_block: u64;
     let mut frame_delay: libc::c_double = 0.;
     let mut len1: libc::c_int = 0;
     let mut frameFinished: libc::c_int = 0;
@@ -3981,7 +3979,7 @@ pub unsafe extern "C" fn video_packet_process(
                     let mut i: libc::c_int = 0;
                     i = 0 as libc::c_int;
                     while i < (*(*is_0).pFrame).nb_side_data {
-                        let mut sd: *mut AVFrameSideData =
+                        let sd: *mut AVFrameSideData =
                             *((*(*is_0).pFrame).side_data).offset(i as isize);
                         if !((*sd).type_0 as libc::c_uint
                             != AV_FRAME_DATA_A53_CC as libc::c_int as libc::c_uint)
@@ -4020,9 +4018,9 @@ pub unsafe extern "C" fn video_packet_process(
 #[no_mangle]
 pub unsafe extern "C" fn stream_component_open(
     mut is_0: *mut VideoState,
-    mut stream_index_0: libc::c_int,
+    stream_index_0: libc::c_int,
 ) -> libc::c_int {
-    let mut pFormatCtx: *mut AVFormatContext = (*is_0).pFormatCtx;
+    let pFormatCtx: *mut AVFormatContext = (*is_0).pFormatCtx;
     let mut codecCtx: *mut AVCodecContext = 0 as *mut AVCodecContext;
     let mut codec: *mut AVCodec = 0 as *mut AVCodec;
     if stream_index_0 < 0 as libc::c_int
@@ -4169,10 +4167,10 @@ pub unsafe extern "C" fn stream_component_open(
     return 0 as libc::c_int;
 }
 unsafe extern "C" fn log_callback_report(
-    mut ptr: *mut libc::c_void,
-    mut level: libc::c_int,
-    mut fmt: *const libc::c_char,
-    mut vl: ::std::ffi::VaList,
+    ptr: *mut libc::c_void,
+    level: libc::c_int,
+    fmt: *const libc::c_char,
+    vl: ::std::ffi::VaList,
 ) {
     let mut vl2: ::std::ffi::VaListImpl;
     let mut line: [libc::c_char; 1024] = [0; 1024];
@@ -4431,7 +4429,7 @@ pub unsafe extern "C" fn file_close() {
     av_frame_free(&mut (*is).frame);
     avformat_network_deinit();
 }
-unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> libc::c_int {
+unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int {
     let mut packet_time: libc::c_double = 0.;
     let mut current_block: u64;
     let mut pkt1: AVPacket = AVPacket {
@@ -4704,7 +4702,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char) -> lib
                 if !(live_tv != 0 && retries < live_tv_retries) {
                     break;
                 }
-                let mut frame_delay: libc::c_double = av_q2d((*(*(*is).video_st).codec).time_base)
+                let frame_delay: libc::c_double = av_q2d((*(*(*is).video_st).codec).time_base)
                     * (*(*(*is).video_st).codec).ticks_per_frame as libc::c_double;
                 if retries == 0 as libc::c_int {
                     if selftest == 3 as libc::c_int {

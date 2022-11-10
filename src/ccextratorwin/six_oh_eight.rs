@@ -3,8 +3,7 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
-    unused_assignments,
-    unused_mut
+    unused_assignments
 )]
 extern "C" {
     pub type __sFILEX;
@@ -540,25 +539,25 @@ pub unsafe extern "C" fn encode_line(
     return bytes;
 }
 #[no_mangle]
-pub unsafe extern "C" fn correct_case(mut line_num: libc::c_int, mut data: *mut eia608_screen) {
+pub unsafe extern "C" fn correct_case(line_num: libc::c_int, data: *mut eia608_screen) {
     let mut i: libc::c_int = 0 as libc::c_int;
     while i < spell_words {
         let mut c: *mut libc::c_char =
             ((*data).characters[line_num as usize]).as_mut_ptr() as *mut libc::c_char;
-        let mut len: size_t = strlen(*spell_correct.offset(i as isize));
+        let len: size_t = strlen(*spell_correct.offset(i as isize));
         loop {
             c = strstr(c, *spell_lower.offset(i as isize));
             if c.is_null() {
                 break;
             }
-            let mut prev: libc::c_uchar = (if c
+            let prev: libc::c_uchar = (if c
                 == ((*data).characters[line_num as usize]).as_mut_ptr() as *mut libc::c_char
             {
                 ' ' as i32
             } else {
                 *c.offset(-(1 as libc::c_int as isize)) as libc::c_int
             }) as libc::c_uchar;
-            let mut next: libc::c_uchar = *c.offset(len as isize) as libc::c_uchar;
+            let next: libc::c_uchar = *c.offset(len as isize) as libc::c_uchar;
             if (prev as libc::c_int == ' ' as i32
                 || prev as libc::c_int == 0x89 as libc::c_int
                 || ispunct(prev as libc::c_int) != 0)
@@ -578,11 +577,11 @@ pub unsafe extern "C" fn correct_case(mut line_num: libc::c_int, mut data: *mut 
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn capitalize(mut line_num: libc::c_int, mut data: *mut eia608_screen) {
+pub unsafe extern "C" fn capitalize(line_num: libc::c_int, mut data: *mut eia608_screen) {
     let mut i: libc::c_int = 0;
     i = 0 as libc::c_int;
     while i < 32 as libc::c_int {
-        let mut current_block_5: u64;
+        let current_block_5: u64;
         match (*data).characters[line_num as usize][i as usize] as libc::c_int {
             32 | 137 => {
                 current_block_5 = 13536709405535804910;
@@ -617,8 +616,8 @@ pub unsafe extern "C" fn capitalize(mut line_num: libc::c_int, mut data: *mut ei
 #[no_mangle]
 pub unsafe extern "C" fn get_decoder_line_encoded(
     mut buffer: *mut libc::c_uchar,
-    mut line_num: libc::c_int,
-    mut data: *mut eia608_screen,
+    line_num: libc::c_int,
+    data: *mut eia608_screen,
 ) -> libc::c_uint {
     let mut is_underlined: libc::c_int = 0;
     let mut col: libc::c_int = COL_WHITE as libc::c_int;
@@ -627,11 +626,11 @@ pub unsafe extern "C" fn get_decoder_line_encoded(
     let mut i: libc::c_int = 0;
     let mut bytes: libc::c_int = 0 as libc::c_int;
     let mut has_ita: libc::c_int = 0;
-    let mut line: *mut libc::c_uchar = ((*data).characters[line_num as usize]).as_mut_ptr();
-    let mut orig: *mut libc::c_uchar = buffer;
+    let line: *mut libc::c_uchar = ((*data).characters[line_num as usize]).as_mut_ptr();
+    let orig: *mut libc::c_uchar = buffer;
     i = 0 as libc::c_int;
     while i < 32 as libc::c_int {
-        let mut its_col: libc::c_int = (*data).colors[line_num as usize][i as usize] as libc::c_int;
+        let its_col: libc::c_int = (*data).colors[line_num as usize][i as usize] as libc::c_int;
         if its_col != col && nofontcolor == 0 {
             if col != COL_WHITE as libc::c_int {
                 buffer = buffer.offset(encode_line(
@@ -767,7 +766,7 @@ pub unsafe extern "C" fn init_eia608(mut data: *mut eia608) {
     (*data).rollup_base_row = 14 as libc::c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn get_writing_buffer(mut wb: *mut s_write) -> *mut eia608_screen {
+pub unsafe extern "C" fn get_writing_buffer(wb: *mut s_write) -> *mut eia608_screen {
     let mut use_buffer: *mut eia608_screen = 0 as *mut eia608_screen;
     match (*(*wb).data608).mode {
         0 => {
@@ -795,7 +794,7 @@ pub unsafe extern "C" fn get_writing_buffer(mut wb: *mut s_write) -> *mut eia608
     return use_buffer;
 }
 #[no_mangle]
-pub unsafe extern "C" fn write_char(c: libc::c_uchar, mut wb: *mut s_write) {
+pub unsafe extern "C" fn write_char(c: libc::c_uchar, wb: *mut s_write) {
     if (*(*wb).data608).mode != MODE_TEXT as libc::c_int {
         let mut use_buffer: *mut eia608_screen = get_writing_buffer(wb);
         (*use_buffer).characters[(*(*wb).data608).cursor_row as usize]
@@ -831,7 +830,7 @@ pub unsafe extern "C" fn handle_text_attr(
     {
         printf(b"\rThis is not a text attribute!\n\0" as *const u8 as *const libc::c_char);
     } else {
-        let mut i: libc::c_int = c2 as libc::c_int - 0x20 as libc::c_int;
+        let i: libc::c_int = c2 as libc::c_int - 0x20 as libc::c_int;
         (*(*wb).data608).color = pac2_attribs[i as usize][0 as libc::c_int as usize];
         (*(*wb).data608).font = pac2_attribs[i as usize][1 as libc::c_int as usize];
         if debug_608 != 0 {
@@ -850,10 +849,10 @@ pub unsafe extern "C" fn handle_text_attr(
 #[no_mangle]
 pub unsafe extern "C" fn mstotime(
     mut milli: LONG,
-    mut hours: *mut libc::c_uint,
-    mut minutes: *mut libc::c_uint,
-    mut seconds: *mut libc::c_uint,
-    mut ms: *mut libc::c_uint,
+    hours: *mut libc::c_uint,
+    minutes: *mut libc::c_uint,
+    seconds: *mut libc::c_uint,
+    ms: *mut libc::c_uint,
 ) {
     *ms = (milli % 1000 as libc::c_int as libc::c_long) as libc::c_uint;
     milli = (milli - *ms as libc::c_long) / 1000 as libc::c_int as libc::c_long;
@@ -864,7 +863,7 @@ pub unsafe extern "C" fn mstotime(
     *hours = milli as libc::c_int as libc::c_uint;
 }
 #[no_mangle]
-pub unsafe extern "C" fn write_subtitle_file_footer(mut wb: *mut s_write) {
+pub unsafe extern "C" fn write_subtitle_file_footer(wb: *mut s_write) {
     match write_format {
         2 => {
             sprintf(
@@ -889,7 +888,7 @@ pub unsafe extern "C" fn write_subtitle_file_footer(mut wb: *mut s_write) {
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn fprintf_encoded(mut fh: *mut FILE, mut string: *mut libc::c_char) {
+pub unsafe extern "C" fn fprintf_encoded(fh: *mut FILE, string: *mut libc::c_char) {
     enc_buffer_used = encode_line(enc_buffer.as_mut_ptr(), string as *mut libc::c_uchar);
     fwrite(
         enc_buffer.as_mut_ptr() as *const libc::c_void,
@@ -899,7 +898,7 @@ pub unsafe extern "C" fn fprintf_encoded(mut fh: *mut FILE, mut string: *mut lib
     );
 }
 #[no_mangle]
-pub unsafe extern "C" fn write_subtitle_file_header(mut wb: *mut s_write) {
+pub unsafe extern "C" fn write_subtitle_file_header(wb: *mut s_write) {
     match write_format {
         2 => {
             fprintf_encoded(
@@ -956,8 +955,8 @@ pub unsafe extern "C" fn write_subtitle_file_header(mut wb: *mut s_write) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn write_cc_buffer_as_srt(
-    mut data: *mut eia608_screen,
-    mut wb: *mut s_write,
+    data: *mut eia608_screen,
+    wb: *mut s_write,
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut h1: libc::c_uint = 0;
@@ -969,7 +968,7 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
     let mut s2: libc::c_uint = 0;
     let mut ms2: libc::c_uint = 0;
     let mut wrote_something: libc::c_int = 0 as libc::c_int;
-    let mut pg: libc::c_uint = if c1global != 0 { c1global } else { c2global };
+    let pg: libc::c_uint = if c1global != 0 { c1global } else { c2global };
     let mut timeline: [libc::c_char; 128] = [0; 128];
     let mut ms_end: libc::c_long = 0;
     let mut ms_start: LONG = (((*(*wb).data608).current_visible_start_cc)
@@ -1085,12 +1084,12 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
 }
 #[no_mangle]
 pub unsafe extern "C" fn write_cc_buffer_as_sami(
-    mut data: *mut eia608_screen,
-    mut wb: *mut s_write,
+    data: *mut eia608_screen,
+    wb: *mut s_write,
 ) -> libc::c_int {
     let mut i: libc::c_int = 0;
     let mut wrote_something: libc::c_int = 0 as libc::c_int;
-    let mut pg: libc::c_uint = if c1global != 0 { c1global } else { c2global };
+    let pg: libc::c_uint = if c1global != 0 { c1global } else { c2global };
     let mut startms: LONG = (((*(*wb).data608).current_visible_start_cc)
         .wrapping_add(pg)
         .wrapping_mul(1000 as libc::c_int as libc::c_uint)
@@ -1131,7 +1130,7 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
     i = 0 as libc::c_int;
     while i < 15 as libc::c_int {
         if (*data).row_used[i as usize] != 0 {
-            let mut length: libc::c_int = get_decoder_line_encoded(subline, i, data) as libc::c_int;
+            let length: libc::c_int = get_decoder_line_encoded(subline, i, data) as libc::c_int;
             if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
                 printf(b"\r\0" as *const u8 as *const libc::c_char);
                 printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
@@ -1199,7 +1198,7 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
     return wrote_something;
 }
 #[no_mangle]
-pub unsafe extern "C" fn write_cc_buffer(mut wb: *mut s_write) -> libc::c_int {
+pub unsafe extern "C" fn write_cc_buffer(wb: *mut s_write) -> libc::c_int {
     let mut data: *mut eia608_screen = 0 as *mut eia608_screen;
     let mut wrote_something: libc::c_int = 0 as libc::c_int;
     if screens_to_process != -(1 as libc::c_int) as libc::c_long
@@ -1228,7 +1227,7 @@ pub unsafe extern "C" fn write_cc_buffer(mut wb: *mut s_write) -> libc::c_int {
     return wrote_something;
 }
 #[no_mangle]
-pub unsafe extern "C" fn roll_up(mut wb: *mut s_write) {
+pub unsafe extern "C" fn roll_up(wb: *mut s_write) {
     let mut i: libc::c_int = 0;
     let mut keep_lines: libc::c_int = 0;
     let mut lastrow: libc::c_int = 0;
@@ -1350,7 +1349,7 @@ pub unsafe extern "C" fn roll_up(mut wb: *mut s_write) {
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn erase_memory(mut wb: *mut s_write, mut displayed: libc::c_int) {
+pub unsafe extern "C" fn erase_memory(wb: *mut s_write, displayed: libc::c_int) {
     let mut buf: *mut eia608_screen = 0 as *mut eia608_screen;
     if displayed != 0 {
         if (*(*wb).data608).visible_buffer == 1 as libc::c_int {
@@ -1565,7 +1564,7 @@ pub unsafe extern "C" fn handle_command(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn handle_double(c1: libc::c_uchar, c2: libc::c_uchar, mut wb: *mut s_write) {
+pub unsafe extern "C" fn handle_double(c1: libc::c_uchar, c2: libc::c_uchar, wb: *mut s_write) {
     let mut c: libc::c_uchar = 0;
     if (*(*wb).data608).channel != cc_channel {
         return;
@@ -1585,9 +1584,9 @@ pub unsafe extern "C" fn handle_double(c1: libc::c_uchar, c2: libc::c_uchar, mut
 }
 #[no_mangle]
 pub unsafe extern "C" fn handle_extended(
-    mut hi: libc::c_uchar,
-    mut lo: libc::c_uchar,
-    mut wb: *mut s_write,
+    hi: libc::c_uchar,
+    lo: libc::c_uchar,
+    wb: *mut s_write,
 ) -> libc::c_uchar {
     let mut c: libc::c_uchar = 0 as libc::c_int as libc::c_uchar;
     if debug_608 != 0 {
@@ -1620,14 +1619,14 @@ pub unsafe extern "C" fn handle_extended(
 }
 #[no_mangle]
 pub unsafe extern "C" fn handle_pac(
-    mut c1: libc::c_uchar,
+    c1: libc::c_uchar,
     mut c2: libc::c_uchar,
     mut wb: *mut s_write,
 ) {
     let mut color: libc::c_int = 0;
     let mut font: libc::c_int = 0;
     let mut indent: libc::c_int = 0;
-    let mut row: libc::c_int = rowdata[((c1 as libc::c_int) << 1 as libc::c_int & 14 as libc::c_int
+    let row: libc::c_int = rowdata[((c1 as libc::c_int) << 1 as libc::c_int & 14 as libc::c_int
         | c2 as libc::c_int >> 5 as libc::c_int & 1 as libc::c_int)
         as usize];
     if debug_608 != 0 {
@@ -1666,14 +1665,14 @@ pub unsafe extern "C" fn handle_pac(
     (*(*wb).data608).cursor_column = indent;
 }
 #[no_mangle]
-pub unsafe extern "C" fn handle_single(c1: libc::c_uchar, mut wb: *mut s_write) {
+pub unsafe extern "C" fn handle_single(c1: libc::c_uchar, wb: *mut s_write) {
     if (c1 as libc::c_int) < 0x20 as libc::c_int || (*(*wb).data608).channel != cc_channel {
         return;
     }
     write_char(c1, wb);
 }
 #[no_mangle]
-pub unsafe extern "C" fn check_channel(mut c1: libc::c_uchar, mut wb: *mut s_write) {
+pub unsafe extern "C" fn check_channel(c1: libc::c_uchar, mut wb: *mut s_write) {
     if (*(*wb).data608).channel != 1 as libc::c_int && c1 as libc::c_int == 0x14 as libc::c_int {
         if debug_608 != 0 {
             printf(b"\rChannel change, now 1\n\0" as *const u8 as *const libc::c_char);
@@ -1705,8 +1704,8 @@ pub unsafe extern "C" fn check_channel(mut c1: libc::c_uchar, mut wb: *mut s_wri
 #[no_mangle]
 pub unsafe extern "C" fn disCommand(
     mut hi: libc::c_uchar,
-    mut lo: libc::c_uchar,
-    mut wb: *mut s_write,
+    lo: libc::c_uchar,
+    wb: *mut s_write,
 ) -> libc::c_int {
     let mut wrote_to_screen: libc::c_int = 0 as libc::c_int;
     if hi as libc::c_int >= 0x18 as libc::c_int && hi as libc::c_int <= 0x1f as libc::c_int {
@@ -1781,8 +1780,8 @@ pub unsafe extern "C" fn disCommand(
 }
 #[no_mangle]
 pub unsafe extern "C" fn process608(
-    mut data: *const libc::c_uchar,
-    mut length: libc::c_int,
+    data: *const libc::c_uchar,
+    length: libc::c_int,
     mut wb: *mut s_write,
 ) {
     if !data.is_null() {
