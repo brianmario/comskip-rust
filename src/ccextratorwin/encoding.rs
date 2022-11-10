@@ -2,8 +2,7 @@
     mutable_transmutes,
     non_camel_case_types,
     non_snake_case,
-    non_upper_case_globals,
-    unused_assignments
+    non_upper_case_globals
 )]
 pub type __darwin_ct_rune_t = libc::c_int;
 #[no_mangle]

@@ -2,8 +2,7 @@
     mutable_transmutes,
     non_camel_case_types,
     non_snake_case,
-    non_upper_case_globals,
-    unused_assignments
+    non_upper_case_globals
 )]
 extern "C" {
     fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
