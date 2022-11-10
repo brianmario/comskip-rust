@@ -1,5 +1,4 @@
 #![allow(
-    dead_code,
     mutable_transmutes,
     non_camel_case_types,
     non_snake_case,
@@ -186,13 +185,6 @@ pub struct eia608_screen {
 }
 pub type color_code = libc::c_uint;
 pub const COL_USERDEFINED: color_code = 7;
-pub const COL_MAGENTA: color_code = 6;
-pub const COL_YELLOW: color_code = 5;
-pub const COL_RED: color_code = 4;
-pub const COL_CYAN: color_code = 3;
-pub const COL_BLUE: color_code = 2;
-pub const COL_GREEN: color_code = 1;
-pub const COL_WHITE: color_code = 0;
 pub type LONG = libc::c_long;
 #[derive(Copy, Clone)]
 #[repr(C)]

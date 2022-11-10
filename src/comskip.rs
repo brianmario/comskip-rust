@@ -1,5 +1,4 @@
 #![allow(
-    dead_code,
     mutable_transmutes,
     non_camel_case_types,
     non_snake_case,
@@ -216,7 +215,6 @@ pub type uint32_t = libc::c_uint;
 pub type off_t = __darwin_off_t;
 pub type useconds_t = __darwin_useconds_t;
 pub type time_t = __darwin_time_t;
-pub type va_list = __builtin_va_list;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _RuneEntry {

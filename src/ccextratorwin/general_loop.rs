@@ -1,5 +1,4 @@
 #![allow(
-    dead_code,
     mutable_transmutes,
     non_camel_case_types,
     non_snake_case,
@@ -68,10 +67,6 @@ extern "C" {
         length2: libc::c_int,
     );
     fn too_many_blocks() -> libc::c_int;
-    static mut captions_buffer_1: [libc::c_uchar; 64];
-    static mut used_caption_buffer_1: libc::c_uint;
-    static mut captions_buffer_2: [libc::c_uchar; 64];
-    static mut used_caption_buffer_2: libc::c_uint;
     static mut last_reported_progress: libc::c_int;
     static mut buffer_input: libc::c_int;
     static mut frames_since_last_gop: libc::c_int;
@@ -125,7 +120,6 @@ pub type LONG = libc::c_long;
 pub type frame_type = libc::c_uint;
 pub const B_FRAME: frame_type = 3;
 pub const P_FRAME: frame_type = 2;
-pub const I_FRAME: frame_type = 1;
 pub const RESET_OR_UNKNOWN: frame_type = 0;
 #[derive(Copy, Clone)]
 #[repr(C)]

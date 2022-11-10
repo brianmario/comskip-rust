@@ -1,5 +1,4 @@
 #![allow(
-    dead_code,
     mutable_transmutes,
     non_camel_case_types,
     non_snake_case,
@@ -129,8 +128,6 @@ pub struct eia608_screen {
     pub empty: libc::c_int,
 }
 pub const ENC_UNICODE: encoding_type = 0;
-pub const ENC_LATIN_1: encoding_type = 1;
-pub const ENC_UTF_8: encoding_type = 2;
 pub type LONG = libc::c_long;
 pub const COL_WHITE: color_code = 0;
 pub const FONT_ITALICS: font_bits = 1;
@@ -146,7 +143,6 @@ pub struct boundary_time {
     pub time_in_ccblocks: LONG,
     pub set: libc::c_int,
 }
-pub const OF_SAMI: output_format = 2;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _RuneLocale {
@@ -199,7 +195,6 @@ pub struct _RuneEntry {
     pub __map: __darwin_rune_t,
     pub __types: *mut __uint32_t,
 }
-pub const OF_SRT: output_format = 1;
 pub const MODE_ROLLUP_4: cc_modes = 3;
 pub const MODE_ROLLUP_3: cc_modes = 2;
 pub const MODE_ROLLUP_2: cc_modes = 1;
@@ -231,8 +226,6 @@ pub type cc_modes = libc::c_uint;
 pub type color_code = libc::c_uint;
 pub type font_bits = libc::c_uint;
 pub type command_code = libc::c_uint;
-pub type output_format = libc::c_uint;
-pub const OF_RAW: output_format = 0;
 pub type encoding_type = libc::c_uint;
 #[inline]
 unsafe extern "C" fn isascii(mut _c: libc::c_int) -> libc::c_int {
