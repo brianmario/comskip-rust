@@ -32,24 +32,10 @@ extern "C" {
     pub type AVCodecTag;
     pub type SwsContext;
     static mut __stderrp: *mut libc::FILE;
-    fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn sprintf(_: *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
-    fn strchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn strcpy(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strncpy(_: *mut libc::c_char, _: *const libc::c_char, _: libc::c_ulong)
-        -> *mut libc::c_char;
-    fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
-    fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn signal(
         _: libc::c_int,
         _: Option<unsafe extern "C" fn(libc::c_int) -> ()>,
     ) -> Option<unsafe extern "C" fn(libc::c_int) -> ()>;
-    fn abs(_: libc::c_int) -> libc::c_int;
-    fn exit(_: libc::c_int) -> !;
-    fn gettimeofday(_: *mut timeval, _: *mut libc::c_void) -> libc::c_int;
-    fn fabs(_: libc::c_double) -> libc::c_double;
     fn av_mallocz(size: size_t) -> *mut libc::c_void;
     fn av_log_get_level() -> libc::c_int;
     fn av_log_set_level(level: libc::c_int);
@@ -252,12 +238,6 @@ pub type int64_t = libc::c_longlong;
 pub type uint64_t = libc::c_ulonglong;
 pub type uint32_t = libc::c_uint;
 pub type useconds_t = __darwin_useconds_t;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct timeval {
-    pub tv_sec: __darwin_time_t,
-    pub tv_usec: __darwin_suseconds_t,
-}
 pub type va_list = __builtin_va_list;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -2585,7 +2565,7 @@ pub unsafe extern "C" fn sound_to_frames(
                 * ((*(*(*is_0).audio_st).codec).sample_rate as libc::c_double + 0.5f64)
                 > 800000 as libc::c_int as libc::c_double
             || top_apts < base_apts
-            || !(fabs(
+            || !(libm::fabs(
                 audio_samples as libc::c_double
                     / ((*(*(*is_0).audio_st).codec).sample_rate as libc::c_double + 0.5f64)
                     + base_apts
@@ -2630,7 +2610,7 @@ pub unsafe extern "C" fn sound_to_frames(
     }
     old_sample_rate = (*(*(*is_0).audio_st).codec).sample_rate;
     old_base_apts = base_apts;
-    if fabs(
+    if libm::fabs(
         base_apts
             - ((*is_0).audio_clock
                 - audio_samples as libc::c_double
@@ -2645,16 +2625,16 @@ pub unsafe extern "C" fn sound_to_frames(
         && (*(*(*is_0).audio_st).codec).codec_id as libc::c_uint
             == AV_CODEC_ID_AC3 as libc::c_int as libc::c_uint
     {
-        if fabs(base_apts - old_base_apts - 0.032f64) < 0.001f64
-            || fabs(base_apts - old_base_apts - -0.032f64) < 0.001f64
-            || fabs(base_apts - old_base_apts - 0.064f64) < 0.001f64
-            || fabs(base_apts - old_base_apts - -0.064f64) < 0.001f64
-            || fabs(base_apts - old_base_apts - -0.096f64) < 0.001f64
+        if libm::fabs(base_apts - old_base_apts - 0.032f64) < 0.001f64
+            || libm::fabs(base_apts - old_base_apts - -0.032f64) < 0.001f64
+            || libm::fabs(base_apts - old_base_apts - 0.064f64) < 0.001f64
+            || libm::fabs(base_apts - old_base_apts - -0.064f64) < 0.001f64
+            || libm::fabs(base_apts - old_base_apts - -0.096f64) < 0.001f64
         {
             old_base_apts = base_apts;
         }
     }
-    if old_base_apts != 0.0f64 && fabs(base_apts - old_base_apts) > 0.01f64 {
+    if old_base_apts != 0.0f64 && libm::fabs(base_apts - old_base_apts) > 0.01f64 {
         Debug(
             8 as libc::c_int,
             b"Jump in base apts from %6.5f to %6.5f, delta=%6.5f\n\0" as *const u8
@@ -2710,7 +2690,7 @@ pub unsafe extern "C" fn sound_to_frames(
                 let fresh4 = audio_buffer_ptr;
                 audio_buffer_ptr = audio_buffer_ptr.offset(1);
                 *fresh4 = (volume / (*(*(*is_0).audio_st).codec).channels) as libc::c_short;
-                avg_volume += abs(volume / (*(*(*is_0).audio_st).codec).channels) as libc::c_double;
+                avg_volume += libc::abs(volume / (*(*(*is_0).audio_st).codec).channels) as libc::c_double;
                 i += 1;
             }
         } else {
@@ -2742,7 +2722,7 @@ pub unsafe extern "C" fn sound_to_frames(
                 let fresh7 = audio_buffer_ptr;
                 audio_buffer_ptr = audio_buffer_ptr.offset(1);
                 *fresh7 = (volume / (*(*(*is_0).audio_st).codec).channels) as libc::c_short;
-                avg_volume += abs(volume / (*(*(*is_0).audio_st).codec).channels) as libc::c_double;
+                avg_volume += libc::abs(volume / (*(*(*is_0).audio_st).codec).channels) as libc::c_double;
                 i += 1;
             }
         }
@@ -2909,21 +2889,21 @@ pub unsafe extern "C" fn audio_packet_process(mut is_0: *mut VideoState, pkt: *m
             && (*(*(*is_0).audio_st).codec).codec_id as libc::c_uint
                 == AV_CODEC_ID_AC3 as libc::c_int as libc::c_uint
         {
-            if fabs((*is_0).audio_clock - prev_audio_clock - 0.032f64) < 0.001f64
-                || fabs((*is_0).audio_clock - prev_audio_clock - -0.032f64) < 0.001f64
-                || fabs((*is_0).audio_clock - prev_audio_clock - 0.064f64) < 0.001f64
-                || fabs((*is_0).audio_clock - prev_audio_clock - -0.064f64) < 0.001f64
-                || fabs((*is_0).audio_clock - prev_audio_clock - -0.096f64) < 0.001f64
+            if libm::fabs((*is_0).audio_clock - prev_audio_clock - 0.032f64) < 0.001f64
+                || libm::fabs((*is_0).audio_clock - prev_audio_clock - -0.032f64) < 0.001f64
+                || libm::fabs((*is_0).audio_clock - prev_audio_clock - 0.064f64) < 0.001f64
+                || libm::fabs((*is_0).audio_clock - prev_audio_clock - -0.064f64) < 0.001f64
+                || libm::fabs((*is_0).audio_clock - prev_audio_clock - -0.096f64) < 0.001f64
             {
                 prev_audio_clock = (*is_0).audio_clock;
             }
         }
         if initial_apts_set != 0
             && (*is_0).audio_clock != 0.0f64
-            && fabs((*is_0).audio_clock - prev_audio_clock) > 0.02f64
+            && libm::fabs((*is_0).audio_clock - prev_audio_clock) > 0.02f64
         {
             if do_audio_repair != 0
-                && fabs((*is_0).audio_clock - prev_audio_clock) < 1 as libc::c_int as libc::c_double
+                && libm::fabs((*is_0).audio_clock - prev_audio_clock) < 1 as libc::c_int as libc::c_double
             {
                 (*is_0).audio_clock = prev_audio_clock;
             } else {
@@ -3032,17 +3012,17 @@ pub unsafe extern "C" fn audio_packet_process(mut is_0: *mut VideoState, pkt: *m
 }
 unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
     static mut frame_counter: uint32_t = 0 as libc::c_int as uint32_t;
-    static mut tv_beg: timeval = timeval {
+    static mut tv_beg: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
-    static mut tv_start: timeval = timeval {
+    static mut tv_start: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
     static mut total_elapsed: libc::c_int = 0;
     static mut last_count: libc::c_int = 0 as libc::c_int;
-    let mut tv_end: timeval = timeval {
+    let mut tv_end: libc::timeval = libc::timeval {
         tv_sec: 0,
         tv_usec: 0,
     };
@@ -3067,7 +3047,7 @@ unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
         last_count = 0 as libc::c_int;
         return 0.0f64;
     }
-    gettimeofday(&mut tv_end, 0 as *mut libc::c_void);
+    libc::gettimeofday(&mut tv_end, 0 as *mut libc::c_void);
     if frame_counter == 0 {
         tv_beg = tv_end;
         tv_start = tv_beg;
@@ -3110,7 +3090,7 @@ unsafe extern "C" fn print_fps(final_0: libc::c_int) -> libc::c_double {
     cur_second -= cur_hour * 60 as libc::c_int * 60 as libc::c_int;
     cur_minute = cur_second / 60 as libc::c_int;
     cur_second -= cur_minute * 60 as libc::c_int;
-    sprintf(
+    libc::sprintf(
         cur_pos.as_mut_ptr(),
         b"%2i:%.2i:%.2i\0" as *const u8 as *const libc::c_char,
         cur_hour,
@@ -3255,7 +3235,7 @@ pub unsafe extern "C" fn SubmitFrame(
                     as *mut libc::c_char,
             );
         }
-        exit(1 as libc::c_int);
+        ::std::process::exit(1 as libc::c_int);
     }
     if reviewing == 0 {
         print_fps(0 as libc::c_int);
@@ -3419,7 +3399,7 @@ pub unsafe extern "C" fn DecodeOnePicture(f: *mut libc::FILE, pts_0: libc::c_dou
                     } else if (*is_0).seek_req < 6 as libc::c_int
                         && (*is_0).seek_flags & 2 as libc::c_int != 0
                         && (*is_0).duration > 0 as libc::c_int as libc::c_double
-                        && fabs(packet_time - ((*is_0).seek_pts - 2.5f64))
+                        && libm::fabs(packet_time - ((*is_0).seek_pts - 2.5f64))
                             < (*is_0).duration
                                 / (10 as libc::c_int * (*is_0).seek_req) as libc::c_double
                     {
@@ -3456,12 +3436,12 @@ pub unsafe extern "C" fn DecodeOnePicture(f: *mut libc::FILE, pts_0: libc::c_dou
 }
 #[no_mangle]
 pub unsafe extern "C" fn raise_exception() {
-    asm!("int3", options(preserves_flags));
+    asm!("brk #0x1", options(preserves_flags));
 }
 #[no_mangle]
 pub unsafe extern "C" fn filter() -> libc::c_int {
-    printf(b"Exception raised, Comskip is terminating\n\0" as *const u8 as *const libc::c_char);
-    exit(99 as libc::c_int);
+    libc::printf(b"Exception raised, Comskip is terminating\n\0" as *const u8 as *const libc::c_char);
+    ::std::process::exit(99 as libc::c_int);
 }
 #[no_mangle]
 pub unsafe extern "C" fn video_packet_process(
@@ -3558,7 +3538,7 @@ pub unsafe extern "C" fn video_packet_process(
             if initial_pts_set < 3 as libc::c_int && reviewing == 0
                 || reviewing != 0 && initial_pts_set < 2 as libc::c_int
             {
-                if !(fabs(
+                if !(libm::fabs(
                     initial_pts
                         - ((best_effort_timestamp
                             - (if (*(*is_0).video_st).start_time
@@ -3614,13 +3594,13 @@ pub unsafe extern "C" fn video_packet_process(
         }
         calculated_delay = real_pts - prev_real_pts;
         if framenum < 500 as libc::c_int {
-            if !(fabs(frame_delay - 0.03336666f64) < 0.001f64)
-                && (fabs(calculated_delay - 0.0333333f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.033f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.034f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.067f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.066f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.06673332f64) < 0.0001f64)
+            if !(libm::fabs(frame_delay - 0.03336666f64) < 0.001f64)
+                && (libm::fabs(calculated_delay - 0.0333333f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.033f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.034f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.067f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.066f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.06673332f64) < 0.0001f64)
             {
                 find_29fps += 1;
             } else {
@@ -3637,10 +3617,10 @@ pub unsafe extern "C" fn video_packet_process(
                     frame_count,
                 );
             }
-            if !(fabs(frame_delay - 0.040f64) < 0.001f64)
-                && (fabs(calculated_delay - 0.04f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.039f64) < 0.0001f64
-                    || fabs(calculated_delay - 0.041f64) < 0.0001f64)
+            if !(libm::fabs(frame_delay - 0.040f64) < 0.001f64)
+                && (libm::fabs(calculated_delay - 0.04f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.039f64) < 0.0001f64
+                    || libm::fabs(calculated_delay - 0.041f64) < 0.0001f64)
             {
                 find_25fps += 1;
             } else {
@@ -3658,9 +3638,9 @@ pub unsafe extern "C" fn video_packet_process(
                 );
             }
             if find_24fps & 1 as libc::c_int == 0 as libc::c_int
-                && fabs(calculated_delay - 0.050f64) < 0.001f64
+                && libm::fabs(calculated_delay - 0.050f64) < 0.001f64
                 || find_24fps & 1 as libc::c_int == 1 as libc::c_int
-                    && fabs(calculated_delay - 0.033f64) < 0.001f64
+                    && libm::fabs(calculated_delay - 0.033f64) < 0.001f64
             {
                 find_24fps += 1;
             } else {
@@ -3690,15 +3670,15 @@ pub unsafe extern "C" fn video_packet_process(
         pts_offset *= 0.9f64;
         if reviewing == 0 && timeline_repair != 0 {
             if framenum > 1 as libc::c_int
-                && fabs(calculated_delay - pts_offset - frame_delay) < 1.0f64
+                && libm::fabs(calculated_delay - pts_offset - frame_delay) < 1.0f64
             {
-                if !(fabs(
+                if !(libm::fabs(
                     3 as libc::c_int as libc::c_double * frame_delay
                         / (*(*(*is_0).video_st).codec).ticks_per_frame as libc::c_double
                         - calculated_delay,
                 ) < 0.001f64)
                 {
-                    if !(fabs(
+                    if !(libm::fabs(
                         1 as libc::c_int as libc::c_double * frame_delay
                             / (*(*(*is_0).video_st).codec).ticks_per_frame as libc::c_double
                             - calculated_delay,
@@ -3715,20 +3695,20 @@ pub unsafe extern "C" fn video_packet_process(
         calculated_delay = pts_0 - prev_pts;
         if reviewing == 0
             && framenum > 1 as libc::c_int
-            && fabs(calculated_delay - frame_delay) > 0.01f64
-            && !(fabs(
+            && libm::fabs(calculated_delay - frame_delay) > 0.01f64
+            && !(libm::fabs(
                 3 as libc::c_int as libc::c_double * frame_delay
                     / (*(*(*is_0).video_st).codec).ticks_per_frame as libc::c_double
                     - calculated_delay,
             ) < 0.001f64)
-            && !(fabs(
+            && !(libm::fabs(
                 1 as libc::c_int as libc::c_double * frame_delay
                     / (*(*(*is_0).video_st).codec).ticks_per_frame as libc::c_double
                     - calculated_delay,
             ) < 0.001f64)
         {
             if prev_strange_framenum + 1 as libc::c_int != framenum
-                && prev_strange_step < fabs(calculated_delay - frame_delay)
+                && prev_strange_step < libm::fabs(calculated_delay - frame_delay)
             {
                 Debug(
                     8 as libc::c_int,
@@ -3743,7 +3723,7 @@ pub unsafe extern "C" fn video_packet_process(
                 }
             }
             prev_strange_framenum = framenum;
-            prev_strange_step = fabs(calculated_delay - frame_delay);
+            prev_strange_step = libm::fabs(calculated_delay - frame_delay);
         }
         set_fps(
             frame_delay,
@@ -3877,7 +3857,7 @@ pub unsafe extern "C" fn video_packet_process(
                             as *mut libc::c_char,
                     );
                 }
-                exit(1 as libc::c_int);
+                ::std::process::exit(1 as libc::c_int);
             }
             retries = 0 as libc::c_int;
             if SubmitFrame((*is_0).video_st, (*is_0).pFrame, (*is_0).video_clock) != 0 {
@@ -3885,7 +3865,7 @@ pub unsafe extern "C" fn video_packet_process(
             } else {
                 current_block = 2838755337219234678;
             }
-        } else if fabs((*is_0).seek_pts - (*is_0).video_clock) > 80 as libc::c_int as libc::c_double
+        } else if libm::fabs((*is_0).seek_pts - (*is_0).video_clock) > 80 as libc::c_int as libc::c_double
         {
             Debug(
                 1 as libc::c_int,
@@ -3920,7 +3900,7 @@ pub unsafe extern "C" fn video_packet_process(
                         as *mut libc::c_char,
                     selftest,
                 );
-                exit(1 as libc::c_int);
+                ::std::process::exit(1 as libc::c_int);
             }
             current_block = 14537325084018676057;
         } else {
@@ -3985,7 +3965,7 @@ pub unsafe extern "C" fn stream_component_open(
     {
         return -(1 as libc::c_int);
     }
-    if strcmp(
+    if libc::strcmp(
         (*(*pFormatCtx).iformat).name,
         b"mpegts\0" as *const u8 as *const libc::c_char,
     ) == 0 as libc::c_int
@@ -4165,7 +4145,7 @@ pub unsafe extern "C" fn file_open() {
             0 as libc::c_int,
             ::std::mem::size_of::<AVPacket>() as usize,
         );
-        strcpy(((*is_0).filename).as_mut_ptr(), mpegfilename.as_mut_ptr());
+        libc::strcpy(((*is_0).filename).as_mut_ptr(), mpegfilename.as_mut_ptr());
         av_log_level = 32 as libc::c_int;
         av_log_set_callback(Some(
             log_callback_report
@@ -4233,7 +4213,7 @@ pub unsafe extern "C" fn file_open() {
                     if fresh28 < live_tv_retries {
                         std::thread::sleep(std::time::Duration::from_millis(1000));
                     } else {
-                        exit(-(1 as libc::c_int));
+                        ::std::process::exit(-(1 as libc::c_int));
                     }
                 } else {
                     break 's_142;
@@ -4241,7 +4221,7 @@ pub unsafe extern "C" fn file_open() {
             }
         }
         (*is_0).seek_by_bytes = ((*(*(*is_0).pFormatCtx).iformat).flags & 0x200 as libc::c_int != 0
-            && strcmp(
+            && libc::strcmp(
                 b"ogg\0" as *const u8 as *const libc::c_char,
                 (*(*(*is_0).pFormatCtx).iformat).name,
             ) != 0) as libc::c_int;
@@ -4253,7 +4233,7 @@ pub unsafe extern "C" fn file_open() {
                 b"%s: Can not find stream info\n\0" as *const u8 as *const libc::c_char,
                 ((*is_0).filename).as_mut_ptr(),
             );
-            exit(-(1 as libc::c_int));
+            ::std::process::exit(-(1 as libc::c_int));
         }
         if retries == 0 as libc::c_int {
             av_dump_format(
@@ -4287,7 +4267,7 @@ pub unsafe extern "C" fn file_open() {
                 b"%s: could not open video codec\n\0" as *const u8 as *const libc::c_char,
                 ((*is_0).filename).as_mut_ptr(),
             );
-            exit(-(1 as libc::c_int));
+            ::std::process::exit(-(1 as libc::c_int));
         }
         if (*(*is_0).video_st).duration == 0x8000000000000000 as libc::c_ulonglong as int64_t
             || (*(*is_0).video_st).duration < 0 as libc::c_int as libc::c_longlong
@@ -4415,7 +4395,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
     retries = 0 as libc::c_int;
     let mut ptr: *mut libc::c_char = 0 as *mut libc::c_char;
     let mut len: size_t = 0;
-    if !(strstr(
+    if !(libc::strstr(
         *argv.offset(0 as libc::c_int as isize),
         b"comskipGUI\0" as *const u8 as *const libc::c_char,
     ))
@@ -4426,12 +4406,12 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
     ptr = *argv.offset(0 as libc::c_int as isize);
     if *ptr as libc::c_int == '"' as i32 {
         ptr = ptr.offset(1);
-        len = (strchr(ptr, '"' as i32)).offset_from(ptr) as libc::c_long as size_t;
+        len = (libc::strchr(ptr, '"' as i32)).offset_from(ptr) as libc::c_long as size_t;
     } else {
-        len = strlen(ptr);
+        len = libc::strlen(ptr) as u64;
     }
-    strncpy(HomeDir.as_mut_ptr(), ptr, len);
-    ptr = strrchr(HomeDir.as_mut_ptr(), '\\' as i32);
+    libc::strncpy(HomeDir.as_mut_ptr(), ptr, len as usize);
+    ptr = libc::strrchr(HomeDir.as_mut_ptr(), '\\' as i32);
     if ptr.is_null()
         || ptr.offset_from(HomeDir.as_mut_ptr()) as libc::c_long == 0 as libc::c_int as libc::c_long
     {
@@ -4454,7 +4434,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
     csRestart = 0 as libc::c_int;
     framenum = 0 as libc::c_int;
     if output_timing != 0 {
-        sprintf(
+        libc::sprintf(
             tempstring.as_mut_ptr(),
             b"%s.timing.csv\0" as *const u8 as *const libc::c_char,
             inbasename.as_mut_ptr(),
@@ -4487,7 +4467,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                     timing_file = 0 as *mut libc::FILE;
                 }
                 if output_timing != 0 {
-                    sprintf(
+                    libc::sprintf(
                         tempstring.as_mut_ptr(),
                         b"%s.timing.csv\0" as *const u8 as *const libc::c_char,
                         inbasename.as_mut_ptr(),
@@ -4539,7 +4519,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
             } else if (*is).seek_req < 6 as libc::c_int
                 && (*is).seek_flags & 2 as libc::c_int != 0
                 && (*is).duration > 0 as libc::c_int as libc::c_double
-                && fabs(packet_time - ((*is).seek_pts - 2.5f64))
+                && libm::fabs(packet_time - ((*is).seek_pts - 2.5f64))
                     < (*is).duration / (10 as libc::c_int * (*is).seek_req) as libc::c_double
             {
                 current_block = 12758904613967585247;
@@ -4636,7 +4616,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
                                     as *mut libc::c_char,
                                 selftest,
                             );
-                            exit(1 as libc::c_int);
+                            ::std::process::exit(1 as libc::c_int);
                         }
                     } else {
                         if (*is).video_clock < 500.0f64 {
@@ -4801,14 +4781,14 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
     if framenum > 0 as libc::c_int {
         if BuildMasterCommList() != 0 {
             result = 1 as libc::c_int;
-            printf(b"Commercials were found.\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"Commercials were found.\n\0" as *const u8 as *const libc::c_char);
         } else {
             result = 0 as libc::c_int;
-            printf(b"Commercials were not found.\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"Commercials were not found.\n\0" as *const u8 as *const libc::c_char);
         }
         if output_debugwindow != 0 {
             processCC = 0 as libc::c_int;
-            printf(b"Close window when done\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"Close window when done\n\0" as *const u8 as *const libc::c_char);
             if !timing_file.is_null() {
                 libc::fclose(timing_file);
                 timing_file = 0 as *mut libc::FILE;
@@ -4818,7 +4798,7 @@ unsafe fn main_0(argc: libc::c_int, argv: *mut *mut libc::c_char) -> libc::c_int
             }
         }
     }
-    exit((result == 0) as libc::c_int);
+    ::std::process::exit((result == 0) as libc::c_int);
 }
 pub fn main() {
     let mut args: Vec<*mut libc::c_char> = Vec::new();

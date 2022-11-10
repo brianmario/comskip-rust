@@ -1,17 +1,7 @@
 extern "C" {
     static mut _DefaultRuneLocale: _RuneLocale;
     fn __tolower(_: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
-    fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn strcat(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn strcmp(_: *const libc::c_char, _: *const libc::c_char) -> libc::c_int;
-    fn strcpy(_: *mut libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
-    fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn atoi(_: *const libc::c_char) -> libc::c_int;
-    fn exit(_: libc::c_int) -> !;
     fn time(_: *mut time_t) -> time_t;
-    fn lseek(_: libc::c_int, _: off_t, _: libc::c_int) -> off_t;
     static mut usercolor_rgb: [libc::c_uchar; 8];
     static mut default_color: libc::c_int;
     fn init_file_buffer() -> libc::c_int;
@@ -558,417 +548,417 @@ pub static mut spell_builtin: [*const libc::c_char; 30] = [
 ];
 #[no_mangle]
 pub unsafe extern "C" fn getfilesize(in_1: libc::c_int) -> LONG {
-    let current: LONG = lseek(in_1, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
-    let length: LONG = lseek(in_1, 0 as libc::c_int as off_t, 2 as libc::c_int) as LONG;
-    lseek(in_1, current as off_t, 0 as libc::c_int);
+    let current: LONG = libc::lseek(in_1, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
+    let length: LONG = libc::lseek(in_1, 0 as libc::c_int as off_t, 2 as libc::c_int) as LONG;
+    libc::lseek(in_1, current as off_t, 0 as libc::c_int);
     return length;
 }
 #[no_mangle]
 pub unsafe extern "C" fn header() {
-    printf(b"CCExtractor v0.34, cfsmp3 at gmail\n\0" as *const u8 as *const libc::c_char);
-    printf(b"----------------------------------\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"CCExtractor v0.34, cfsmp3 at gmail\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"----------------------------------\n\0" as *const u8 as *const libc::c_char);
 }
 #[no_mangle]
 pub unsafe extern "C" fn usage() {
-    printf(
+    libc::printf(
         b"Heavily based on McPoodle's tools. Check his page for lots of information\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"on closed captions technical details.\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"on closed captions technical details.\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"(http://www.geocities.com/mcpoodle43/SCC_TOOLS/DOCS/SCC_TOOLS.HTML)\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"This tool home page:\n\0" as *const u8 as *const libc::c_char);
-    printf(b"http://ccextractor.sourceforge.net\n\0" as *const u8 as *const libc::c_char);
-    printf(b"  Extracts closed captions from MPEG files.\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"This tool home page:\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"http://ccextractor.sourceforge.net\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"  Extracts closed captions from MPEG files.\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"    (DVB, .TS, ReplayTV 4000 and 5000, dvr-ms, bttv and Dish Network are known\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"     to work).\n\n\0" as *const u8 as *const libc::c_char);
-    printf(b"  Syntax:\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"     to work).\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"  Syntax:\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"  ccextractor [options] inputfile1 [inputfile2...] [-o outputfilename]\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"               [-o1 outputfilename1] [-o2 outputfilename2]\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"File name related options:\n\0" as *const u8 as *const libc::c_char);
-    printf(b"            inputfile: file(s) to process\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"File name related options:\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"            inputfile: file(s) to process\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"    -o outputfilename: Use -o parameters to define output filename if you don't\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       like the default ones (same as infile plus _1 or _2 when\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       needed and .bin or .srt extension).\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                           -o or -o1 -> Name of the first (maybe only) output\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                                        file.\n\0" as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                           -o2       -> Name of the second output file, when\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                                        it applies.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"         -cf filename: Write 'clean' data to a file. Cleans means the ES\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       without TS or PES headers.\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"You can pass as many input files as you need. They will be processed in order.\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"Output will be one single file (either raw or srt). Use this if you made your\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"recording in several cuts (to skip commercials for example) but you want one\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"subtitle file with contiguous timing.\n\n\0" as *const u8 as *const libc::c_char);
-    printf(b"Options that affect what will be processed:\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"subtitle file with contiguous timing.\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"Options that affect what will be processed:\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"          -1, -2, -12: Output Field 1 data, Field 2 data, or both\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"                       (DEFAULT is -1)\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       (DEFAULT is -1)\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"                 -cc2: When in srt/sami mode, process captions in channel 2\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"                       instead channel 1.\n\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       instead channel 1.\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"In general, if you want English subtitles you don't need to use these options\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"as they are broadcast in field 1, channel 1. If you want the second language\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"(usually Spanish) you may need to try -2, or -cc2, or both.\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"Options that affect how input files will be processed.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                  -ts: Force Transport Stream mode.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                -nots: Disable Transport Stream mode.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                 -bin: Process a raw (bin) closed captions dump instead of a\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       MPEG files. Requires that either -srt or -sami is used\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"                       as well.\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       as well.\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"                -myth: Force MythTV code branch.\n\0" as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"              -nomyth: Disable MythTV code branch.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"     -fp --fixpadding: Fix padding - some cards (or providers, or whatever)\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       seem to send 0000 as CC padding instead of 8080. If you\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       get bad timing, this might solve it.\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"Usually you only need to use -bin (if you want to produce srt/sami from a\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"dump of previously extracted closed captions). For MPEG files, transport\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"stream mode is autodetected. The MythTV branch is needed for analog captures\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"such as those with bttv cards (Hauppage 250 for example), which is detected\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"as well. You can however force whatever you need in case autodetection\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"doesn't work for you.\n\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"doesn't work for you.\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"Options that affect what kind of output will be produced:\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                   -d: Output raw captions in DVD format\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       (DEFAULT is broadcast format)\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                 -srt: Generate .srt instead of .bin.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                -sami: Generate .sami instead of .bin.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                -utf8: Encode subtitles in UTF-8 instead of Latin-1\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"             -unicode: Encode subtitles in Unicode instead of Latin-1\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"  -nofc --nofontcolor: For .srt/.sami, don't add font color tags.\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"    -sc --sentencecap: Sentence capitalization. Use if you hate.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       ALL CAPS in subtitles.\n\0" as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"  --capfile -caf file: Add the contents of 'file' to the list of words\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       that must be capitalized. For example, if file\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       is a plain text file that contains\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"                       Tony\n\0" as *const u8 as *const libc::c_char);
-    printf(b"                       Alan\n\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       Tony\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"                       Alan\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"                       Whenever those words are found they will be written\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       exactly as they appear in the file.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       Use one line per word. Lines starting with # are\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       considered comments and discarded.\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"Options that affect how ccextractor reads and writes (buffering):\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"    -bo -bufferoutput: Buffer writes. Might help a bit with performance.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"     -bi -bufferinput: Forces input buffering.\n\0" as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b" -nobi -nobufferinput: Disables input buffering.\n\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"Options that affect the built-in closed caption decoder:\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                 -dru: Direct Roll-Up. When in roll-up mode, write character by\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       character instead of line by line. Note that this\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       produces (much) larger files.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                -noff: Disable FF clean-up. This is extra sanity check when\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       processing CC blocks. FF clean-up usually gets rid of\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       garbage produced by false CC block, but might cause\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       good characters to be missed. Use this option if you\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       prefer not to have any character discarded. Note that\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       this option is probably no longer needed and will\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"                       be removed soon.\n\n\0" as *const u8 as *const libc::c_char);
-    printf(b"Options that affect timing:\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       be removed soon.\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"Options that affect timing:\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"    -noap --noautopad: Disable autopad. By default ccextractor pads closed\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       captions data to ensure that there's exactly 29.97 CC\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       2-byte blocks per second. Usually this fixes timing\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       issues, but you may disable it with this option.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       Note that autopadding only happens in TS mode.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"         -gp --goppad: Use GOP timing for padding instead of PTS. Use this\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       if you need padding on a non-TS file.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"            -delay ms: For srt/sami, add this number of milliseconds to\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       all times. For example, -delay 400 makes subtitles\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       appear 400ms late. You can also use negative numbers\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       to make subs appear early.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"Notes on times: -startat and -endat times are used first, then -delay.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"So if you use -srt -startat 3:00 -endat 5:00 -delay 12000, ccextractor will\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"generate a .srt file, with only data from 3:00 to 5:00 in the input file(s)\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"and then add that (huge) delay, which would make the final file start at\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"5:00 and end at 7:00.\n\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"5:00 and end at 7:00.\n\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"Options that affect what segment of the input file(s) to process:\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"        -startat time: For .srt/.sami, only write subtitles that start after\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       the given time. Time can be seconds, MM:SS or HH:MM:SS.\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       For example, -startat 3:00 means 'start writing from\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"                       minute 3.\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       minute 3.\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"                       This option is ignored in raw mode.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"          -endat time: Stop processing after the given time (same format as\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       -startat). This option is honored in all output\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"                       formats.\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"                       formats.\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"-scr --screenfuls num: Write 'num' screenfuls and terminate processing.\n\n\0"
             as *const u8 as *const libc::c_char,
     );
-    printf(b"Options that affect debug data:\n\0" as *const u8 as *const libc::c_char);
-    printf(
+    libc::printf(b"Options that affect debug data:\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(
         b"               -debug: For HDTV dumps 'interesting' packets.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                 -608: Print debug traces from the EIA-608 decoder.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       If you need to submit a bug report, please send\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(
+    libc::printf(
         b"                       the output from this option.\n\0" as *const u8
             as *const libc::c_char,
     );
-    printf(b"\n\0" as *const u8 as *const libc::c_char);
+    libc::printf(b"\n\0" as *const u8 as *const libc::c_char);
 }
 #[no_mangle]
 pub unsafe extern "C" fn totalblockswritten_thisfile() -> libc::c_uint {
@@ -1155,7 +1145,7 @@ pub unsafe extern "C" fn dump(start: *mut libc::c_uchar, mut l: libc::c_int) {
     x = 0 as libc::c_int;
     while x < l {
         let mut j: libc::c_int = 0;
-        printf(b"%03d | \0" as *const u8 as *const libc::c_char, x);
+        libc::printf(b"%03d | \0" as *const u8 as *const libc::c_char, x);
         j = 0 as libc::c_int;
         while j < 16 as libc::c_int {
             if x + j == 34 as libc::c_int {
@@ -1163,29 +1153,29 @@ pub unsafe extern "C" fn dump(start: *mut libc::c_uchar, mut l: libc::c_int) {
                 l += 4 as libc::c_int;
             }
             if x + j < l {
-                printf(
+                libc::printf(
                     b"%02X \0" as *const u8 as *const libc::c_char,
                     *start.offset((x + j) as isize) as libc::c_int,
                 );
             } else {
-                printf(b"   \0" as *const u8 as *const libc::c_char);
+                libc::printf(b"   \0" as *const u8 as *const libc::c_char);
             }
             j += 1;
         }
-        printf(b" | \0" as *const u8 as *const libc::c_char);
+        libc::printf(b" | \0" as *const u8 as *const libc::c_char);
         j = 0 as libc::c_int;
         while j < 16 as libc::c_int {
             if x + j <= l && *start.offset((x + j) as isize) as libc::c_int >= ' ' as i32 {
-                printf(
+                libc::printf(
                     b"%c\0" as *const u8 as *const libc::c_char,
                     *start.offset((x + j) as isize) as libc::c_int,
                 );
             } else {
-                printf(b" \0" as *const u8 as *const libc::c_char);
+                libc::printf(b" \0" as *const u8 as *const libc::c_char);
             }
             j += 1;
         }
-        printf(b"\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"\n\0" as *const u8 as *const libc::c_char);
         x = x + 16 as libc::c_int;
     }
 }
@@ -1323,18 +1313,18 @@ pub unsafe extern "C" fn add_word(word: *const libc::c_char) -> libc::c_int {
     let mut new_correct: *mut libc::c_char = 0 as *mut libc::c_char;
     if spell_words == spell_capacity {
         spell_capacity += 50 as libc::c_int;
-        spell_lower = realloc(
+        spell_lower = libc::realloc(
             spell_lower as *mut libc::c_void,
             (::std::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
-                .wrapping_mul(spell_capacity as libc::c_ulong),
+                .wrapping_mul(spell_capacity as libc::c_ulong) as usize,
         ) as *mut *mut libc::c_char;
-        spell_correct = realloc(
+        spell_correct = libc::realloc(
             spell_correct as *mut libc::c_void,
             (::std::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
-                .wrapping_mul(spell_capacity as libc::c_ulong),
+                .wrapping_mul(spell_capacity as libc::c_ulong) as usize,
         ) as *mut *mut libc::c_char;
     }
-    len = strlen(word);
+    len = libc::strlen(word) as u64;
     new_lower = libc::malloc(len.wrapping_add(1) as usize) as *mut libc::c_char;
     new_correct = libc::malloc(len.wrapping_add(1) as usize) as *mut libc::c_char;
     if spell_lower.is_null()
@@ -1342,10 +1332,10 @@ pub unsafe extern "C" fn add_word(word: *const libc::c_char) -> libc::c_int {
         || new_lower.is_null()
         || new_correct.is_null()
     {
-        printf(b"\rNot enough memory.\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"\rNot enough memory.\n\0" as *const u8 as *const libc::c_char);
         return -(1 as libc::c_int);
     }
-    strcpy(new_correct, word);
+    libc::strcpy(new_correct, word);
     i = 0 as libc::c_int as size_t;
     while i < len {
         let mut c: libc::c_char = 0;
@@ -1382,7 +1372,7 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
     let mut num: libc::c_int = 0 as libc::c_int;
     let mut line: [libc::c_char; 35] = [0; 35];
     if fi.is_null() {
-        printf(
+        libc::printf(
             b"\rUnable to open capitalization file: %s\n\0" as *const u8 as *const libc::c_char,
             filename,
         );
@@ -1396,7 +1386,7 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
         }
         c = line
             .as_mut_ptr()
-            .offset(strlen(line.as_mut_ptr()) as isize)
+            .offset(libc::strlen(line.as_mut_ptr()) as isize)
             .offset(-(1 as libc::c_int as isize));
         while c >= line.as_mut_ptr()
             && (*c as libc::c_int == 0xd as libc::c_int || *c as libc::c_int == 0xa as libc::c_int)
@@ -1404,8 +1394,8 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
             *c = 0 as libc::c_int as libc::c_char;
             c = c.offset(-1);
         }
-        if strlen(line.as_mut_ptr()) > 32 as libc::c_int as libc::c_ulong {
-            printf(
+        if libc::strlen(line.as_mut_ptr()) > 32{
+            libc::printf(
                 b"Word in line %d too long, max = 32 characters.\n\0" as *const u8
                     as *const libc::c_char,
                 num,
@@ -1413,7 +1403,7 @@ pub unsafe extern "C" fn process_cap_file(filename: *mut libc::c_char) -> libc::
             libc::fclose(fi);
             return -(1 as libc::c_int);
         }
-        if strlen(line.as_mut_ptr()) > 0 as libc::c_int as libc::c_ulong {
+        if libc::strlen(line.as_mut_ptr()) > 0 {
             if add_word(line.as_mut_ptr()) != 0 {
                 return -(1 as libc::c_int);
             }
@@ -1427,7 +1417,7 @@ pub unsafe extern "C" fn CEW_reinit() {
     if !(wbout1.fh).is_null() {
         libc::fclose(wbout1.fh);
     }
-    if !(wbout1.filename).is_null() && strlen(wbout1.filename) > 0 as libc::c_int as libc::c_ulong {
+    if !(wbout1.filename).is_null() && libc::strlen(wbout1.filename) > 0 {
         wbout1.fh = libc::fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
     }
     init_boundary_time(&mut extraction_start);
@@ -1475,241 +1465,241 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         {
             if inputfile_capacity <= num_input_files {
                 inputfile_capacity += 10 as libc::c_int;
-                inputfile = realloc(
+                inputfile = libc::realloc(
                     inputfile as *mut libc::c_void,
                     (::std::mem::size_of::<*mut libc::c_char>() as libc::c_ulong)
-                        .wrapping_mul(inputfile_capacity as libc::c_ulong),
+                        .wrapping_mul(inputfile_capacity as libc::c_ulong) as usize,
                 ) as *mut *mut libc::c_char;
             }
             let ref mut fresh6 = *inputfile.offset(num_input_files as isize);
             *fresh6 = *argv.offset(i as isize);
             num_input_files += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-bo\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--bufferoutput\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             buffer_output = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-bi\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--bufferinput\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             buffer_input = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-nobi\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--nobufferinput\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             buffer_input = 0 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-d\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             rawmode = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-dru\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             direct_rollup = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-nots\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             auto_ts = 0 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-nofc\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--nofontcolor\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             nofontcolor = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-ts\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             auto_ts = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-12\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             extract = 12 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-noff\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             ff_cleanup = 0 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-fp\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--fixpadding\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             fix_padding = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-noap\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--noautopad\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             autopad = 0 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-gp\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--goppad\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             gop_pad = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-debug\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             debug = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"--sentencecap\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"-sc\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             if add_built_in_words() != 0 {
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             sentence_cap = 1 as libc::c_int;
         }
-        if (strcmp(
+        if (libc::strcmp(
             *argv.offset(i as isize),
             b"--capfile\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"-caf\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int)
             && i < argc - 1 as libc::c_int
         {
             if add_built_in_words() != 0 {
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             if process_cap_file(*argv.offset((i + 1 as libc::c_int) as isize)) != 0 as libc::c_int {
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             sentence_cap = 1 as libc::c_int;
             sentence_cap_file = *argv.offset((i + 1 as libc::c_int) as isize);
             i += 1;
         }
-        if (strcmp(
+        if (libc::strcmp(
             *argv.offset(i as isize),
             b"--defaultcolor\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"-dc\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int)
             && i < argc - 1 as libc::c_int
         {
-            if strlen(*argv.offset((i + 1 as libc::c_int) as isize))
-                != 7 as libc::c_int as libc::c_ulong
+            if libc::strlen(*argv.offset((i + 1 as libc::c_int) as isize))
+                != 7
                 || *(*argv.offset((i + 1 as libc::c_int) as isize))
                     .offset(0 as libc::c_int as isize) as libc::c_int
                     != '#' as i32
             {
-                printf(
+                libc::printf(
                     b"\r--defaultcolor expects a 7 character parameter that starts with #\n\0"
                         as *const u8 as *const libc::c_char,
                 );
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
-            strcpy(
+            libc::strcpy(
                 usercolor_rgb.as_mut_ptr() as *mut libc::c_char,
                 *argv.offset((i + 1 as libc::c_int) as isize),
             );
             default_color = COL_USERDEFINED as libc::c_int;
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-delay\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
             && i < argc - 1 as libc::c_int
         {
             if parsedelay(*argv.offset((i + 1 as libc::c_int) as isize)) != 0 {
-                printf(
+                libc::printf(
                     b"\r-delay only accept integers (such as -300 or 300)\n\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             i += 1;
         }
-        if (strcmp(
+        if (libc::strcmp(
             *argv.offset(i as isize),
             b"-scr\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"--screenfuls\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int)
             && i < argc - 1 as libc::c_int
         {
-            screens_to_process = atoi(*argv.offset((i + 1 as libc::c_int) as isize)) as LONG;
+            screens_to_process = libc::atoi(*argv.offset((i + 1 as libc::c_int) as isize)) as LONG;
             if screens_to_process < 0 as libc::c_int as libc::c_long {
-                printf(
+                libc::printf(
                     b"\r--screenfuls only accepts positive integers.\n\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-startat\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1720,15 +1710,15 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
                 &mut extraction_start,
             ) == -(1 as libc::c_int)
             {
-                printf(
+                libc::printf(
                     b"\r-startat only accepts SS, MM:SS or HH:MM:SS\n\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-endat\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1739,68 +1729,68 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
                 &mut extraction_end,
             ) == -(1 as libc::c_int)
             {
-                printf(
+                libc::printf(
                     b"\r-endat only accepts SS, MM:SS or HH:MM:SS\n\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(-(1 as libc::c_int));
+                ::std::process::exit(-(1 as libc::c_int));
             }
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-1\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             extract = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-2\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             extract = 2 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-srt\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             write_format = OF_SRT as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-sami\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             write_format = OF_SAMI as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-bin\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             input_bin = 1 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-cc2\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
-            || strcmp(
+            || libc::strcmp(
                 *argv.offset(i as isize),
                 b"-CC2\0" as *const u8 as *const libc::c_char,
             ) == 0 as libc::c_int
         {
             cc_channel = 2 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-608\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
         {
             debug_608 = 1 as libc::c_int;
         }
-        if !(strstr(
+        if !(libc::strstr(
             *argv.offset(i as isize),
             b"-unicode\0" as *const u8 as *const libc::c_char,
         ))
@@ -1808,7 +1798,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         {
             encoding = ENC_UNICODE as libc::c_int;
         }
-        if !(strstr(
+        if !(libc::strstr(
             *argv.offset(i as isize),
             b"-utf8\0" as *const u8 as *const libc::c_char,
         ))
@@ -1816,7 +1806,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         {
             encoding = ENC_UTF_8 as libc::c_int;
         }
-        if !(strstr(
+        if !(libc::strstr(
             *argv.offset(i as isize),
             b"-myth\0" as *const u8 as *const libc::c_char,
         ))
@@ -1824,7 +1814,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         {
             auto_myth = 1 as libc::c_int;
         }
-        if !(strstr(
+        if !(libc::strstr(
             *argv.offset(i as isize),
             b"-nomyth\0" as *const u8 as *const libc::c_char,
         ))
@@ -1832,7 +1822,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         {
             auto_myth = 0 as libc::c_int;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-o\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1841,7 +1831,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             output_filename = *argv.offset((i + 1 as libc::c_int) as isize);
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-cf\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1850,7 +1840,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             clean_filename = *argv.offset((i + 1 as libc::c_int) as isize);
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-o1\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1859,7 +1849,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             wbout1.filename = *argv.offset((i + 1 as libc::c_int) as isize);
             i += 1;
         }
-        if strcmp(
+        if libc::strcmp(
             *argv.offset(i as isize),
             b"-o2\0" as *const u8 as *const libc::c_char,
         ) == 0 as libc::c_int
@@ -1872,7 +1862,7 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
     }
     if num_input_files == 0 as libc::c_int {
         usage();
-        exit(2 as libc::c_int);
+        ::std::process::exit(2 as libc::c_int);
     }
     if !output_filename.is_null() {
         if extract == 2 as libc::c_int {
@@ -1892,46 +1882,46 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             extension = b".smi\0" as *const u8 as *const libc::c_char as *mut libc::c_char;
         }
         _ => {
-            printf(
+            libc::printf(
                 b"write_format doesn't have any legal value, this is a bug.\n\0" as *const u8
                     as *const libc::c_char,
             );
-            exit(500 as libc::c_int);
+            ::std::process::exit(500 as libc::c_int);
         }
     }
     if input_bin != 0 && write_format == OF_RAW as libc::c_int {
-        printf(
+        libc::printf(
             b"-bin can only be used if the output is a subtitle file.\n\0" as *const u8
                 as *const libc::c_char,
         );
-        printf(
+        libc::printf(
             b"If you want to produce a raw closed captions dump from\n\0" as *const u8
                 as *const libc::c_char,
         );
-        printf(
+        libc::printf(
             b"a raw closed captions dump just copy the file.\n\0" as *const u8
                 as *const libc::c_char,
         );
-        exit(-(5 as libc::c_int));
+        ::std::process::exit(-(5 as libc::c_int));
     }
     fbuffer = libc::malloc(256 * 1024 + 120) as *mut libc::c_uchar;
     subline = libc::malloc(2048) as *mut libc::c_uchar;
     pesheaderbuf = libc::malloc(188) as *mut libc::c_uchar;
     basefilename =
-        libc::malloc((strlen(*inputfile.offset(0))).wrapping_add(1) as usize) as *mut libc::c_char;
+        libc::malloc((libc::strlen(*inputfile.offset(0))).wrapping_add(1) as usize) as *mut libc::c_char;
     if (wbout1.filename).is_null() {
         wbout1.filename = libc::malloc(
-            (strlen(*inputfile.offset(0)))
+            (libc::strlen(*inputfile.offset(0)))
                 .wrapping_add(3)
-                .wrapping_add(strlen(extension)) as usize,
+                .wrapping_add(libc::strlen(extension)) as usize,
         ) as *mut libc::c_char;
         *(wbout1.filename).offset(0 as libc::c_int as isize) = 0 as libc::c_int as libc::c_char;
     }
     if (wbout2.filename).is_null() {
         wbout2.filename = libc::malloc(
-            (strlen(*inputfile.offset(0)))
+            (libc::strlen(*inputfile.offset(0)))
                 .wrapping_add(3)
-                .wrapping_add(strlen(extension)) as usize,
+                .wrapping_add(libc::strlen(extension)) as usize,
         ) as *mut libc::c_char;
         *(wbout2.filename).offset(0 as libc::c_int as isize) = 0 as libc::c_int as libc::c_char;
     }
@@ -1943,12 +1933,12 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
         || subline.is_null()
         || init_file_buffer() != 0
     {
-        printf(b"Not enough memory\n\0" as *const u8 as *const libc::c_char);
-        exit(1 as libc::c_int);
+        libc::printf(b"Not enough memory\n\0" as *const u8 as *const libc::c_char);
+        ::std::process::exit(1 as libc::c_int);
     }
-    strcpy(basefilename, *inputfile.offset(0 as libc::c_int as isize));
+    libc::strcpy(basefilename, *inputfile.offset(0 as libc::c_int as isize));
     c = basefilename
-        .offset(strlen(basefilename) as isize)
+        .offset(libc::strlen(basefilename) as isize)
         .offset(-(1 as libc::c_int as isize));
     while c > basefilename && *c as libc::c_int != '.' as i32 {
         c = c.offset(-1);
@@ -1958,37 +1948,37 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
     }
     if rawmode == 1 as libc::c_int {
         if *(wbout1.filename).offset(0 as libc::c_int as isize) as libc::c_int == 0 as libc::c_int {
-            strcpy(wbout1.filename, basefilename);
-            strcat(
+            libc::strcpy(wbout1.filename, basefilename);
+            libc::strcat(
                 wbout1.filename,
                 b".bin\0" as *const u8 as *const libc::c_char,
             );
         }
-        printf(
+        libc::printf(
             b"Creating %s\n\0" as *const u8 as *const libc::c_char,
             wbout1.filename,
         );
         wbout1.fh = libc::fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
         if (wbout1.fh).is_null() {
-            printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
-            exit(3 as libc::c_int);
+            libc::printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
+            ::std::process::exit(3 as libc::c_int);
         }
     } else {
         if extract != 2 as libc::c_int {
             if *(wbout1.filename).offset(0 as libc::c_int as isize) as libc::c_int
                 == 0 as libc::c_int
             {
-                strcpy(wbout1.filename, basefilename);
-                strcat(wbout1.filename, extension as *const libc::c_char);
+                libc::strcpy(wbout1.filename, basefilename);
+                libc::strcat(wbout1.filename, extension as *const libc::c_char);
             }
-            printf(
+            libc::printf(
                 b"Creating %s\n\0" as *const u8 as *const libc::c_char,
                 wbout1.filename,
             );
             wbout1.fh = libc::fopen(wbout1.filename, b"wb\0" as *const u8 as *const libc::c_char);
             if (wbout1.fh).is_null() {
-                printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
-                exit(3 as libc::c_int);
+                libc::printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
+                ::std::process::exit(3 as libc::c_int);
             }
             if write_format == OF_RAW as libc::c_int {
                 writeraw(
@@ -2008,24 +1998,24 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
             }
         }
         if extract == 12 as libc::c_int {
-            printf(b" and \n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b" and \n\0" as *const u8 as *const libc::c_char);
         }
         if extract != 1 as libc::c_int {
             if *(wbout2.filename).offset(0 as libc::c_int as isize) as libc::c_int
                 == 0 as libc::c_int
             {
-                strcpy(wbout2.filename, basefilename);
-                strcat(wbout2.filename, b"_2\0" as *const u8 as *const libc::c_char);
-                strcat(wbout2.filename, extension as *const libc::c_char);
+                libc::strcpy(wbout2.filename, basefilename);
+                libc::strcat(wbout2.filename, b"_2\0" as *const u8 as *const libc::c_char);
+                libc::strcat(wbout2.filename, extension as *const libc::c_char);
             }
-            printf(
+            libc::printf(
                 b"Creating %s\n\0" as *const u8 as *const libc::c_char,
                 wbout2.filename,
             );
             wbout2.fh = libc::fopen(wbout2.filename, b"wb\0" as *const u8 as *const libc::c_char);
             if (wbout2.fh).is_null() {
-                printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
-                exit(3 as libc::c_int);
+                libc::printf(b"Failed\n\0" as *const u8 as *const libc::c_char);
+                ::std::process::exit(3 as libc::c_int);
             }
             if write_format == OF_RAW as libc::c_int {
                 writeraw(
@@ -2049,11 +2039,11 @@ pub unsafe extern "C" fn CEW_init(argc: libc::c_int, argv: *mut *mut libc::c_cha
     if !clean_filename.is_null() {
         clean = libc::fopen(clean_filename, b"wb\0" as *const u8 as *const libc::c_char);
         if clean.is_null() {
-            printf(
+            libc::printf(
                 b"Unable to open clean file: %s\n\0" as *const u8 as *const libc::c_char,
                 clean_filename,
             );
-            exit(-(4 as libc::c_int));
+            ::std::process::exit(-(4 as libc::c_int));
         }
     }
     encoded_crlf_length = encode_line(

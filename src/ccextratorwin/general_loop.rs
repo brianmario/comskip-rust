@@ -1,8 +1,4 @@
 extern "C" {
-    fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn exit(_: libc::c_int) -> !;
-    fn lseek(_: libc::c_int, _: off_t, _: libc::c_int) -> off_t;
     static mut gop_time: gop_time_code;
     static mut first_gop_time: gop_time_code;
     static mut gop_rollover: libc::c_int;
@@ -186,24 +182,24 @@ pub unsafe extern "C" fn update_clock() {
         dif = (current_pts - last_pts) as libc::c_int;
         dif = dif / 90000 as libc::c_int;
         if dif < 0 as libc::c_int {
-            printf(
+            libc::printf(
                 b"\nThe clock is going backwards -  %ld seconds)\n\0" as *const u8
                     as *const libc::c_char,
                 (last_pts - current_pts) / 90000 as libc::c_int as libc::c_long,
             );
         }
         if dif < 0 as libc::c_int || dif >= 5 as libc::c_int {
-            printf(
+            libc::printf(
                 b"\nWarning: Reference clock has changed abruptly (%d seconds), attempting to synchronize\n\0"
                     as *const u8 as *const libc::c_char,
                 dif,
             );
-            printf(
+            libc::printf(
                 b"Last PTS value: %lu\n\0" as *const u8 as *const libc::c_char,
                 last_pts,
             );
             dump(lastptsdata.as_mut_ptr(), 5 as libc::c_int);
-            printf(
+            libc::printf(
                 b"Current PTS value: %lu\n\0" as *const u8 as *const libc::c_char,
                 current_pts,
             );
@@ -300,11 +296,11 @@ pub unsafe extern "C" fn buffered_seek(offset: libc::c_int) {
             startbytes_pos = startbytes_pos.wrapping_add(filebuffer_pos as libc::c_uint);
             filebuffer_pos = 0 as libc::c_int;
             if startbytes_pos <= 0 as libc::c_int as libc::c_uint {
-                printf(
+                libc::printf(
                     b"PANIC: Attempt to seek before buffer start, this is a bug!\0" as *const u8
                         as *const libc::c_char,
                 );
-                exit(-(4 as libc::c_int));
+                ::std::process::exit(-(4 as libc::c_int));
             }
         }
     } else {
@@ -386,7 +382,7 @@ pub unsafe extern "C" fn buffered_read_opt(
         if !fbuffer.is_null() {
             return copied + libc::read(in_0, fbuffer as *mut libc::c_void, bytes as usize) as i64;
         }
-        return (copied as libc::c_longlong + lseek(in_0, bytes as off_t, 1 as libc::c_int))
+        return (copied as libc::c_longlong + libc::lseek(in_0, bytes as off_t, 1 as libc::c_int))
             as LONG;
     };
 }
@@ -443,12 +439,12 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                 }
             }
             if tsheader[0 as libc::c_int as usize] as libc::c_int != 0x47 as libc::c_int {
-                printf(
+                libc::printf(
                     b"\nProblem: No TS header mark. Received bytes:\n\0" as *const u8
                         as *const libc::c_char,
                 );
                 dump(tsheader.as_mut_ptr(), 4 as libc::c_int);
-                printf(b"Trying to continue anyway.\n\0" as *const u8 as *const libc::c_char);
+                libc::printf(b"Trying to continue anyway.\n\0" as *const u8 as *const libc::c_char);
             }
             error = ((tsheader[1 as libc::c_int as usize] as libc::c_int & 0x80 as libc::c_int)
                 >> 7 as libc::c_int) as libc::c_uint;
@@ -473,7 +469,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                 adapt = ((tsheader[3 as libc::c_int as usize] as libc::c_int & 0x30 as libc::c_int)
                     >> 4 as libc::c_int) as libc::c_uint;
                 if error != 0 {
-                    printf(
+                    libc::printf(
                         b"Warning: Defective TS packet: %u\n\0" as *const u8 as *const libc::c_char,
                         error,
                     );
@@ -667,7 +663,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                                     );
                                 }
                                 if need_to_skip < 0 as libc::c_int {
-                                    printf(
+                                    libc::printf(
                                         b"Something's wrong here.\n\0" as *const u8
                                             as *const libc::c_char,
                                     );
@@ -727,7 +723,7 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
                         }
                         past = past + result;
                         if dump_tspacket != 0 {
-                            printf(b"Payload dump:\n\0" as *const u8 as *const libc::c_char);
+                            libc::printf(b"Payload dump:\n\0" as *const u8 as *const libc::c_char);
                             dump_tspacket = 0 as libc::c_int;
                             dump(fbuffer.offset(inbuf as isize), 184 as libc::c_int);
                         }
@@ -745,11 +741,11 @@ pub unsafe extern "C" fn ts_getmoredata() -> libc::c_long {
         }
     }
     if (pes_start_in_this_pass == 0 as libc::c_int || full_pes == 0 as libc::c_int) && result != 0 {
-        printf(
+        libc::printf(
             b"Warning: We don't have the complete PES in buffer.\n\0" as *const u8
                 as *const libc::c_char,
         );
-        printf(
+        libc::printf(
             b"Things may start to go wrong from this point.\n\0" as *const u8
                 as *const libc::c_char,
         );
@@ -1006,7 +1002,7 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                             last_picture_coding_type = B_FRAME as libc::c_int;
                         }
                         if debug != 0 {
-                            printf(
+                            libc::printf(
                                 b"\rPicture time assumed to be: %d\n\0" as *const u8
                                     as *const libc::c_char,
                                 last_picture_coding_type,
@@ -1047,11 +1043,11 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                             limit = cc_count as libc::c_int * 3 as libc::c_int;
                             printed = 0 as libc::c_int;
                             if proceed == 0 && debug != 0 {
-                                printf(
+                                libc::printf(
                                     b"\rThe following payload seems to be CC but is not properly terminated.\n\0"
                                         as *const u8 as *const libc::c_char,
                                 );
-                                printf(
+                                libc::printf(
                                     b"(it will be processed anyway).\n\0" as *const u8
                                         as *const libc::c_char,
                                 );
@@ -1063,11 +1059,11 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                             }
                             bail = 0 as libc::c_int;
                             if proceed == 0 && debug != 0 {
-                                printf(
+                                libc::printf(
                                     b"This packet is not correctly terminated.\n\0" as *const u8
                                         as *const libc::c_char,
                                 );
-                                printf(
+                                libc::printf(
                                     b"Data start at offset %d of a %d bytes block.\n\0" as *const u8
                                         as *const libc::c_char,
                                     (header.offset_from(data) as libc::c_long
@@ -1135,7 +1131,7 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                                         && debug != 0
                                     {
                                         if printed == 0 {
-                                            printf(
+                                            libc::printf(
                                                 b"\rThis packet is not supposed to have more CC but it does!\n\0"
                                                     as *const u8 as *const libc::c_char,
                                             );
@@ -1144,7 +1140,7 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                                                 128 as libc::c_int,
                                             );
                                         } else {
-                                            printf(
+                                            libc::printf(
                                                 b"\rThe PREVIOUSLY dumped packet was not supposed to have more CC but it did!\n\0"
                                                     as *const u8 as *const libc::c_char,
                                             );
@@ -1317,9 +1313,9 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                     data1_2[1 as libc::c_int as usize] = *header.offset(1 as libc::c_int as isize);
                     header = header.offset(2 as libc::c_int as isize);
                     if p_caption_capacity < 2 as libc::c_int {
-                        p_caption = realloc(
+                        p_caption = libc::realloc(
                             p_caption as *mut libc::c_void,
-                            1024 as libc::c_int as libc::c_ulong,
+                            1024,
                         ) as *mut libc::c_uchar;
                         p_caption_capacity = 1024 as libc::c_int;
                     }
@@ -1337,9 +1333,9 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                             && (hi as libc::c_int) < 32 as libc::c_int
                         {
                             if p_caption_capacity < p_caption_size + 2 as libc::c_int {
-                                p_caption = realloc(
+                                p_caption = libc::realloc(
                                     p_caption as *mut libc::c_void,
-                                    (p_caption_capacity + 1024 as libc::c_int) as libc::c_ulong,
+                                    (p_caption_capacity + 1024 as libc::c_int) as usize,
                                 ) as *mut libc::c_uchar;
                                 p_caption_capacity += 1024 as libc::c_int;
                             }
@@ -1356,9 +1352,9 @@ pub unsafe extern "C" fn process_block(data: *mut libc::c_uchar, length: LONG) -
                             *header.offset(1 as libc::c_int as isize);
                         header = header.offset(2 as libc::c_int as isize);
                         if p_caption_capacity < p_caption_size + 2 as libc::c_int {
-                            p_caption = realloc(
+                            p_caption = libc::realloc(
                                 p_caption as *mut libc::c_void,
-                                (p_caption_capacity + 1024 as libc::c_int) as libc::c_ulong,
+                                (p_caption_capacity + 1024 as libc::c_int) as usize,
                             ) as *mut libc::c_uchar;
                             p_caption_capacity += 1024 as libc::c_int;
                         }
@@ -1427,7 +1423,7 @@ pub unsafe extern "C" fn general_loop() {
         }
         got = process_block(fbuffer, inbuf);
         if got > inbuf {
-            printf(b"BUG BUG\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"BUG BUG\n\0" as *const u8 as *const libc::c_char);
         }
         pos += got;
         if inputsize > 0 as libc::c_int as libc::c_long {
@@ -1436,10 +1432,10 @@ pub unsafe extern "C" fn general_loop() {
                     / (inputsize >> 8 as libc::c_int)) as libc::c_int;
             if last_reported_progress != progress {
                 let mut cur_sec: libc::c_int = 0;
-                printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
+                libc::printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
                 cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double / 29.97f64)
                     as libc::c_int;
-                printf(
+                libc::printf(
                     b"  |  %02d:%02d\0" as *const u8 as *const libc::c_char,
                     cur_sec / 60 as libc::c_int,
                     cur_sec % 60 as libc::c_int,

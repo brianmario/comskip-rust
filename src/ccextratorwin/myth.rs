@@ -1,8 +1,4 @@
 extern "C" {
-    fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn realloc(_: *mut libc::c_void, _: libc::c_ulong) -> *mut libc::c_void;
-    fn exit(_: libc::c_int) -> !;
-    fn lseek(_: libc::c_int, _: off_t, _: libc::c_int) -> off_t;
     static mut current_pts: LONG;
     static mut pts_set: libc::c_int;
     static mut c1count: libc::c_uint;
@@ -379,7 +375,7 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
     let mut meat: *const libc::c_uchar = av.data;
     let mut i: libc::c_uint = 0;
     if meat.is_null() {
-        printf(
+        libc::printf(
             b"Warning: ProcessVBIDataPacket called with NULL data, ignoring.\n\0" as *const u8
                 as *const libc::c_char,
         );
@@ -402,7 +398,7 @@ pub unsafe extern "C" fn ProcessVBIDataPacket() {
         linemask = 0xffffffffffffffff as libc::c_ulong as LONG;
         meat = meat.offset(3 as libc::c_int as isize);
     } else {
-        printf(b"Unknown VBI data stream\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"Unknown VBI data stream\n\0" as *const u8 as *const libc::c_char);
         return;
     }
     i = 0 as libc::c_int as libc::c_uint;
@@ -590,13 +586,13 @@ unsafe extern "C" fn mpegps_read_packet() -> libc::c_int {
         url_fskip(len);
     }
     av.size = len;
-    av.data = realloc(av.data as *mut libc::c_void, av.size as libc::c_ulong) as *mut libc::c_uchar;
+    av.data = libc::realloc(av.data as *mut libc::c_void, av.size as usize) as *mut libc::c_uchar;
     if (av.data).is_null() {
-        printf(
-            b"\rNot enough memory, realloc() failed. Giving up.\n\0" as *const u8
+        libc::printf(
+            b"\rNot enough memory, libc::realloc() failed. Giving up.\n\0" as *const u8
                 as *const libc::c_char,
         );
-        exit(-(3 as libc::c_int));
+        ::std::process::exit(-(3 as libc::c_int));
     }
     av.codec_id = codec_id;
     av.type_0 = type_0;
@@ -654,8 +650,8 @@ pub unsafe extern "C" fn myth_loop() {
     av.data = 0 as *mut libc::c_uchar;
     buffer_input = 1 as libc::c_int;
     if init_file_buffer() != 0 {
-        printf(b"Not enough memory.\n\0" as *const u8 as *const libc::c_char);
-        exit(-(3 as libc::c_int));
+        libc::printf(b"Not enough memory.\n\0" as *const u8 as *const libc::c_char);
+        ::std::process::exit(-(3 as libc::c_int));
     }
     desp = libc::malloc(65536) as *mut libc::c_uchar;
     saved = 0 as libc::c_int as LONG;
@@ -667,7 +663,7 @@ pub unsafe extern "C" fn myth_loop() {
             && av.type_0 == CODEC_TYPE_DATA as libc::c_int
         {
             if has_vbi == 0 {
-                printf(
+                libc::printf(
                     b"\rDetected VBI data, disabling user-data packet analysis (not needed).\n\0"
                         as *const u8 as *const libc::c_char,
                 );
@@ -682,11 +678,11 @@ pub unsafe extern "C" fn myth_loop() {
             let length: LONG = saved + av.size as libc::c_long;
             let mut used: LONG = 0;
             if length > 65536 as libc::c_int as libc::c_long {
-                printf(
+                libc::printf(
                     b"Not enough memory. Please report this: 65536 bytes is not enough!\0"
                         as *const u8 as *const libc::c_char,
                 );
-                exit(-(500 as libc::c_int));
+                ::std::process::exit(-(500 as libc::c_int));
             }
             if av.pts as libc::c_longlong != 0x8000000000000000 as libc::c_ulong as int64_t {
                 current_pts = av.pts;
@@ -709,15 +705,15 @@ pub unsafe extern "C" fn myth_loop() {
         }
         if inputsize > 0 as libc::c_int as libc::c_long {
             let mut cur_sec: libc::c_int = 0;
-            let at: LONG = lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
+            let at: LONG = libc::lseek(in_0, 0 as libc::c_int as off_t, 1 as libc::c_int) as LONG;
             let progress: libc::c_int =
                 ((at >> 8 as libc::c_int) * 100 as libc::c_int as libc::c_long
                     / (inputsize >> 8 as libc::c_int)) as libc::c_int;
             if last_reported_progress != progress {
-                printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
+                libc::printf(b"\r%3d%%\0" as *const u8 as *const libc::c_char, progress);
                 cur_sec = (c1count.wrapping_add(c1count_total) as libc::c_double / 29.97f64)
                     as libc::c_int;
-                printf(
+                libc::printf(
                     b"  |  %02d:%02d\0" as *const u8 as *const libc::c_char,
                     cur_sec / 60 as libc::c_int,
                     cur_sec % 60 as libc::c_int,

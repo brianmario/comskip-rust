@@ -1,6 +1,4 @@
 extern "C" {
-    fn printf(_: *const libc::c_char, _: ...) -> libc::c_int;
-    fn sprintf(_: *mut libc::c_char, _: *const libc::c_char, _: ...) -> libc::c_int;
     fn get_char_in_latin_1(buffer: *mut libc::c_uchar, c: libc::c_uchar);
     fn get_char_in_unicode(buffer: *mut libc::c_uchar, c: libc::c_uchar);
     fn get_char_in_utf_8(buffer: *mut libc::c_uchar, c: libc::c_uchar) -> libc::c_int;
@@ -23,9 +21,6 @@ extern "C" {
     static mut spell_correct: *mut *mut libc::c_char;
     static mut spell_words: libc::c_int;
     static mut write_format: libc::c_int;
-    fn exit(_: libc::c_int) -> !;
-    fn strlen(_: *const libc::c_char) -> libc::c_ulong;
-    fn strstr(_: *const libc::c_char, _: *const libc::c_char) -> *mut libc::c_char;
     fn __maskrune(_: __darwin_ct_rune_t, _: libc::c_ulong) -> libc::c_int;
     static mut _DefaultRuneLocale: _RuneLocale;
 }
@@ -36,7 +31,6 @@ pub type __darwin_size_t = libc::c_ulong;
 pub type __darwin_wchar_t = libc::c_int;
 pub type __darwin_rune_t = __darwin_wchar_t;
 pub type __darwin_off_t = __int64_t;
-pub type size_t = __darwin_size_t;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sbuf {
@@ -498,9 +492,9 @@ pub unsafe extern "C" fn correct_case(line_num: libc::c_int, data: *mut eia608_s
     while i < spell_words {
         let mut c: *mut libc::c_char =
             ((*data).characters[line_num as usize]).as_mut_ptr() as *mut libc::c_char;
-        let len: size_t = strlen(*spell_correct.offset(i as isize));
+        let len = libc::strlen(*spell_correct.offset(i as isize));
         loop {
-            c = strstr(c, *spell_lower.offset(i as isize));
+            c = libc::strstr(c, *spell_lower.offset(i as isize));
             if c.is_null() {
                 break;
             }
@@ -738,11 +732,11 @@ pub unsafe extern "C" fn get_writing_buffer(wb: *mut s_write) -> *mut eia608_scr
             }
         }
         _ => {
-            printf(
+            libc::printf(
                 b"Caption mode has an illegal value at get_writing_buffer(), this is a bug.\n\0"
                     as *const u8 as *const libc::c_char,
             );
-            exit(500 as libc::c_int);
+            ::std::process::exit(500 as libc::c_int);
         }
     }
     return use_buffer;
@@ -772,7 +766,7 @@ pub unsafe extern "C" fn handle_text_attr(
     mut wb: *mut s_write,
 ) {
     if debug_608 != 0 {
-        printf(
+        libc::printf(
             b"\r608: text_attr: %02X %02X\n\0" as *const u8 as *const libc::c_char,
             c1 as libc::c_int,
             c2 as libc::c_int,
@@ -782,13 +776,13 @@ pub unsafe extern "C" fn handle_text_attr(
         || ((c2 as libc::c_int) < 0x20 as libc::c_int || c2 as libc::c_int > 0x2f as libc::c_int))
         && debug_608 != 0
     {
-        printf(b"\rThis is not a text attribute!\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"\rThis is not a text attribute!\n\0" as *const u8 as *const libc::c_char);
     } else {
         let i: libc::c_int = c2 as libc::c_int - 0x20 as libc::c_int;
         (*(*wb).data608).color = pac2_attribs[i as usize][0 as libc::c_int as usize];
         (*(*wb).data608).font = pac2_attribs[i as usize][1 as libc::c_int as usize];
         if debug_608 != 0 {
-            printf(
+            libc::printf(
                 b"\rColor: %s,  font: %s\n\0" as *const u8 as *const libc::c_char,
                 color_text[(*(*wb).data608).color as usize][0 as libc::c_int as usize],
                 font_text[(*(*wb).data608).font as usize],
@@ -820,12 +814,12 @@ pub unsafe extern "C" fn mstotime(
 pub unsafe extern "C" fn write_subtitle_file_footer(wb: *mut s_write) {
     match write_format {
         2 => {
-            sprintf(
+            libc::sprintf(
                 str.as_mut_ptr() as *mut libc::c_char,
                 b"<BODY><SAMI>\n\0" as *const u8 as *const libc::c_char,
             );
             if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
-                printf(
+                libc::printf(
                     b"\r%s\n\0" as *const u8 as *const libc::c_char,
                     str.as_mut_ptr(),
                 );
@@ -952,7 +946,7 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
     );
     let ref mut fresh2 = (*(*wb).data608).srt_counter;
     *fresh2 += 1;
-    sprintf(
+    libc::sprintf(
         timeline.as_mut_ptr(),
         b"%u\r\n\0" as *const u8 as *const libc::c_char,
         (*(*wb).data608).srt_counter,
@@ -967,7 +961,7 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
         1,
         (*wb).fh,
     );
-    sprintf(
+    libc::sprintf(
         timeline.as_mut_ptr(),
         b"%02u:%02u:%02u,%03u --> %02u:%02u:%02u,%03u\r\n\0" as *const u8 as *const libc::c_char,
         h1,
@@ -984,8 +978,8 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
         timeline.as_mut_ptr() as *mut libc::c_uchar,
     );
     if debug_608 != 0 {
-        printf(b"\r\0" as *const u8 as *const libc::c_char);
-        printf(
+        libc::printf(b"\r\0" as *const u8 as *const libc::c_char);
+        libc::printf(
             b"%s\0" as *const u8 as *const libc::c_char,
             timeline.as_mut_ptr(),
         );
@@ -1006,8 +1000,8 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
             }
             length = get_decoder_line_encoded(subline, i, data) as libc::c_int;
             if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
-                printf(b"\r\0" as *const u8 as *const libc::c_char);
-                printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
+                libc::printf(b"\r\0" as *const u8 as *const libc::c_char);
+                libc::printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
             }
             libc::fwrite(subline as *const libc::c_void, 1, length as usize, (*wb).fh);
             libc::fwrite(
@@ -1021,7 +1015,7 @@ pub unsafe extern "C" fn write_cc_buffer_as_srt(
         i += 1;
     }
     if debug_608 != 0 {
-        printf(b"\r\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"\r\n\0" as *const u8 as *const libc::c_char);
     }
     libc::fwrite(
         encoded_crlf.as_mut_ptr() as *const libc::c_void,
@@ -1058,13 +1052,13 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         / 29.97f64) as LONG
         + subs_delay;
     endms -= 1;
-    sprintf(
+    libc::sprintf(
         str.as_mut_ptr() as *mut libc::c_char,
         b"<SYNC start=\"%ld\"><P class=\"UNKNOWNCC\">\r\n\0" as *const u8 as *const libc::c_char,
         startms,
     );
     if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
-        printf(
+        libc::printf(
             b"\r%s\n\0" as *const u8 as *const libc::c_char,
             str.as_mut_ptr(),
         );
@@ -1081,8 +1075,8 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         if (*data).row_used[i as usize] != 0 {
             let length: libc::c_int = get_decoder_line_encoded(subline, i, data) as libc::c_int;
             if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
-                printf(b"\r\0" as *const u8 as *const libc::c_char);
-                printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
+                libc::printf(b"\r\0" as *const u8 as *const libc::c_char);
+                libc::printf(b"%s\n\0" as *const u8 as *const libc::c_char, subline);
             }
             libc::fwrite(subline as *const libc::c_void, 1, length as usize, (*wb).fh);
             wrote_something = 1 as libc::c_int;
@@ -1103,12 +1097,12 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         }
         i += 1;
     }
-    sprintf(
+    libc::sprintf(
         str.as_mut_ptr() as *mut libc::c_char,
         b"</P></SYNC>\r\n\0" as *const u8 as *const libc::c_char,
     );
     if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
-        printf(
+        libc::printf(
             b"\r%s\n\0" as *const u8 as *const libc::c_char,
             str.as_mut_ptr(),
         );
@@ -1120,14 +1114,14 @@ pub unsafe extern "C" fn write_cc_buffer_as_sami(
         1,
         (*wb).fh,
     );
-    sprintf(
+    libc::sprintf(
         str.as_mut_ptr() as *mut libc::c_char,
         b"<SYNC start=\"%ld\"><P class=\"UNKNOWNCC\">&nbsp</P></SYNC>\r\n\r\n\0" as *const u8
             as *const libc::c_char,
         endms,
     );
     if debug_608 != 0 && encoding != ENC_UNICODE as libc::c_int {
-        printf(
+        libc::printf(
             b"\r%s\n\0" as *const u8 as *const libc::c_char,
             str.as_mut_ptr(),
         );
@@ -1204,7 +1198,7 @@ pub unsafe extern "C" fn roll_up(wb: *mut s_write) {
         i += 1;
     }
     if rows_now > keep_lines {
-        printf(b"Bug here.\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"Bug here.\n\0" as *const u8 as *const libc::c_char);
     }
     i = 14 as libc::c_int;
     while i >= 0 as libc::c_int && (*use_buffer).row_used[i as usize] == 0 as libc::c_int {
@@ -1289,7 +1283,7 @@ pub unsafe extern "C" fn roll_up(wb: *mut s_write) {
         i += 1;
     }
     if rows_now > keep_lines {
-        printf(b"Bug here.\n\0" as *const u8 as *const libc::c_char);
+        libc::printf(b"Bug here.\n\0" as *const u8 as *const libc::c_char);
     }
 }
 #[no_mangle]
@@ -1384,7 +1378,7 @@ pub unsafe extern "C" fn handle_command(
         command = COM_RESUMETEXTDISPLAY as libc::c_int;
     }
     if debug_608 != 0 {
-        printf(
+        libc::printf(
             b"\rCommand: %02X %02X (%s)\n\0" as *const u8 as *const libc::c_char,
             c1 as libc::c_int,
             c2 as libc::c_int,
@@ -1502,7 +1496,7 @@ pub unsafe extern "C" fn handle_command(
         }
         _ => {
             if debug_608 != 0 {
-                printf(b"\rNot yet implemented.\n\0" as *const u8 as *const libc::c_char);
+                libc::printf(b"\rNot yet implemented.\n\0" as *const u8 as *const libc::c_char);
             }
         }
     };
@@ -1516,7 +1510,7 @@ pub unsafe extern "C" fn handle_double(c1: libc::c_uchar, c2: libc::c_uchar, wb:
     if c2 as libc::c_int >= 0x30 as libc::c_int && c2 as libc::c_int <= 0x3f as libc::c_int {
         c = (c2 as libc::c_int + 0x50 as libc::c_int) as libc::c_uchar;
         if debug_608 != 0 {
-            printf(
+            libc::printf(
                 b"\rDouble: %02X %02X  -->  %c\n\0" as *const u8 as *const libc::c_char,
                 c1 as libc::c_int,
                 c2 as libc::c_int,
@@ -1534,7 +1528,7 @@ pub unsafe extern "C" fn handle_extended(
 ) -> libc::c_uchar {
     let mut c: libc::c_uchar = 0 as libc::c_int as libc::c_uchar;
     if debug_608 != 0 {
-        printf(
+        libc::printf(
             b"\rExtended: %02X %02X\n\0" as *const u8 as *const libc::c_char,
             hi as libc::c_int,
             lo as libc::c_int,
@@ -1574,7 +1568,7 @@ pub unsafe extern "C" fn handle_pac(
         | c2 as libc::c_int >> 5 as libc::c_int & 1 as libc::c_int)
         as usize];
     if debug_608 != 0 {
-        printf(
+        libc::printf(
             b"\rPAC: %02X %02X\n\0" as *const u8 as *const libc::c_char,
             c1 as libc::c_int,
             c2 as libc::c_int,
@@ -1586,7 +1580,7 @@ pub unsafe extern "C" fn handle_pac(
         c2 = (c2 as libc::c_int - 0x60 as libc::c_int) as libc::c_uchar;
     } else {
         if debug_608 != 0 {
-            printf(b"\rThis is not a PAC!!!!!\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"\rThis is not a PAC!!!!!\n\0" as *const u8 as *const libc::c_char);
         }
         return;
     }
@@ -1594,7 +1588,7 @@ pub unsafe extern "C" fn handle_pac(
     font = pac2_attribs[c2 as usize][1 as libc::c_int as usize] as libc::c_int;
     indent = pac2_attribs[c2 as usize][2 as libc::c_int as usize] as libc::c_int;
     if debug_608 != 0 {
-        printf(
+        libc::printf(
             b"\rPosition: %d:%d, color: %s,  font: %s\n\0" as *const u8 as *const libc::c_char,
             row,
             indent,
@@ -1619,13 +1613,13 @@ pub unsafe extern "C" fn handle_single(c1: libc::c_uchar, wb: *mut s_write) {
 pub unsafe extern "C" fn check_channel(c1: libc::c_uchar, mut wb: *mut s_write) {
     if (*(*wb).data608).channel != 1 as libc::c_int && c1 as libc::c_int == 0x14 as libc::c_int {
         if debug_608 != 0 {
-            printf(b"\rChannel change, now 1\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"\rChannel change, now 1\n\0" as *const u8 as *const libc::c_char);
         }
         (*(*wb).data608).channel = 1 as libc::c_int;
     }
     if (*(*wb).data608).channel != 2 as libc::c_int && c1 as libc::c_int == 0x1c as libc::c_int {
         if debug_608 != 0 {
-            printf(b"\rChannel change, now 2\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"\rChannel change, now 2\n\0" as *const u8 as *const libc::c_char);
         }
         (*(*wb).data608).channel = 2 as libc::c_int;
     }
@@ -1634,13 +1628,13 @@ pub unsafe extern "C" fn check_channel(c1: libc::c_uchar, mut wb: *mut s_write) 
             || c1 as libc::c_int == 0x15 as libc::c_int)
     {
         if debug_608 != 0 {
-            printf(b"\rChannel change, now 3\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"\rChannel change, now 3\n\0" as *const u8 as *const libc::c_char);
         }
         (*(*wb).data608).channel = 3 as libc::c_int;
     }
     if (*(*wb).data608).channel != 4 as libc::c_int && c1 as libc::c_int == 0x1d as libc::c_int {
         if debug_608 != 0 {
-            printf(b"\rChannel change, now 4\n\0" as *const u8 as *const libc::c_char);
+            libc::printf(b"\rChannel change, now 4\n\0" as *const u8 as *const libc::c_char);
         }
         (*(*wb).data608).channel = 4 as libc::c_int;
     }
